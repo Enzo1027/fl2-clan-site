@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 148" role="img" aria-labelledby="title desc">
+  <title id="title">FrostBorn Lions FL2 mark</title>
+  <desc id="desc">A frost blue and gold shield mark for FrostBorn Lions.</desc>
+  <defs>
+    <linearGradient id="shield" x1="18" y1="12" x2="110" y2="136" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0b2530"/>
+      <stop offset="0.55" stop-color="#081116"/>
+      <stop offset="1" stop-color="#0c171b"/>
+    </linearGradient>
+  </defs>
+  <path d="M64 7 115 27v42c0 34-20 57-51 72C33 126 13 103 13 69V27L64 7Z" fill="url(#shield)" stroke="#d6a84b" stroke-width="6" />
+  <path d="M64 19 103 34v35c0 27-15 45-39 58-24-13-39-31-39-58V34l39-15Z" fill="none" stroke="#55c7f3" stroke-width="2.5" opacity=".8" />
+  <path d="M38 84 51 44l13-11 13 11 13 40-14-11-12 31-12-31-14 11Z" fill="#d6a84b" />
+  <path d="M44 63h40M50 78h28M58 48l6 12 6-12" fill="none" stroke="#071116" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M35 96c8 8 18 15 29 21 11-6 21-13 29-21" fill="none" stroke="#55c7f3" stroke-width="4" stroke-linecap="round" opacity=".9" />
+</svg>

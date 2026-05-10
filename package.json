@@ -1,0 +1,10 @@
+{
+  "name": "fl2-clan-site",
+  "version": "0.1.0",
+  "private": true,
+  "description": "FrostBorn Lions FL2 browser-first Season 2 guide library.",
+  "scripts": {
+    "import:s2": "python3 scripts/import_s2_guides.py",
+    "serve": "python3 -m http.server 4173 --directory public"
+  }
+}

@@ -1,0 +1,240 @@
+{
+  "clan": "FrostBorn Lions",
+  "tag": "FL2",
+  "season": "Season 2",
+  "languages": [
+    {
+      "code": "en",
+      "name": "English",
+      "native": "English",
+      "short": "EN",
+      "flag": "🇺🇸",
+      "dir": "ltr"
+    },
+    {
+      "code": "es",
+      "name": "Spanish",
+      "native": "Español",
+      "short": "ES",
+      "flag": "🇪🇸",
+      "dir": "ltr"
+    },
+    {
+      "code": "fr",
+      "name": "French",
+      "native": "Français",
+      "short": "FR",
+      "flag": "🇫🇷",
+      "dir": "ltr"
+    },
+    {
+      "code": "de",
+      "name": "German",
+      "native": "Deutsch",
+      "short": "DE",
+      "flag": "🇩🇪",
+      "dir": "ltr"
+    },
+    {
+      "code": "ar",
+      "name": "Arabic",
+      "native": "العربية",
+      "short": "AR",
+      "flag": "🇸🇦",
+      "dir": "rtl"
+    },
+    {
+      "code": "tr",
+      "name": "Turkish",
+      "native": "Türkçe",
+      "short": "TR",
+      "flag": "🇹🇷",
+      "dir": "ltr"
+    }
+  ],
+  "days": [
+    {
+      "id": "day-1",
+      "number": 1,
+      "title": "S2 Day 1",
+      "label": "Day 1",
+      "season": "Season 2",
+      "status": "live",
+      "languages": {
+        "en": {
+          "image": "assets/guides/s2/day-1/en.png",
+          "sourceFile": "z day1.png"
+        },
+        "es": {
+          "image": "assets/guides/s2/day-1/es.png",
+          "sourceFile": "Spanish Day 1.png"
+        },
+        "fr": {
+          "image": "assets/guides/s2/day-1/fr.png",
+          "sourceFile": "French Day 1.png"
+        },
+        "de": {
+          "image": "assets/guides/s2/day-1/de.png",
+          "sourceFile": "German.png"
+        },
+        "ar": {
+          "image": "assets/guides/s2/day-1/ar.png",
+          "sourceFile": "Arabic Day 1.png"
+        },
+        "tr": {
+          "image": "assets/guides/s2/day-1/tr.png",
+          "sourceFile": "Turkish.png"
+        }
+      }
+    },
+    {
+      "id": "day-2",
+      "number": 2,
+      "title": "S2 Day 2",
+      "label": "Day 2",
+      "season": "Season 2",
+      "status": "live",
+      "languages": {
+        "en": {
+          "image": "assets/guides/s2/day-2/en.png",
+          "sourceFile": "S2 Day 2 English.png"
+        },
+        "es": {
+          "image": "assets/guides/s2/day-2/es.png",
+          "sourceFile": "S2 Day 2 Spanish.png"
+        },
+        "fr": {
+          "image": "assets/guides/s2/day-2/fr.png",
+          "sourceFile": "S2 Day 2 French.png"
+        },
+        "de": {
+          "image": "assets/guides/s2/day-2/de.png",
+          "sourceFile": "S2 Day 2 German.png"
+        },
+        "ar": {
+          "image": "assets/guides/s2/day-2/ar.png",
+          "sourceFile": "S2 Day 2 Arabic.png"
+        },
+        "tr": {
+          "image": "assets/guides/s2/day-2/tr.png",
+          "sourceFile": "S2 Day 2 Turkish.png"
+        }
+      }
+    },
+    {
+      "id": "day-3",
+      "number": 3,
+      "title": "S2 Day 3",
+      "label": "Day 3",
+      "season": "Season 2",
+      "status": "live",
+      "languages": {
+        "en": {
+          "image": "assets/guides/s2/day-3/en.png",
+          "sourceFile": "S2 Day 3 English.png"
+        },
+        "es": {
+          "image": "assets/guides/s2/day-3/es.png",
+          "sourceFile": "S2 Day 3 Spanish.png"
+        },
+        "fr": {
+          "image": "assets/guides/s2/day-3/fr.png",
+          "sourceFile": "S2 Day 3 French.png"
+        },
+        "de": {
+          "image": "assets/guides/s2/day-3/de.png",
+          "sourceFile": "S2 Day 3 German.png"
+        },
+        "ar": {
+          "image": "assets/guides/s2/day-3/ar.png",
+          "sourceFile": "S2 Day 3 Arabic.png"
+        },
+        "tr": {
+          "image": "assets/guides/s2/day-3/tr.png",
+          "sourceFile": "S2 Day 3 Turkish.png"
+        }
+      }
+    },
+    {
+      "id": "day-4",
+      "number": 4,
+      "title": "S2 Day 4",
+      "label": "Day 4",
+      "season": "Season 2",
+      "status": "upcoming",
+      "languages": {}
+    },
+    {
+      "id": "day-5",
+      "number": 5,
+      "title": "S2 Day 5",
+      "label": "Day 5",
+      "season": "Season 2",
+      "status": "upcoming",
+      "languages": {}
+    },
+    {
+      "id": "day-6",
+      "number": 6,
+      "title": "S2 Day 6",
+      "label": "Day 6",
+      "season": "Season 2",
+      "status": "upcoming",
+      "languages": {}
+    },
+    {
+      "id": "day-7",
+      "number": 7,
+      "title": "S2 Day 7",
+      "label": "Day 7",
+      "season": "Season 2",
+      "status": "upcoming",
+      "languages": {}
+    },
+    {
+      "id": "day-8",
+      "number": 8,
+      "title": "S2 Day 8",
+      "label": "Day 8",
+      "season": "Season 2",
+      "status": "upcoming",
+      "languages": {}
+    },
+    {
+      "id": "day-9",
+      "number": 9,
+      "title": "S2 Day 9",
+      "label": "Day 9",
+      "season": "Season 2",
+      "status": "upcoming",
+      "languages": {}
+    },
+    {
+      "id": "day-10",
+      "number": 10,
+      "title": "S2 Day 10",
+      "label": "Day 10",
+      "season": "Season 2",
+      "status": "upcoming",
+      "languages": {}
+    }
+  ],
+  "uploads": [],
+  "library": [
+    {
+      "id": "s2-guides",
+      "title": "Season 2 Guides",
+      "status": "live"
+    },
+    {
+      "id": "alliance-mails",
+      "title": "Alliance Mail Text",
+      "status": "live"
+    },
+    {
+      "id": "future-uploads",
+      "title": "Upload Queue",
+      "status": "ready"
+    }
+  ]
+}

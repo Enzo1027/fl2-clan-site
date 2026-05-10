@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#071015" />
+    <meta name="description" content="FrostBorn Lions FL2 Season 2 guide library." />
+    <title>FrostBorn Lions [FL2] | Season 2 Library</title>
+    <link rel="icon" href="assets/brand/fl2-mark.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css?v=20260510-i18n" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="topbar">
+        <a class="brand" href="#lang=en&day=day-1&view=poster" aria-label="FrostBorn Lions home">
+          <img src="assets/brand/fl2-mark.svg" alt="" />
+          <span>
+            <strong>FrostBorn Lions</strong>
+            <em>[FL2]</em>
+          </span>
+        </a>
+        <nav class="language-tabs" id="languageTabs" aria-label="Choose language"></nav>
+      </header>
+
+      <main>
+        <section class="command-surface" aria-labelledby="appTitle">
+          <div class="surface-heading">
+            <div>
+              <p class="season-label" id="appSeason">Season 2</p>
+              <h1 id="appTitle">Field Library</h1>
+            </div>
+            <div class="signal" aria-label="Library status">
+              <span></span>
+              <strong id="liveLabel">Live</strong>
+            </div>
+          </div>
+
+          <div class="day-tabs" id="dayTabs" aria-label="Choose S2 day"></div>
+
+          <div class="reader-grid">
+            <article class="viewer-panel" aria-live="polite">
+              <div class="viewer-toolbar">
+                <div>
+                  <p id="guideMeta" class="guide-meta"></p>
+                  <h2 id="guideTitle"></h2>
+                </div>
+                <div class="toolbar-actions">
+                  <button class="mode-button is-active" type="button" data-view="poster" aria-pressed="true">
+                    <span class="button-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="m8 15 2.5-3 2 2.2 2.2-3.2L18 15"></path></svg>
+                    </span>
+                    <span id="posterModeLabel">Poster</span>
+                  </button>
+                  <button class="mode-button" type="button" data-view="text" aria-pressed="false">
+                    <span class="button-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24"><path d="M6 4h9l3 3v13H6z"></path><path d="M14 4v4h4"></path><path d="M9 12h6M9 16h6"></path></svg>
+                    </span>
+                    <span id="textModeLabel">Text</span>
+                  </button>
+                  <a class="icon-button" id="downloadPoster" href="#" download aria-label="Save poster">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M5 21h14"></path></svg>
+                  </a>
+                  <button class="icon-button" id="expandGuide" type="button" aria-label="Open poster reader">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M21 16v5h-5"></path></svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="poster-stage" id="posterStage">
+                <img id="guideImage" alt="" />
+                <div class="upcoming-poster" id="upcomingPoster" hidden>
+                  <img src="assets/brand/fl2-mark.svg" alt="" />
+                  <p id="upcomingPosterLabel">Upcoming</p>
+                  <strong id="upcomingTitle">S2 Day</strong>
+                </div>
+              </div>
+
+              <div class="text-stage" id="textStage" hidden></div>
+            </article>
+
+            <aside class="intel-panel" aria-label="Guide details">
+              <div class="intel-card current-card">
+                <p class="intel-kicker" id="currentFileLabel">Current File</p>
+                <h3 id="currentFileTitle"></h3>
+                <dl>
+                  <div>
+                    <dt id="languageTerm">Language</dt>
+                    <dd id="currentLanguage"></dd>
+                  </div>
+                  <div>
+                    <dt id="formatTerm">Format</dt>
+                    <dd id="browserViewLabel">Browser view</dd>
+                  </div>
+                  <div>
+                    <dt id="imageTerm">Image</dt>
+                    <dd>1024 x 1536</dd>
+                  </div>
+                </dl>
+              </div>
+
+              <div class="intel-card">
+                <div class="mini-head">
+                  <p class="intel-kicker" id="libraryLabel">Library</p>
+                  <span id="liveCount"></span>
+                </div>
+                <div class="library-list" id="libraryList"></div>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="guide-section" aria-labelledby="guideGridTitle">
+          <div class="section-heading">
+            <div>
+              <p class="season-label" id="guideGridKicker">S2 Guide Set</p>
+              <h2 id="guideGridTitle">All Days</h2>
+            </div>
+            <p id="sectionLanguage"></p>
+          </div>
+          <div class="guide-grid" id="guideGrid"></div>
+        </section>
+
+        <section class="guide-section" aria-labelledby="uploadsTitle">
+          <div class="section-heading">
+            <div>
+              <p class="season-label" id="uploadsKicker">Clan Repository</p>
+              <h2 id="uploadsTitle">Other Uploads</h2>
+            </div>
+            <p id="uploadsSubhead">Browser-first</p>
+          </div>
+          <div class="upload-list" id="uploadList"></div>
+        </section>
+      </main>
+    </div>
+
+    <dialog class="poster-dialog" id="posterDialog" aria-label="Poster reader">
+      <div class="dialog-frame">
+        <div class="dialog-toolbar">
+          <div>
+            <p id="dialogMeta"></p>
+            <h2 id="dialogTitle"></h2>
+          </div>
+          <div class="dialog-actions">
+            <button class="icon-button" type="button" id="zoomOut" aria-label="Zoom out">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path></svg>
+            </button>
+            <button class="icon-button" type="button" id="zoomFit" aria-label="Fit poster">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="16" rx="2"></rect><path d="M9 8h6M9 16h6"></path></svg>
+            </button>
+            <button class="icon-button" type="button" id="zoomIn" aria-label="Zoom in">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+            </button>
+            <button class="icon-button close-button" type="button" id="closeDialog" aria-label="Close poster reader">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+            </button>
+          </div>
+        </div>
+        <div class="dialog-scroll">
+          <img id="dialogImage" alt="" />
+        </div>
+      </div>
+    </dialog>
+
+    <script src="app.js?v=20260510-i18n" type="module"></script>
+  </body>
+</html>
