@@ -14,6 +14,7 @@ const mimeTypes = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
+  ".pdf": "application/pdf",
   ".png": "image/png",
   ".svg": "image/svg+xml; charset=utf-8",
   ".txt": "text/plain; charset=utf-8",
@@ -123,13 +124,24 @@ function serveStatic(req, res) {
 
   const ext = path.extname(filePath).toLowerCase();
   const contentType = mimeTypes[ext] || "application/octet-stream";
-  const cacheControl = filePath.endsWith("index.html")
-    ? "no-cache"
-    : "public, max-age=31536000, immutable";
+  const relativePath = path.relative(publicDir, filePath).split(path.sep).join("/");
+  const noStore =
+    filePath.endsWith("index.html") ||
+    [".css", ".js", ".json"].includes(ext) ||
+    relativePath === "robots.txt";
+  const cacheHeaders = noStore
+    ? {
+        "Cache-Control": "no-store, max-age=0, must-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
+      }
+    : {
+        "Cache-Control": "public, max-age=31536000, immutable",
+      };
 
   res.writeHead(200, {
     "Content-Type": contentType,
-    "Cache-Control": cacheControl,
+    ...cacheHeaders,
     "X-Content-Type-Options": "nosniff",
   });
   fs.createReadStream(filePath).pipe(res);

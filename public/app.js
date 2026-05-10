@@ -1,3 +1,6 @@
+const APP_VERSION = "20260510-nl-cachefix";
+window.FL2_BUILD = APP_VERSION;
+
 const state = {
   manifest: null,
   docs: null,
@@ -1148,8 +1151,8 @@ async function reportVisit() {
 
 async function boot() {
   const [manifest, docs] = await Promise.all([
-    fetch("data/manifest.json").then((response) => response.json()),
-    fetch("data/docs.json").then((response) => response.json()),
+    fetch(`data/manifest.json?v=${APP_VERSION}`, { cache: "no-store" }).then((response) => response.json()),
+    fetch(`data/docs.json?v=${APP_VERSION}`, { cache: "no-store" }).then((response) => response.json()),
   ]);
 
   state.manifest = manifest;
