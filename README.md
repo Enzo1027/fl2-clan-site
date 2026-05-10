@@ -20,7 +20,7 @@ The local preview uses the same Node server as production. It serves `public/` a
 - Original DOCX files can be kept locally in `source-documents/s2`; this folder is intentionally not committed or served by Render.
 - Source guide PNGs are copied byte-for-byte by `scripts/import_s2_guides.py`; the importer does not resize or recompress them.
 - The Everfrost master guide PDFs are copied per language and rendered into responsive page images for the in-browser reader.
-- The S2 daily guide area is modeled as a 10-day collection. Missing day folders are shown as `Upcoming`.
+- The S2 daily guide area is modeled as a 7-day collection. Missing day folders are shown as `Upcoming`.
 - Other clan resources can be added to `manifest.uploads` and linked from `public/assets/uploads` or another browser-viewable public path.
 
 To refresh from `/Users/davidprice/Downloads/S2 Guide`:

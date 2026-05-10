@@ -42,7 +42,7 @@ LANGUAGE_ALIASES = {
     "tr": ["turkish"],
 }
 
-TOTAL_DAYS = 10
+TOTAL_DAYS = 7
 
 
 IMAGE_SOURCES = {

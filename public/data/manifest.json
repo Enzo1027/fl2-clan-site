@@ -215,33 +215,6 @@
       "season": "Season 2",
       "status": "upcoming",
       "languages": {}
-    },
-    {
-      "id": "day-8",
-      "number": 8,
-      "title": "S2 Day 8",
-      "label": "Day 8",
-      "season": "Season 2",
-      "status": "upcoming",
-      "languages": {}
-    },
-    {
-      "id": "day-9",
-      "number": 9,
-      "title": "S2 Day 9",
-      "label": "Day 9",
-      "season": "Season 2",
-      "status": "upcoming",
-      "languages": {}
-    },
-    {
-      "id": "day-10",
-      "number": 10,
-      "title": "S2 Day 10",
-      "label": "Day 10",
-      "season": "Season 2",
-      "status": "upcoming",
-      "languages": {}
     }
   ],
   "uploads": [
