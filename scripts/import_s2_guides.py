@@ -31,6 +31,7 @@ LANGUAGES = [
     {"code": "de", "name": "German", "native": "Deutsch", "short": "DE", "flag": "🇩🇪", "dir": "ltr"},
     {"code": "ar", "name": "Arabic", "native": "العربية", "short": "AR", "flag": "🇸🇦", "dir": "rtl"},
     {"code": "tr", "name": "Turkish", "native": "Türkçe", "short": "TR", "flag": "🇹🇷", "dir": "ltr"},
+    {"code": "nl", "name": "Dutch", "native": "Nederlands", "short": "NL", "flag": "🇳🇱", "dir": "ltr"},
 ]
 
 LANGUAGE_ALIASES = {
@@ -40,6 +41,7 @@ LANGUAGE_ALIASES = {
     "de": ["german"],
     "ar": ["arabic"],
     "tr": ["turkish"],
+    "nl": [" nl ", " dutch ", " nederlands "],
 }
 
 TOTAL_DAYS = 7
@@ -53,6 +55,7 @@ IMAGE_SOURCES = {
         "de": "German.png",
         "ar": "Arabic Day 1.png",
         "tr": "Turkish.png",
+        "nl": "NL.png",
     },
     2: {
         "en": "S2 Day 2 English.png",
@@ -61,6 +64,7 @@ IMAGE_SOURCES = {
         "de": "S2 Day 2 German.png",
         "ar": "S2 Day 2 Arabic.png",
         "tr": "S2 Day 2 Turkish.png",
+        "nl": "S2 Day 2 NL.png",
     },
     3: {
         "en": "S2 Day 3 English.png",
@@ -69,6 +73,16 @@ IMAGE_SOURCES = {
         "de": "S2 Day 3 German.png",
         "ar": "S2 Day 3 Arabic.png",
         "tr": "S2 Day 3 Turkish.png",
+        "nl": "S2 Day 3 NL.png",
+    },
+    4: {
+        "en": "S2 Day 4 English.png",
+        "es": "S2 Day 4 Spanish.png",
+        "fr": "S2 Day 4 French.png",
+        "de": "S2 Day 4 German.png",
+        "ar": "S2 Day 4 Arabic.png",
+        "tr": "S2 Day 4 Turkish.png",
+        "nl": "S2 Day 4 NL.png",
     },
 }
 
@@ -77,18 +91,22 @@ DOCX_SOURCES = {
     1: [
         "FL2_Day1_Alliance_Mail_With_Icons.docx",
         "FL2_Day1_Master_Plan_Word_Outputs_DE_ES_AR_FR.docx",
+        "FL2_Day1_Master_Plan_NL.docx",
     ],
     2: [
         "S2 Day 2 English.docx",
         "FL2_Day2_Master_Plan_All_Languages.docx",
+        "FL2_Day2_Master_Plan_NL.docx",
     ],
     3: [
         "S2 Day 3 English.docx",
         "FL2_Day3_Master_Plan_All_Languages.docx",
+        "FL2_Day3_Master_Plan_NL.docx",
     ],
     4: [
         "FL2_Day4_Alliance_Mail_With_Icons.docx",
         "FL2_Day4_Master_Plan_All_Languages.docx",
+        "FL2_Day4_Master_Plan_NL.docx",
     ],
 }
 
@@ -101,6 +119,7 @@ MASTER_GUIDE_SOURCES = {
     "de": MASTER_GUIDE_ROOT / "DE" / "Server_630_Season_2_Everfrost_Master_Guide_DE.pdf",
     "ar": MASTER_GUIDE_ROOT / "AR" / "Server_630_Season_2_Everfrost_Master_Guide_AR.pdf",
     "tr": MASTER_GUIDE_ROOT / "TR" / "Server_630_Season_2_Everfrost_Master_Guide_TR.pdf",
+    "nl": MASTER_GUIDE_ROOT / "DU" / "Server_630_Season_2_Everfrost_Master_Guide_NL.pdf",
 }
 
 
@@ -280,6 +299,14 @@ def extract_docs() -> dict:
             "blocks": blocks,
         }
 
+    day1_nl = SOURCE / "S2 Day 1" / "FL2_Day1_Master_Plan_NL.docx"
+    if day1_nl.exists():
+        docs["day-1"]["nl"] = {
+            "source": day1_nl.name,
+            "title": "S2 Day 1 Master Plan",
+            "blocks": iter_blocks(day1_nl),
+        }
+
     day2_en = SOURCE / "S2 Day 2" / "S2 Day 2 English.docx"
     docs["day-2"]["en"] = {
         "source": day2_en.name,
@@ -295,6 +322,14 @@ def extract_docs() -> dict:
             "blocks": blocks,
         }
 
+    day2_nl = SOURCE / "S2 Day 2" / "FL2_Day2_Master_Plan_NL.docx"
+    if day2_nl.exists():
+        docs["day-2"]["nl"] = {
+            "source": day2_nl.name,
+            "title": "S2 Day 2 Master Plan",
+            "blocks": iter_blocks(day2_nl),
+        }
+
     day3_en = SOURCE / "S2 Day 3" / "S2 Day 3 English.docx"
     docs["day-3"]["en"] = {
         "source": day3_en.name,
@@ -308,6 +343,14 @@ def extract_docs() -> dict:
             "source": day3_all.name,
             "title": "S2 Day 3 Master Plan",
             "blocks": blocks,
+        }
+
+    day3_nl = SOURCE / "S2 Day 3" / "FL2_Day3_Master_Plan_NL.docx"
+    if day3_nl.exists():
+        docs["day-3"]["nl"] = {
+            "source": day3_nl.name,
+            "title": "S2 Day 3 Master Plan",
+            "blocks": iter_blocks(day3_nl),
         }
 
     day4_en = SOURCE / "S2 Day 4" / "FL2_Day4_Alliance_Mail_With_Icons.docx"
@@ -326,6 +369,14 @@ def extract_docs() -> dict:
                 "title": "S2 Day 4 Master Plan",
                 "blocks": blocks,
             }
+
+    day4_nl = SOURCE / "S2 Day 4" / "FL2_Day4_Master_Plan_NL.docx"
+    if day4_nl.exists():
+        docs["day-4"]["nl"] = {
+            "source": day4_nl.name,
+            "title": "S2 Day 4 Master Plan",
+            "blocks": iter_blocks(day4_nl),
+        }
 
     return docs
 

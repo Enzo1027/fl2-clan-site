@@ -34,6 +34,10 @@ const els = {
   libraryLabel: document.querySelector("#libraryLabel"),
   liveCount: document.querySelector("#liveCount"),
   libraryList: document.querySelector("#libraryList"),
+  masterShortcut: document.querySelector("#masterShortcut"),
+  openMasterShortcut: document.querySelector("#openMasterShortcut"),
+  masterShortcutLabel: document.querySelector("#masterShortcutLabel"),
+  masterShortcutMeta: document.querySelector("#masterShortcutMeta"),
   masterGuideSection: document.querySelector("#masterGuideSection"),
   masterKicker: document.querySelector("#masterKicker"),
   masterTitle: document.querySelector("#masterTitle"),
@@ -503,6 +507,74 @@ const I18N = {
     page: "Sayfa",
     englishOnly: "Yalnızca İngilizce",
   },
+  nl: {
+    season2: "Seizoen 2",
+    fieldLibrary: "Veldbibliotheek",
+    live: "Live",
+    poster: "Poster",
+    text: "Tekst",
+    upcoming: "Binnenkort",
+    currentFile: "Huidig bestand",
+    language: "Taal",
+    format: "Formaat",
+    browserView: "Browserweergave",
+    image: "Afbeelding",
+    library: "Bibliotheek",
+    s2GuideSet: "S2-gidsen",
+    allDays: "Alle dagen",
+    clanRepository: "Clanarchief",
+    otherUploads: "Andere uploads",
+    browserFirst: "Browser-first",
+    chooseLanguage: "Kies taal",
+    chooseDay: "Kies S2-dag",
+    libraryStatus: "Bibliotheekstatus",
+    guideDetails: "Gidsdetails",
+    savePoster: "Poster opslaan",
+    openPosterReader: "Posterlezer openen",
+    posterReader: "Posterlezer",
+    zoomOut: "Uitzoomen",
+    fitPoster: "Poster passend maken",
+    zoomIn: "Inzoomen",
+    closePosterReader: "Posterlezer sluiten",
+    day: "Dag",
+    guide: "Gids",
+    posterNoun: "Poster",
+    days: "dagen",
+    season2Guides: "Seizoen 2-gidsen",
+    allianceMailText: "Alliantiemailtekst",
+    uploadQueue: "Uploadwachtrij",
+    readyInBrowser: "Klaar in de browser",
+    preparedForUploads: "Klaar voor uploads",
+    readyForFullGuide: "Klaar voor de volledige S2-gids",
+    dropUploads: "Voeg nieuwe browserbestanden toe aan de repo en zet ze in het uploadmanifest zodra ze er zijn.",
+    extraResources: "extra bronnen",
+    resource: "Bron",
+    liveStatus: "Live",
+    viewOnline: "Online bekijken",
+    readOnlyTextView: "alleen-lezen tekst",
+    posterOnlyView: "alleen poster",
+    browserPosterAnd: "browserposter en",
+    noSourceFolder: "Er was geen bronmap aanwezig toen deze site werd gemaakt.",
+    noTextReader: "Deze taal is beschikbaar als originele poster. Tekstinhoud is voor deze dag nog niet geleverd.",
+    isUpcoming: "komt binnenkort",
+    openText: "Alleen-lezen tekstweergave openen",
+    openPosterOnlyNote: "Alleen-poster melding openen",
+    unableToLoad: "Gidsgegevens konden niet worden geladen",
+    visitCounter: "Bezoekersteller",
+    visits: "Bezoeken",
+    uniqueVisitors: "Unieke bezoekers",
+    everfrostArchive: "Everfrost-archief",
+    masterGuide: "Mastergids",
+    visualReader: "Visuele lezer",
+    completeSeasonGuide: "Volledige Seizoen 2-gids",
+    readGuide: "Gids lezen",
+    hideGuide: "Gids verbergen",
+    downloadPdf: "PDF downloaden",
+    sourcePdf: "Bron-PDF",
+    pages: "Pagina's",
+    page: "Pagina",
+    englishOnly: "Alleen Engels",
+  },
 };
 
 function normalizeHash() {
@@ -598,6 +670,7 @@ function renderChromeLabels() {
   els.masterKicker.textContent = t("everfrostArchive");
   els.masterTitle.textContent = t("masterGuide");
   els.masterStatus.textContent = t("visualReader");
+  els.masterShortcutLabel.textContent = t("completeSeasonGuide");
   els.masterLanguageLabel.textContent = t("language");
   els.masterFormatLabel.textContent = t("format");
   els.masterPagesLabel.textContent = t("pages");
@@ -725,12 +798,15 @@ function renderMasterGuide() {
   const language = getLanguage();
   if (!upload || !entry?.pages?.length) {
     els.masterGuideSection.hidden = true;
+    els.masterShortcut.hidden = true;
     return;
   }
 
   const pageCount = entry.pageCount ?? entry.pages.length;
   const cover = entry.pages[0];
   els.masterGuideSection.hidden = false;
+  els.masterShortcut.hidden = false;
+  els.masterShortcutMeta.textContent = `${language.flag} ${language.native} · ${pageCount} ${t("pages")}`;
   els.masterMeta.textContent = `${language.flag} ${language.native} · ${pageCount} ${t("pages")}`;
   els.masterGuideName.textContent = upload.title;
   els.masterLanguageValue.textContent = `${language.flag} ${language.native}`;
@@ -1014,6 +1090,12 @@ function wireEvents() {
     state.masterExpanded = true;
     renderMasterGuide();
     els.masterReader.scrollIntoView({ block: "start" });
+  });
+
+  els.openMasterShortcut.addEventListener("click", () => {
+    state.masterExpanded = true;
+    renderMasterGuide();
+    els.masterGuideSection.scrollIntoView({ block: "start" });
   });
 
   els.toggleMasterReader.addEventListener("click", () => {

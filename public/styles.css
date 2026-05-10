@@ -270,9 +270,50 @@ h1 {
   display: flex;
   gap: 12px;
   overflow-x: auto;
-  margin: 22px 0;
+  margin: 22px 0 14px;
   padding-bottom: 8px;
   scrollbar-width: thin;
+}
+
+.resource-shortcut {
+  margin-bottom: 18px;
+}
+
+.resource-shortcut button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px;
+  border: 1px solid rgba(212, 164, 71, 0.3);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(90deg, rgba(212, 164, 71, 0.13), rgba(79, 195, 238, 0.08)),
+    rgba(5, 12, 17, 0.62);
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.resource-shortcut button:hover {
+  border-color: rgba(212, 164, 71, 0.56);
+}
+
+.resource-shortcut strong,
+.resource-shortcut span span {
+  display: block;
+}
+
+.resource-shortcut strong {
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.resource-shortcut span span {
+  margin-top: 3px;
+  color: var(--gold-2);
+  font-size: 0.86rem;
+  font-weight: 850;
 }
 
 .day-tab {
