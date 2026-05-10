@@ -41,6 +41,11 @@ const els = {
   uploadsTitle: document.querySelector("#uploadsTitle"),
   uploadsSubhead: document.querySelector("#uploadsSubhead"),
   uploadList: document.querySelector("#uploadList"),
+  siteFooter: document.querySelector(".site-footer"),
+  visitsLabel: document.querySelector("#visitsLabel"),
+  visitCount: document.querySelector("#visitCount"),
+  uniqueVisitorsLabel: document.querySelector("#uniqueVisitorsLabel"),
+  uniqueVisitorCount: document.querySelector("#uniqueVisitorCount"),
   expandGuide: document.querySelector("#expandGuide"),
   downloadPoster: document.querySelector("#downloadPoster"),
   posterDialog: document.querySelector("#posterDialog"),
@@ -120,6 +125,9 @@ const I18N = {
     openText: "Open read-only text view",
     openPosterOnlyNote: "Open poster-only note",
     unableToLoad: "Unable to load guide data",
+    visitCounter: "Visit counter",
+    visits: "Visits",
+    uniqueVisitors: "Unique visitors",
   },
   es: {
     season2: "Temporada 2",
@@ -174,6 +182,9 @@ const I18N = {
     openText: "Abrir vista de texto de solo lectura",
     openPosterOnlyNote: "Abrir nota de solo póster",
     unableToLoad: "No se pudieron cargar los datos de la guía",
+    visitCounter: "Contador de visitas",
+    visits: "Visitas",
+    uniqueVisitors: "Visitantes únicos",
   },
   fr: {
     season2: "Saison 2",
@@ -228,6 +239,9 @@ const I18N = {
     openText: "Ouvrir la vue texte en lecture seule",
     openPosterOnlyNote: "Ouvrir la note affiche seule",
     unableToLoad: "Impossible de charger les données du guide",
+    visitCounter: "Compteur de visites",
+    visits: "Visites",
+    uniqueVisitors: "Visiteurs uniques",
   },
   de: {
     season2: "Saison 2",
@@ -282,6 +296,9 @@ const I18N = {
     openText: "Schreibgeschützte Textansicht öffnen",
     openPosterOnlyNote: "Nur-Poster-Hinweis öffnen",
     unableToLoad: "Leitfaden-Daten konnten nicht geladen werden",
+    visitCounter: "Besucherzähler",
+    visits: "Besuche",
+    uniqueVisitors: "Eindeutige Besucher",
   },
   ar: {
     season2: "الموسم 2",
@@ -336,6 +353,9 @@ const I18N = {
     openText: "فتح عرض النص للقراءة فقط",
     openPosterOnlyNote: "فتح ملاحظة الملصق فقط",
     unableToLoad: "تعذر تحميل بيانات الدليل",
+    visitCounter: "عداد الزيارات",
+    visits: "الزيارات",
+    uniqueVisitors: "زوار فريدون",
   },
   tr: {
     season2: "Sezon 2",
@@ -390,6 +410,9 @@ const I18N = {
     openText: "Salt okunur metin görünümünü aç",
     openPosterOnlyNote: "Sadece poster notunu aç",
     unableToLoad: "Rehber verileri yüklenemedi",
+    visitCounter: "Ziyaret sayacı",
+    visits: "Ziyaretler",
+    uniqueVisitors: "Benzersiz ziyaretçiler",
   },
 };
 
@@ -461,6 +484,7 @@ function renderChromeLabels() {
   els.zoomFit.setAttribute("aria-label", t("fitPoster"));
   els.zoomIn.setAttribute("aria-label", t("zoomIn"));
   els.closeDialog.setAttribute("aria-label", t("closePosterReader"));
+  els.siteFooter.setAttribute("aria-label", t("visitCounter"));
 
   els.appSeason.textContent = t("season2");
   els.appTitle.textContent = t("fieldLibrary");
@@ -479,6 +503,8 @@ function renderChromeLabels() {
   els.uploadsKicker.textContent = t("clanRepository");
   els.uploadsTitle.textContent = t("otherUploads");
   els.uploadsSubhead.textContent = t("browserFirst");
+  els.visitsLabel.textContent = t("visits");
+  els.uniqueVisitorsLabel.textContent = t("uniqueVisitors");
 }
 
 function renderLanguageTabs() {
@@ -822,6 +848,40 @@ function wireEvents() {
   });
 }
 
+function getVisitorId() {
+  const key = "fl2-visitor-id";
+  let visitorId = localStorage.getItem(key);
+  if (!visitorId) {
+    visitorId = crypto.randomUUID
+      ? crypto.randomUUID()
+      : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+    localStorage.setItem(key, visitorId);
+  }
+  return visitorId;
+}
+
+function renderVisitCounter(payload) {
+  els.visitCount.textContent = Number(payload.visits || 0).toLocaleString();
+  els.uniqueVisitorCount.textContent = Number(payload.uniqueVisitors || 0).toLocaleString();
+}
+
+async function reportVisit() {
+  try {
+    const response = await fetch("/api/visit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ visitorId: getVisitorId() }),
+    });
+    if (!response.ok) {
+      throw new Error("counter unavailable");
+    }
+    renderVisitCounter(await response.json());
+  } catch {
+    els.visitCount.textContent = "-";
+    els.uniqueVisitorCount.textContent = "-";
+  }
+}
+
 async function boot() {
   const [manifest, docs] = await Promise.all([
     fetch("data/manifest.json").then((response) => response.json()),
@@ -833,6 +893,7 @@ async function boot() {
   normalizeHash();
   wireEvents();
   renderAll();
+  reportVisit();
 }
 
 boot().catch((error) => {

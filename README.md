@@ -10,6 +10,8 @@ npm run serve
 
 Open `http://localhost:4173`.
 
+The local preview uses the same Node server as production. It serves `public/` and exposes `/api/visit` for the footer visit counter.
+
 ## Content Model
 
 - Public browser assets live in `public/assets/guides/s2`.
@@ -27,4 +29,6 @@ npm run import:s2
 
 ## Render
 
-This repo includes `render.yaml` for a Render Static Site. Render publishes `./public`, with no app server or database required.
+This repo includes `render.yaml` for a Render Node web service. The server serves `./public` and powers the bottom visit counter.
+
+The visit counter stores counts in `.data/visits.json` by default, or in `DATA_DIR` if that environment variable is set. On Render's free ephemeral filesystem, counts can reset after deploys/restarts. Attach a persistent disk and set `DATA_DIR` to that mount path if long-term counter persistence matters.
