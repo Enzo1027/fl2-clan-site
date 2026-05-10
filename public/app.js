@@ -5,6 +5,7 @@ const state = {
   day: "day-1",
   view: "poster",
   zoom: 1,
+  masterExpanded: false,
 };
 
 const els = {
@@ -33,6 +34,28 @@ const els = {
   libraryLabel: document.querySelector("#libraryLabel"),
   liveCount: document.querySelector("#liveCount"),
   libraryList: document.querySelector("#libraryList"),
+  masterGuideSection: document.querySelector("#masterGuideSection"),
+  masterKicker: document.querySelector("#masterKicker"),
+  masterTitle: document.querySelector("#masterTitle"),
+  masterMeta: document.querySelector("#masterMeta"),
+  masterCoverButton: document.querySelector("#masterCoverButton"),
+  masterCover: document.querySelector("#masterCover"),
+  masterStatus: document.querySelector("#masterStatus"),
+  masterGuideName: document.querySelector("#masterGuideName"),
+  masterLanguageLabel: document.querySelector("#masterLanguageLabel"),
+  masterLanguageValue: document.querySelector("#masterLanguageValue"),
+  masterFormatLabel: document.querySelector("#masterFormatLabel"),
+  masterFormatValue: document.querySelector("#masterFormatValue"),
+  masterPagesLabel: document.querySelector("#masterPagesLabel"),
+  masterPagesValue: document.querySelector("#masterPagesValue"),
+  toggleMasterReader: document.querySelector("#toggleMasterReader"),
+  toggleMasterReaderLabel: document.querySelector("#toggleMasterReaderLabel"),
+  downloadMasterGuide: document.querySelector("#downloadMasterGuide"),
+  downloadMasterGuideLabel: document.querySelector("#downloadMasterGuideLabel"),
+  masterReader: document.querySelector("#masterReader"),
+  masterReaderLabel: document.querySelector("#masterReaderLabel"),
+  masterReaderCount: document.querySelector("#masterReaderCount"),
+  masterPages: document.querySelector("#masterPages"),
   guideGridKicker: document.querySelector("#guideGridKicker"),
   guideGridTitle: document.querySelector("#guideGridTitle"),
   sectionLanguage: document.querySelector("#sectionLanguage"),
@@ -128,6 +151,17 @@ const I18N = {
     visitCounter: "Visit counter",
     visits: "Visits",
     uniqueVisitors: "Unique visitors",
+    everfrostArchive: "Everfrost Archive",
+    masterGuide: "Master Guide",
+    visualReader: "Visual reader",
+    completeSeasonGuide: "Complete Season 2 Guide",
+    readGuide: "Read guide",
+    hideGuide: "Hide guide",
+    downloadPdf: "Download PDF",
+    sourcePdf: "Source PDF",
+    pages: "Pages",
+    page: "Page",
+    englishOnly: "English only",
   },
   es: {
     season2: "Temporada 2",
@@ -185,6 +219,17 @@ const I18N = {
     visitCounter: "Contador de visitas",
     visits: "Visitas",
     uniqueVisitors: "Visitantes únicos",
+    everfrostArchive: "Archivo de Everfrost",
+    masterGuide: "Guía maestra",
+    visualReader: "Lector visual",
+    completeSeasonGuide: "Guía completa de Temporada 2",
+    readGuide: "Leer guía",
+    hideGuide: "Ocultar guía",
+    downloadPdf: "Descargar PDF",
+    sourcePdf: "PDF fuente",
+    pages: "Páginas",
+    page: "Página",
+    englishOnly: "Solo inglés",
   },
   fr: {
     season2: "Saison 2",
@@ -242,6 +287,17 @@ const I18N = {
     visitCounter: "Compteur de visites",
     visits: "Visites",
     uniqueVisitors: "Visiteurs uniques",
+    everfrostArchive: "Archive Everfrost",
+    masterGuide: "Guide maître",
+    visualReader: "Lecteur visuel",
+    completeSeasonGuide: "Guide complet de la Saison 2",
+    readGuide: "Lire le guide",
+    hideGuide: "Masquer le guide",
+    downloadPdf: "Télécharger le PDF",
+    sourcePdf: "PDF source",
+    pages: "Pages",
+    page: "Page",
+    englishOnly: "Anglais uniquement",
   },
   de: {
     season2: "Saison 2",
@@ -299,6 +355,17 @@ const I18N = {
     visitCounter: "Besucherzähler",
     visits: "Besuche",
     uniqueVisitors: "Eindeutige Besucher",
+    everfrostArchive: "Everfrost-Archiv",
+    masterGuide: "Master-Guide",
+    visualReader: "Visueller Leser",
+    completeSeasonGuide: "Vollständiger Saison-2-Leitfaden",
+    readGuide: "Guide lesen",
+    hideGuide: "Guide ausblenden",
+    downloadPdf: "PDF herunterladen",
+    sourcePdf: "Quell-PDF",
+    pages: "Seiten",
+    page: "Seite",
+    englishOnly: "Nur Englisch",
   },
   ar: {
     season2: "الموسم 2",
@@ -356,6 +423,17 @@ const I18N = {
     visitCounter: "عداد الزيارات",
     visits: "الزيارات",
     uniqueVisitors: "زوار فريدون",
+    everfrostArchive: "أرشيف إيفرفروست",
+    masterGuide: "الدليل الرئيسي",
+    visualReader: "قارئ مرئي",
+    completeSeasonGuide: "دليل الموسم 2 الكامل",
+    readGuide: "قراءة الدليل",
+    hideGuide: "إخفاء الدليل",
+    downloadPdf: "تنزيل PDF",
+    sourcePdf: "ملف PDF المصدر",
+    pages: "الصفحات",
+    page: "صفحة",
+    englishOnly: "بالإنجليزية فقط",
   },
   tr: {
     season2: "Sezon 2",
@@ -413,6 +491,17 @@ const I18N = {
     visitCounter: "Ziyaret sayacı",
     visits: "Ziyaretler",
     uniqueVisitors: "Benzersiz ziyaretçiler",
+    everfrostArchive: "Everfrost Arşivi",
+    masterGuide: "Ana Rehber",
+    visualReader: "Görsel okuyucu",
+    completeSeasonGuide: "Tam Sezon 2 Rehberi",
+    readGuide: "Rehberi oku",
+    hideGuide: "Rehberi gizle",
+    downloadPdf: "PDF indir",
+    sourcePdf: "Kaynak PDF",
+    pages: "Sayfa",
+    page: "Sayfa",
+    englishOnly: "Yalnızca İngilizce",
   },
 };
 
@@ -460,6 +549,14 @@ function getEntry(day = getDay(), language = state.language) {
   return day.languages[language];
 }
 
+function getFeaturedUpload() {
+  return state.manifest.uploads?.find((upload) => upload.featured && (upload.pages?.length || upload.languages));
+}
+
+function getUploadEntry(upload, language = state.language) {
+  return upload?.languages?.[language] ?? upload?.languages?.en ?? upload;
+}
+
 function isLiveDay(day = getDay(), language = state.language) {
   return Boolean(day?.languages?.[language]?.image);
 }
@@ -498,6 +595,14 @@ function renderChromeLabels() {
   els.browserViewLabel.textContent = t("browserView");
   els.imageTerm.textContent = t("image");
   els.libraryLabel.textContent = t("library");
+  els.masterKicker.textContent = t("everfrostArchive");
+  els.masterTitle.textContent = t("masterGuide");
+  els.masterStatus.textContent = t("visualReader");
+  els.masterLanguageLabel.textContent = t("language");
+  els.masterFormatLabel.textContent = t("format");
+  els.masterPagesLabel.textContent = t("pages");
+  els.downloadMasterGuideLabel.textContent = t("downloadPdf");
+  els.masterReaderLabel.textContent = t("visualReader");
   els.guideGridKicker.textContent = t("s2GuideSet");
   els.guideGridTitle.textContent = t("allDays");
   els.uploadsKicker.textContent = t("clanRepository");
@@ -614,6 +719,57 @@ function renderDocument() {
   els.textStage.append(reader);
 }
 
+function renderMasterGuide() {
+  const upload = getFeaturedUpload();
+  const entry = getUploadEntry(upload);
+  const language = getLanguage();
+  if (!upload || !entry?.pages?.length) {
+    els.masterGuideSection.hidden = true;
+    return;
+  }
+
+  const pageCount = entry.pageCount ?? entry.pages.length;
+  const cover = entry.pages[0];
+  els.masterGuideSection.hidden = false;
+  els.masterMeta.textContent = `${language.flag} ${language.native} · ${pageCount} ${t("pages")}`;
+  els.masterGuideName.textContent = upload.title;
+  els.masterLanguageValue.textContent = `${language.flag} ${language.native}`;
+  els.masterFormatValue.textContent = `${upload.type} · ${t("sourcePdf")}`;
+  els.masterPagesValue.textContent = pageCount.toLocaleString();
+  els.toggleMasterReaderLabel.textContent = state.masterExpanded ? t("hideGuide") : t("readGuide");
+  els.toggleMasterReader.setAttribute(
+    "aria-label",
+    state.masterExpanded ? t("hideGuide") : t("readGuide"),
+  );
+  els.downloadMasterGuide.href = entry.href;
+  els.downloadMasterGuide.download = entry.sourceFile || "";
+  els.downloadMasterGuide.setAttribute("aria-label", t("downloadPdf"));
+
+  if (cover?.image) {
+    els.masterCover.src = cover.image;
+    els.masterCover.alt = `${upload.title} ${t("page")} 1`;
+  }
+  els.masterCoverButton.setAttribute("aria-label", t("readGuide"));
+
+  els.masterReader.hidden = !state.masterExpanded;
+  els.masterReaderCount.textContent = `${pageCount} ${t("pages")}`;
+  if (!state.masterExpanded) {
+    els.masterPages.innerHTML = "";
+    return;
+  }
+
+  els.masterPages.innerHTML = "";
+  for (const page of entry.pages) {
+    const figure = document.createElement("figure");
+    figure.className = "master-page";
+    figure.innerHTML = `
+      <img src="${page.image}" alt="${upload.title} ${t("page")} ${page.number}" loading="lazy">
+      <figcaption>${t("page")} ${page.number}</figcaption>
+    `;
+    els.masterPages.append(figure);
+  }
+}
+
 function renderLibrary() {
   els.libraryList.innerHTML = "";
   const liveDays = state.manifest.days.filter((day) => day.status === "live").length;
@@ -665,16 +821,27 @@ function renderUploads() {
   }
 
   for (const upload of uploads) {
-    const item = document.createElement(upload.href ? "a" : "div");
+    const entry = getUploadEntry(upload);
+    const hasReader = Boolean(entry?.pages?.length);
+    const item = document.createElement(hasReader ? "button" : upload.href ? "a" : "div");
     item.className = "upload-item";
-    if (upload.href) {
+    if (hasReader) {
+      item.type = "button";
+      item.addEventListener("click", () => {
+        state.masterExpanded = true;
+        renderMasterGuide();
+        els.masterGuideSection.scrollIntoView({ block: "start" });
+      });
+    } else if (upload.href) {
       item.href = upload.href;
     }
     item.innerHTML = `
       <span class="library-symbol">${icons.book}</span>
       <span>
         <strong>${upload.title}</strong>
-        <span>${upload.type ?? t("resource")} · ${upload.status ?? t("liveStatus")}</span>
+        <span>${upload.type ?? t("resource")} · ${
+          entry?.pageCount ? `${entry.pageCount} ${t("pages")}` : upload.status ?? t("liveStatus")
+        }</span>
       </span>
     `;
     els.uploadList.append(item);
@@ -787,6 +954,7 @@ function renderAll() {
   renderLanguageTabs();
   renderDayTabs();
   renderLibrary();
+  renderMasterGuide();
   renderGuideGrid();
   renderUploads();
   updateCurrentGuide();
@@ -840,6 +1008,20 @@ function wireEvents() {
   els.zoomFit.addEventListener("click", () => {
     state.zoom = 1;
     applyZoom();
+  });
+
+  els.masterCoverButton.addEventListener("click", () => {
+    state.masterExpanded = true;
+    renderMasterGuide();
+    els.masterReader.scrollIntoView({ block: "start" });
+  });
+
+  els.toggleMasterReader.addEventListener("click", () => {
+    state.masterExpanded = !state.masterExpanded;
+    renderMasterGuide();
+    if (state.masterExpanded) {
+      els.masterReader.scrollIntoView({ block: "start" });
+    }
   });
 
   window.addEventListener("hashchange", () => {

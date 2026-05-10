@@ -161,8 +161,33 @@
       "title": "S2 Day 4",
       "label": "Day 4",
       "season": "Season 2",
-      "status": "upcoming",
-      "languages": {}
+      "status": "live",
+      "languages": {
+        "en": {
+          "image": "assets/guides/s2/day-4/en.png",
+          "sourceFile": "S2 Day 4 English.png"
+        },
+        "es": {
+          "image": "assets/guides/s2/day-4/es.png",
+          "sourceFile": "S2 Day 4 Spanish.png"
+        },
+        "fr": {
+          "image": "assets/guides/s2/day-4/fr.png",
+          "sourceFile": "S2 Day 4 French.png"
+        },
+        "de": {
+          "image": "assets/guides/s2/day-4/de.png",
+          "sourceFile": "S2 Day 4 German.png"
+        },
+        "ar": {
+          "image": "assets/guides/s2/day-4/ar.png",
+          "sourceFile": "S2 Day 4 Arabic.png"
+        },
+        "tr": {
+          "image": "assets/guides/s2/day-4/tr.png",
+          "sourceFile": "S2 Day 4 Turkish.png"
+        }
+      }
     },
     {
       "id": "day-5",
@@ -219,7 +244,627 @@
       "languages": {}
     }
   ],
-  "uploads": [],
+  "uploads": [
+    {
+      "id": "s2-everfrost-master-guide",
+      "title": "Server 630 Season 2 Everfrost Master Guide",
+      "type": "PDF",
+      "status": "Live",
+      "featured": true,
+      "languages": {
+        "en": {
+          "href": "assets/uploads/s2-everfrost-master-guide/en/Server_630_Season_2_Everfrost_Master_Guide_EN.pdf",
+          "pageCount": 23,
+          "pages": [
+            {
+              "number": 1,
+              "image": "assets/uploads/s2-everfrost-master-guide/en/pages/page-01.png"
+            },
+            {
+              "number": 2,
+              "image": "assets/uploads/s2-everfrost-master-guide/en/pages/page-02.png"
+            },
+            {
+              "number": 3,
+              "image": "assets/uploads/s2-everfrost-master-guide/en/pages/page-03.png"
+            },
+            {
+              "number": 4,
+              "image": "assets/uploads/s2-everfrost-master-guide/en/pages/page-04.png"
+            },
+            {
+              "number": 5,
+              "image": "assets/uploads/s2-everfrost-master-guide/en/pages/page-05.png"
+            },
+            {
+              "number": 6,
+              "image": "assets/uploads/s2-everfrost-master-guide/en/pages/page-06.png"
+            },
+            {
+              "number": 7,
+              "image": "assets/uploads/s2-everfrost-master-guide/en/pages/page-07.png"
+            },
+            {
+              "number": 8,
+              "image": "assets/uploads/s2-everfrost-master-guide/en/pages/page-08.png"
+            },
+            {
+              "number": 9,
+              "image": "assets/uploads/s2-everfrost-master-guide/en/pages/page-09.png"
+            },
+            {
+              "number": 10,
+              "image": "assets/uploads/s2-everfrost-master-guide/en/pages/page-10.png"
+            },
+            {
+              "number": 11,
+              "image": "assets/uploads/s2-everfrost-master-guide/en/pages/page-11.png"
+            },
+            {
+              "number": 12,
+              "image": "assets/uploads/s2-everfrost-master-guide/en/pages/page-12.png"
+            },
+            {
+              "number": 13,
+              "image": "assets/uploads/s2-everfrost-master-guide/en/pages/page-13.png"
+            },
+            {
+              "number": 14,
+              "image": "assets/uploads/s2-everfrost-master-guide/en/pages/page-14.png"
+            },
+            {
+              "number": 15,
+              "image": "assets/uploads/s2-everfrost-master-guide/en/pages/page-15.png"
+            },
+            {
+              "number": 16,
+              "image": "assets/uploads/s2-everfrost-master-guide/en/pages/page-16.png"
+            },
+            {
+              "number": 17,
+              "image": "assets/uploads/s2-everfrost-master-guide/en/pages/page-17.png"
+            },
+            {
+              "number": 18,
+              "image": "assets/uploads/s2-everfrost-master-guide/en/pages/page-18.png"
+            },
+            {
+              "number": 19,
+              "image": "assets/uploads/s2-everfrost-master-guide/en/pages/page-19.png"
+            },
+            {
+              "number": 20,
+              "image": "assets/uploads/s2-everfrost-master-guide/en/pages/page-20.png"
+            },
+            {
+              "number": 21,
+              "image": "assets/uploads/s2-everfrost-master-guide/en/pages/page-21.png"
+            },
+            {
+              "number": 22,
+              "image": "assets/uploads/s2-everfrost-master-guide/en/pages/page-22.png"
+            },
+            {
+              "number": 23,
+              "image": "assets/uploads/s2-everfrost-master-guide/en/pages/page-23.png"
+            }
+          ],
+          "sourceFile": "Server_630_Season_2_Everfrost_Master_Guide_EN.pdf"
+        },
+        "es": {
+          "href": "assets/uploads/s2-everfrost-master-guide/es/Server_630_Season_2_Everfrost_Master_Guide_ES.pdf",
+          "pageCount": 25,
+          "pages": [
+            {
+              "number": 1,
+              "image": "assets/uploads/s2-everfrost-master-guide/es/pages/page-01.png"
+            },
+            {
+              "number": 2,
+              "image": "assets/uploads/s2-everfrost-master-guide/es/pages/page-02.png"
+            },
+            {
+              "number": 3,
+              "image": "assets/uploads/s2-everfrost-master-guide/es/pages/page-03.png"
+            },
+            {
+              "number": 4,
+              "image": "assets/uploads/s2-everfrost-master-guide/es/pages/page-04.png"
+            },
+            {
+              "number": 5,
+              "image": "assets/uploads/s2-everfrost-master-guide/es/pages/page-05.png"
+            },
+            {
+              "number": 6,
+              "image": "assets/uploads/s2-everfrost-master-guide/es/pages/page-06.png"
+            },
+            {
+              "number": 7,
+              "image": "assets/uploads/s2-everfrost-master-guide/es/pages/page-07.png"
+            },
+            {
+              "number": 8,
+              "image": "assets/uploads/s2-everfrost-master-guide/es/pages/page-08.png"
+            },
+            {
+              "number": 9,
+              "image": "assets/uploads/s2-everfrost-master-guide/es/pages/page-09.png"
+            },
+            {
+              "number": 10,
+              "image": "assets/uploads/s2-everfrost-master-guide/es/pages/page-10.png"
+            },
+            {
+              "number": 11,
+              "image": "assets/uploads/s2-everfrost-master-guide/es/pages/page-11.png"
+            },
+            {
+              "number": 12,
+              "image": "assets/uploads/s2-everfrost-master-guide/es/pages/page-12.png"
+            },
+            {
+              "number": 13,
+              "image": "assets/uploads/s2-everfrost-master-guide/es/pages/page-13.png"
+            },
+            {
+              "number": 14,
+              "image": "assets/uploads/s2-everfrost-master-guide/es/pages/page-14.png"
+            },
+            {
+              "number": 15,
+              "image": "assets/uploads/s2-everfrost-master-guide/es/pages/page-15.png"
+            },
+            {
+              "number": 16,
+              "image": "assets/uploads/s2-everfrost-master-guide/es/pages/page-16.png"
+            },
+            {
+              "number": 17,
+              "image": "assets/uploads/s2-everfrost-master-guide/es/pages/page-17.png"
+            },
+            {
+              "number": 18,
+              "image": "assets/uploads/s2-everfrost-master-guide/es/pages/page-18.png"
+            },
+            {
+              "number": 19,
+              "image": "assets/uploads/s2-everfrost-master-guide/es/pages/page-19.png"
+            },
+            {
+              "number": 20,
+              "image": "assets/uploads/s2-everfrost-master-guide/es/pages/page-20.png"
+            },
+            {
+              "number": 21,
+              "image": "assets/uploads/s2-everfrost-master-guide/es/pages/page-21.png"
+            },
+            {
+              "number": 22,
+              "image": "assets/uploads/s2-everfrost-master-guide/es/pages/page-22.png"
+            },
+            {
+              "number": 23,
+              "image": "assets/uploads/s2-everfrost-master-guide/es/pages/page-23.png"
+            },
+            {
+              "number": 24,
+              "image": "assets/uploads/s2-everfrost-master-guide/es/pages/page-24.png"
+            },
+            {
+              "number": 25,
+              "image": "assets/uploads/s2-everfrost-master-guide/es/pages/page-25.png"
+            }
+          ],
+          "sourceFile": "Server_630_Season_2_Everfrost_Master_Guide_ES.pdf"
+        },
+        "fr": {
+          "href": "assets/uploads/s2-everfrost-master-guide/fr/Server_630_Season_2_Everfrost_Master_Guide_FR.pdf",
+          "pageCount": 23,
+          "pages": [
+            {
+              "number": 1,
+              "image": "assets/uploads/s2-everfrost-master-guide/fr/pages/page-01.png"
+            },
+            {
+              "number": 2,
+              "image": "assets/uploads/s2-everfrost-master-guide/fr/pages/page-02.png"
+            },
+            {
+              "number": 3,
+              "image": "assets/uploads/s2-everfrost-master-guide/fr/pages/page-03.png"
+            },
+            {
+              "number": 4,
+              "image": "assets/uploads/s2-everfrost-master-guide/fr/pages/page-04.png"
+            },
+            {
+              "number": 5,
+              "image": "assets/uploads/s2-everfrost-master-guide/fr/pages/page-05.png"
+            },
+            {
+              "number": 6,
+              "image": "assets/uploads/s2-everfrost-master-guide/fr/pages/page-06.png"
+            },
+            {
+              "number": 7,
+              "image": "assets/uploads/s2-everfrost-master-guide/fr/pages/page-07.png"
+            },
+            {
+              "number": 8,
+              "image": "assets/uploads/s2-everfrost-master-guide/fr/pages/page-08.png"
+            },
+            {
+              "number": 9,
+              "image": "assets/uploads/s2-everfrost-master-guide/fr/pages/page-09.png"
+            },
+            {
+              "number": 10,
+              "image": "assets/uploads/s2-everfrost-master-guide/fr/pages/page-10.png"
+            },
+            {
+              "number": 11,
+              "image": "assets/uploads/s2-everfrost-master-guide/fr/pages/page-11.png"
+            },
+            {
+              "number": 12,
+              "image": "assets/uploads/s2-everfrost-master-guide/fr/pages/page-12.png"
+            },
+            {
+              "number": 13,
+              "image": "assets/uploads/s2-everfrost-master-guide/fr/pages/page-13.png"
+            },
+            {
+              "number": 14,
+              "image": "assets/uploads/s2-everfrost-master-guide/fr/pages/page-14.png"
+            },
+            {
+              "number": 15,
+              "image": "assets/uploads/s2-everfrost-master-guide/fr/pages/page-15.png"
+            },
+            {
+              "number": 16,
+              "image": "assets/uploads/s2-everfrost-master-guide/fr/pages/page-16.png"
+            },
+            {
+              "number": 17,
+              "image": "assets/uploads/s2-everfrost-master-guide/fr/pages/page-17.png"
+            },
+            {
+              "number": 18,
+              "image": "assets/uploads/s2-everfrost-master-guide/fr/pages/page-18.png"
+            },
+            {
+              "number": 19,
+              "image": "assets/uploads/s2-everfrost-master-guide/fr/pages/page-19.png"
+            },
+            {
+              "number": 20,
+              "image": "assets/uploads/s2-everfrost-master-guide/fr/pages/page-20.png"
+            },
+            {
+              "number": 21,
+              "image": "assets/uploads/s2-everfrost-master-guide/fr/pages/page-21.png"
+            },
+            {
+              "number": 22,
+              "image": "assets/uploads/s2-everfrost-master-guide/fr/pages/page-22.png"
+            },
+            {
+              "number": 23,
+              "image": "assets/uploads/s2-everfrost-master-guide/fr/pages/page-23.png"
+            }
+          ],
+          "sourceFile": "Server_630_Season_2_Everfrost_Master_Guide_FR.pdf"
+        },
+        "de": {
+          "href": "assets/uploads/s2-everfrost-master-guide/de/Server_630_Season_2_Everfrost_Master_Guide_DE.pdf",
+          "pageCount": 23,
+          "pages": [
+            {
+              "number": 1,
+              "image": "assets/uploads/s2-everfrost-master-guide/de/pages/page-01.png"
+            },
+            {
+              "number": 2,
+              "image": "assets/uploads/s2-everfrost-master-guide/de/pages/page-02.png"
+            },
+            {
+              "number": 3,
+              "image": "assets/uploads/s2-everfrost-master-guide/de/pages/page-03.png"
+            },
+            {
+              "number": 4,
+              "image": "assets/uploads/s2-everfrost-master-guide/de/pages/page-04.png"
+            },
+            {
+              "number": 5,
+              "image": "assets/uploads/s2-everfrost-master-guide/de/pages/page-05.png"
+            },
+            {
+              "number": 6,
+              "image": "assets/uploads/s2-everfrost-master-guide/de/pages/page-06.png"
+            },
+            {
+              "number": 7,
+              "image": "assets/uploads/s2-everfrost-master-guide/de/pages/page-07.png"
+            },
+            {
+              "number": 8,
+              "image": "assets/uploads/s2-everfrost-master-guide/de/pages/page-08.png"
+            },
+            {
+              "number": 9,
+              "image": "assets/uploads/s2-everfrost-master-guide/de/pages/page-09.png"
+            },
+            {
+              "number": 10,
+              "image": "assets/uploads/s2-everfrost-master-guide/de/pages/page-10.png"
+            },
+            {
+              "number": 11,
+              "image": "assets/uploads/s2-everfrost-master-guide/de/pages/page-11.png"
+            },
+            {
+              "number": 12,
+              "image": "assets/uploads/s2-everfrost-master-guide/de/pages/page-12.png"
+            },
+            {
+              "number": 13,
+              "image": "assets/uploads/s2-everfrost-master-guide/de/pages/page-13.png"
+            },
+            {
+              "number": 14,
+              "image": "assets/uploads/s2-everfrost-master-guide/de/pages/page-14.png"
+            },
+            {
+              "number": 15,
+              "image": "assets/uploads/s2-everfrost-master-guide/de/pages/page-15.png"
+            },
+            {
+              "number": 16,
+              "image": "assets/uploads/s2-everfrost-master-guide/de/pages/page-16.png"
+            },
+            {
+              "number": 17,
+              "image": "assets/uploads/s2-everfrost-master-guide/de/pages/page-17.png"
+            },
+            {
+              "number": 18,
+              "image": "assets/uploads/s2-everfrost-master-guide/de/pages/page-18.png"
+            },
+            {
+              "number": 19,
+              "image": "assets/uploads/s2-everfrost-master-guide/de/pages/page-19.png"
+            },
+            {
+              "number": 20,
+              "image": "assets/uploads/s2-everfrost-master-guide/de/pages/page-20.png"
+            },
+            {
+              "number": 21,
+              "image": "assets/uploads/s2-everfrost-master-guide/de/pages/page-21.png"
+            },
+            {
+              "number": 22,
+              "image": "assets/uploads/s2-everfrost-master-guide/de/pages/page-22.png"
+            },
+            {
+              "number": 23,
+              "image": "assets/uploads/s2-everfrost-master-guide/de/pages/page-23.png"
+            }
+          ],
+          "sourceFile": "Server_630_Season_2_Everfrost_Master_Guide_DE.pdf"
+        },
+        "ar": {
+          "href": "assets/uploads/s2-everfrost-master-guide/ar/Server_630_Season_2_Everfrost_Master_Guide_AR.pdf",
+          "pageCount": 23,
+          "pages": [
+            {
+              "number": 1,
+              "image": "assets/uploads/s2-everfrost-master-guide/ar/pages/page-01.png"
+            },
+            {
+              "number": 2,
+              "image": "assets/uploads/s2-everfrost-master-guide/ar/pages/page-02.png"
+            },
+            {
+              "number": 3,
+              "image": "assets/uploads/s2-everfrost-master-guide/ar/pages/page-03.png"
+            },
+            {
+              "number": 4,
+              "image": "assets/uploads/s2-everfrost-master-guide/ar/pages/page-04.png"
+            },
+            {
+              "number": 5,
+              "image": "assets/uploads/s2-everfrost-master-guide/ar/pages/page-05.png"
+            },
+            {
+              "number": 6,
+              "image": "assets/uploads/s2-everfrost-master-guide/ar/pages/page-06.png"
+            },
+            {
+              "number": 7,
+              "image": "assets/uploads/s2-everfrost-master-guide/ar/pages/page-07.png"
+            },
+            {
+              "number": 8,
+              "image": "assets/uploads/s2-everfrost-master-guide/ar/pages/page-08.png"
+            },
+            {
+              "number": 9,
+              "image": "assets/uploads/s2-everfrost-master-guide/ar/pages/page-09.png"
+            },
+            {
+              "number": 10,
+              "image": "assets/uploads/s2-everfrost-master-guide/ar/pages/page-10.png"
+            },
+            {
+              "number": 11,
+              "image": "assets/uploads/s2-everfrost-master-guide/ar/pages/page-11.png"
+            },
+            {
+              "number": 12,
+              "image": "assets/uploads/s2-everfrost-master-guide/ar/pages/page-12.png"
+            },
+            {
+              "number": 13,
+              "image": "assets/uploads/s2-everfrost-master-guide/ar/pages/page-13.png"
+            },
+            {
+              "number": 14,
+              "image": "assets/uploads/s2-everfrost-master-guide/ar/pages/page-14.png"
+            },
+            {
+              "number": 15,
+              "image": "assets/uploads/s2-everfrost-master-guide/ar/pages/page-15.png"
+            },
+            {
+              "number": 16,
+              "image": "assets/uploads/s2-everfrost-master-guide/ar/pages/page-16.png"
+            },
+            {
+              "number": 17,
+              "image": "assets/uploads/s2-everfrost-master-guide/ar/pages/page-17.png"
+            },
+            {
+              "number": 18,
+              "image": "assets/uploads/s2-everfrost-master-guide/ar/pages/page-18.png"
+            },
+            {
+              "number": 19,
+              "image": "assets/uploads/s2-everfrost-master-guide/ar/pages/page-19.png"
+            },
+            {
+              "number": 20,
+              "image": "assets/uploads/s2-everfrost-master-guide/ar/pages/page-20.png"
+            },
+            {
+              "number": 21,
+              "image": "assets/uploads/s2-everfrost-master-guide/ar/pages/page-21.png"
+            },
+            {
+              "number": 22,
+              "image": "assets/uploads/s2-everfrost-master-guide/ar/pages/page-22.png"
+            },
+            {
+              "number": 23,
+              "image": "assets/uploads/s2-everfrost-master-guide/ar/pages/page-23.png"
+            }
+          ],
+          "sourceFile": "Server_630_Season_2_Everfrost_Master_Guide_AR.pdf"
+        },
+        "tr": {
+          "href": "assets/uploads/s2-everfrost-master-guide/tr/Server_630_Season_2_Everfrost_Master_Guide_TR.pdf",
+          "pageCount": 25,
+          "pages": [
+            {
+              "number": 1,
+              "image": "assets/uploads/s2-everfrost-master-guide/tr/pages/page-01.png"
+            },
+            {
+              "number": 2,
+              "image": "assets/uploads/s2-everfrost-master-guide/tr/pages/page-02.png"
+            },
+            {
+              "number": 3,
+              "image": "assets/uploads/s2-everfrost-master-guide/tr/pages/page-03.png"
+            },
+            {
+              "number": 4,
+              "image": "assets/uploads/s2-everfrost-master-guide/tr/pages/page-04.png"
+            },
+            {
+              "number": 5,
+              "image": "assets/uploads/s2-everfrost-master-guide/tr/pages/page-05.png"
+            },
+            {
+              "number": 6,
+              "image": "assets/uploads/s2-everfrost-master-guide/tr/pages/page-06.png"
+            },
+            {
+              "number": 7,
+              "image": "assets/uploads/s2-everfrost-master-guide/tr/pages/page-07.png"
+            },
+            {
+              "number": 8,
+              "image": "assets/uploads/s2-everfrost-master-guide/tr/pages/page-08.png"
+            },
+            {
+              "number": 9,
+              "image": "assets/uploads/s2-everfrost-master-guide/tr/pages/page-09.png"
+            },
+            {
+              "number": 10,
+              "image": "assets/uploads/s2-everfrost-master-guide/tr/pages/page-10.png"
+            },
+            {
+              "number": 11,
+              "image": "assets/uploads/s2-everfrost-master-guide/tr/pages/page-11.png"
+            },
+            {
+              "number": 12,
+              "image": "assets/uploads/s2-everfrost-master-guide/tr/pages/page-12.png"
+            },
+            {
+              "number": 13,
+              "image": "assets/uploads/s2-everfrost-master-guide/tr/pages/page-13.png"
+            },
+            {
+              "number": 14,
+              "image": "assets/uploads/s2-everfrost-master-guide/tr/pages/page-14.png"
+            },
+            {
+              "number": 15,
+              "image": "assets/uploads/s2-everfrost-master-guide/tr/pages/page-15.png"
+            },
+            {
+              "number": 16,
+              "image": "assets/uploads/s2-everfrost-master-guide/tr/pages/page-16.png"
+            },
+            {
+              "number": 17,
+              "image": "assets/uploads/s2-everfrost-master-guide/tr/pages/page-17.png"
+            },
+            {
+              "number": 18,
+              "image": "assets/uploads/s2-everfrost-master-guide/tr/pages/page-18.png"
+            },
+            {
+              "number": 19,
+              "image": "assets/uploads/s2-everfrost-master-guide/tr/pages/page-19.png"
+            },
+            {
+              "number": 20,
+              "image": "assets/uploads/s2-everfrost-master-guide/tr/pages/page-20.png"
+            },
+            {
+              "number": 21,
+              "image": "assets/uploads/s2-everfrost-master-guide/tr/pages/page-21.png"
+            },
+            {
+              "number": 22,
+              "image": "assets/uploads/s2-everfrost-master-guide/tr/pages/page-22.png"
+            },
+            {
+              "number": 23,
+              "image": "assets/uploads/s2-everfrost-master-guide/tr/pages/page-23.png"
+            },
+            {
+              "number": 24,
+              "image": "assets/uploads/s2-everfrost-master-guide/tr/pages/page-24.png"
+            },
+            {
+              "number": 25,
+              "image": "assets/uploads/s2-everfrost-master-guide/tr/pages/page-25.png"
+            }
+          ],
+          "sourceFile": "Server_630_Season_2_Everfrost_Master_Guide_TR.pdf"
+        }
+      }
+    }
+  ],
   "library": [
     {
       "id": "s2-guides",

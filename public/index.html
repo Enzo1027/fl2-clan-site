@@ -7,7 +7,7 @@
     <meta name="description" content="FrostBorn Lions FL2 Season 2 guide library." />
     <title>FrostBorn Lions [FL2] | Season 2 Library</title>
     <link rel="icon" href="assets/brand/fl2-mark.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="styles.css?v=20260510-i18n" />
+    <link rel="stylesheet" href="styles.css?v=20260510-master" />
   </head>
   <body>
     <div class="site-shell">
@@ -109,6 +109,62 @@
           </div>
         </section>
 
+        <section class="master-section" id="masterGuideSection" aria-labelledby="masterTitle" hidden>
+          <div class="section-heading">
+            <div>
+              <p class="season-label" id="masterKicker">Everfrost Archive</p>
+              <h2 id="masterTitle">Master Guide</h2>
+            </div>
+            <p id="masterMeta"></p>
+          </div>
+
+          <div class="master-feature">
+            <button class="master-cover" type="button" id="masterCoverButton" aria-label="Open master guide">
+              <img id="masterCover" alt="" />
+            </button>
+            <div class="master-copy">
+              <p class="intel-kicker" id="masterStatus">Visual Reader</p>
+              <h3 id="masterGuideName"></h3>
+              <dl>
+                <div>
+                  <dt id="masterLanguageLabel">Language</dt>
+                  <dd id="masterLanguageValue"></dd>
+                </div>
+                <div>
+                  <dt id="masterFormatLabel">Format</dt>
+                  <dd id="masterFormatValue"></dd>
+                </div>
+                <div>
+                  <dt id="masterPagesLabel">Pages</dt>
+                  <dd id="masterPagesValue"></dd>
+                </div>
+              </dl>
+              <div class="master-actions">
+                <button class="mode-button" type="button" id="toggleMasterReader">
+                  <span class="button-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M6 4h9l3 3v13H6z"></path><path d="M14 4v4h4"></path><path d="M9 13h6M9 17h6"></path></svg>
+                  </span>
+                  <span id="toggleMasterReaderLabel">Read guide</span>
+                </button>
+                <a class="mode-button" id="downloadMasterGuide" href="#" download>
+                  <span class="button-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M5 21h14"></path></svg>
+                  </span>
+                  <span id="downloadMasterGuideLabel">Download PDF</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="master-reader" id="masterReader" hidden>
+            <div class="master-reader-head">
+              <p class="intel-kicker" id="masterReaderLabel">Visual Reader</p>
+              <span id="masterReaderCount"></span>
+            </div>
+            <div class="master-pages" id="masterPages"></div>
+          </div>
+        </section>
+
         <section class="guide-section" aria-labelledby="guideGridTitle">
           <div class="section-heading">
             <div>
@@ -169,6 +225,6 @@
       </div>
     </dialog>
 
-    <script src="app.js?v=20260510-i18n" type="module"></script>
+    <script src="app.js?v=20260510-master" type="module"></script>
   </body>
 </html>

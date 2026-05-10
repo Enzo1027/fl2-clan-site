@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import shutil
+import subprocess
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -16,8 +18,10 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = Path("/Users/davidprice/Downloads/S2 Guide")
 PUBLIC = ROOT / "public"
 ASSET_ROOT = PUBLIC / "assets" / "guides" / "s2"
+UPLOAD_ROOT = PUBLIC / "assets" / "uploads"
 DATA_DIR = PUBLIC / "data"
 SOURCE_DOCS = ROOT / "source-documents" / "s2"
+MASTER_GUIDE_ROOT = SOURCE / "Server 630 - Season 2 Everfrost Master Guide"
 
 
 LANGUAGES = [
@@ -71,6 +75,7 @@ IMAGE_SOURCES = {
 
 DOCX_SOURCES = {
     1: [
+        "FL2_Day1_Alliance_Mail_With_Icons.docx",
         "FL2_Day1_Master_Plan_Word_Outputs_DE_ES_AR_FR.docx",
     ],
     2: [
@@ -81,6 +86,21 @@ DOCX_SOURCES = {
         "S2 Day 3 English.docx",
         "FL2_Day3_Master_Plan_All_Languages.docx",
     ],
+    4: [
+        "FL2_Day4_Alliance_Mail_With_Icons.docx",
+        "FL2_Day4_Master_Plan_All_Languages.docx",
+    ],
+}
+
+MASTER_GUIDE_ID = "s2-everfrost-master-guide"
+MASTER_GUIDE_TITLE = "Server 630 Season 2 Everfrost Master Guide"
+MASTER_GUIDE_SOURCES = {
+    "en": MASTER_GUIDE_ROOT / "_EN - ORGINAL" / "Server_630_Season_2_Everfrost_Master_Guide_EN.pdf",
+    "es": MASTER_GUIDE_ROOT / "ES" / "Server_630_Season_2_Everfrost_Master_Guide_ES.pdf",
+    "fr": MASTER_GUIDE_ROOT / "FR" / "Server_630_Season_2_Everfrost_Master_Guide_FR.pdf",
+    "de": MASTER_GUIDE_ROOT / "DE" / "Server_630_Season_2_Everfrost_Master_Guide_DE.pdf",
+    "ar": MASTER_GUIDE_ROOT / "AR" / "Server_630_Season_2_Everfrost_Master_Guide_AR.pdf",
+    "tr": MASTER_GUIDE_ROOT / "TR" / "Server_630_Season_2_Everfrost_Master_Guide_TR.pdf",
 }
 
 
@@ -104,6 +124,14 @@ DAY3_BLOCK_RANGES = [
     BlockRange("es", 68, 102),
     BlockRange("fr", 102, 136),
     BlockRange("tr", 136, None),
+]
+
+DAY4_BLOCK_RANGES = [
+    BlockRange("ar", 0, 99),
+    BlockRange("de", 99, 197),
+    BlockRange("es", 197, 295),
+    BlockRange("fr", 295, 393),
+    BlockRange("tr", 393, None),
 ]
 
 
@@ -234,7 +262,15 @@ def discover_images(source_day: Path) -> dict[str, str]:
 
 
 def extract_docs() -> dict:
-    docs: dict[str, dict[str, dict]] = {"day-1": {}, "day-2": {}, "day-3": {}}
+    docs: dict[str, dict[str, dict]] = {f"day-{day}": {} for day in range(1, TOTAL_DAYS + 1)}
+
+    day1_en = SOURCE / "S2 Day 1" / "FL2_Day1_Alliance_Mail_With_Icons.docx"
+    if day1_en.exists():
+        docs["day-1"]["en"] = {
+            "source": day1_en.name,
+            "title": "S2 Day 1 Master Plan",
+            "blocks": iter_blocks(day1_en),
+        }
 
     day1 = SOURCE / "S2 Day 1" / "FL2_Day1_Master_Plan_Word_Outputs_DE_ES_AR_FR.docx"
     for code, blocks in split_ranges(paragraph_blocks(day1), DAY1_PARAGRAPH_RANGES).items():
@@ -274,7 +310,90 @@ def extract_docs() -> dict:
             "blocks": blocks,
         }
 
+    day4_en = SOURCE / "S2 Day 4" / "FL2_Day4_Alliance_Mail_With_Icons.docx"
+    if day4_en.exists():
+        docs["day-4"]["en"] = {
+            "source": day4_en.name,
+            "title": "S2 Day 4 Master Plan",
+            "blocks": iter_blocks(day4_en),
+        }
+
+    day4_all = SOURCE / "S2 Day 4" / "FL2_Day4_Master_Plan_All_Languages.docx"
+    if day4_all.exists():
+        for code, blocks in split_ranges(iter_blocks(day4_all), DAY4_BLOCK_RANGES).items():
+            docs["day-4"][code] = {
+                "source": day4_all.name,
+                "title": "S2 Day 4 Master Plan",
+                "blocks": blocks,
+            }
+
     return docs
+
+
+def page_sort_key(path: Path) -> int:
+    match = re.search(r"-(\d+)\.png$", path.name)
+    return int(match.group(1)) if match else 0
+
+
+def render_pdf_pages(source: Path, pages_dir: Path) -> list[dict]:
+    pages_dir.mkdir(parents=True, exist_ok=True)
+    for path in pages_dir.glob("*.png"):
+        path.unlink()
+
+    prefix = pages_dir / "render"
+    subprocess.run(["pdftoppm", "-r", "160", "-png", str(source), str(prefix)], check=True)
+
+    pages = []
+    rendered = sorted(pages_dir.glob("render-*.png"), key=page_sort_key)
+    for index, path in enumerate(rendered, start=1):
+        target = pages_dir / f"page-{index:02d}.png"
+        path.rename(target)
+        pages.append(
+            {
+                "number": index,
+                "image": str(target.relative_to(PUBLIC)),
+            }
+        )
+    return pages
+
+
+def build_uploads() -> list[dict]:
+    target_dir = UPLOAD_ROOT / MASTER_GUIDE_ID
+    if target_dir.exists():
+        shutil.rmtree(target_dir)
+
+    languages = {}
+    for code, source in MASTER_GUIDE_SOURCES.items():
+        if code == "en" and not source.exists():
+            source = SOURCE / "Server_630_Season_2_Everfrost_Master_Guide_EN.pdf"
+        if not source.exists():
+            continue
+
+        target_lang_dir = target_dir / code
+        target_lang_dir.mkdir(parents=True, exist_ok=True)
+        pdf_target = target_lang_dir / source.name
+        shutil.copy2(source, pdf_target)
+        pages = render_pdf_pages(source, target_lang_dir / "pages")
+        languages[code] = {
+            "href": str(pdf_target.relative_to(PUBLIC)),
+            "pageCount": len(pages),
+            "pages": pages,
+            "sourceFile": source.name,
+        }
+
+    if not languages:
+        return []
+
+    return [
+        {
+            "id": MASTER_GUIDE_ID,
+            "title": MASTER_GUIDE_TITLE,
+            "type": "PDF",
+            "status": "Live",
+            "featured": True,
+            "languages": languages,
+        }
+    ]
 
 
 def write_json(path: Path, payload: dict) -> None:
@@ -289,7 +408,7 @@ def main() -> None:
         "season": "Season 2",
         "languages": LANGUAGES,
         "days": copy_assets(),
-        "uploads": [],
+        "uploads": build_uploads(),
         "library": [
             {"id": "s2-guides", "title": "Season 2 Guides", "status": "live"},
             {"id": "alliance-mails", "title": "Alliance Mail Text", "status": "live"},
