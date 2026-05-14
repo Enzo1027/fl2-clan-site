@@ -253,6 +253,10 @@
           "image": "assets/guides/s2/day-5/es.png",
           "sourceFile": "S2 Day 5 Spanish.png"
         },
+        "fr": {
+          "image": "assets/guides/s2/day-5/fr.png",
+          "sourceFile": "S2 Day 5 French.png"
+        },
         "de": {
           "image": "assets/guides/s2/day-5/de.png",
           "sourceFile": "S2 Day 5 German.png"

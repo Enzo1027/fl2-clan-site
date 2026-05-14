@@ -93,6 +93,7 @@ IMAGE_SOURCES = {
     5: {
         "en": "S2 Day 5 English.png",
         "es": "S2 Day 5 Spanish.png",
+        "fr": "S2 Day 5 French.png",
         "de": "S2 Day 5 German.png",
         "ar": "S2 Day 5 Arabic.png",
         "tr": "S2 Day 5 Turkish.png",
