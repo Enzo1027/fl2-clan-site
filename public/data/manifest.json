@@ -58,6 +58,14 @@
       "short": "NL",
       "flag": "🇳🇱",
       "dir": "ltr"
+    },
+    {
+      "code": "id",
+      "name": "Indonesian",
+      "native": "Bahasa Indonesia",
+      "short": "ID",
+      "flag": "🇮🇩",
+      "dir": "ltr"
     }
   ],
   "days": [
@@ -96,6 +104,10 @@
         "nl": {
           "image": "assets/guides/s2/day-1/nl.png",
           "sourceFile": "NL.png"
+        },
+        "id": {
+          "image": "assets/guides/s2/day-1/id.png",
+          "sourceFile": "Indonesian.png"
         }
       }
     },
@@ -134,6 +146,10 @@
         "nl": {
           "image": "assets/guides/s2/day-2/nl.png",
           "sourceFile": "S2 Day 2 NL.png"
+        },
+        "id": {
+          "image": "assets/guides/s2/day-2/id.png",
+          "sourceFile": "S2 Day 2 Indonesian.png"
         }
       }
     },
@@ -172,6 +188,10 @@
         "nl": {
           "image": "assets/guides/s2/day-3/nl.png",
           "sourceFile": "S2 Day 3 NL.png"
+        },
+        "id": {
+          "image": "assets/guides/s2/day-3/id.png",
+          "sourceFile": "S2 Day 3 Indonesian.png"
         }
       }
     },
@@ -210,6 +230,10 @@
         "nl": {
           "image": "assets/guides/s2/day-4/nl.png",
           "sourceFile": "S2 Day 4 NL.png"
+        },
+        "id": {
+          "image": "assets/guides/s2/day-4/id.png",
+          "sourceFile": "S2 Day 4 Indonesian.png"
         }
       }
     },
@@ -219,8 +243,37 @@
       "title": "S2 Day 5",
       "label": "Day 5",
       "season": "Season 2",
-      "status": "upcoming",
-      "languages": {}
+      "status": "live",
+      "languages": {
+        "en": {
+          "image": "assets/guides/s2/day-5/en.png",
+          "sourceFile": "S2 Day 5 English.png"
+        },
+        "es": {
+          "image": "assets/guides/s2/day-5/es.png",
+          "sourceFile": "S2 Day 5 Spanish.png"
+        },
+        "de": {
+          "image": "assets/guides/s2/day-5/de.png",
+          "sourceFile": "S2 Day 5 German.png"
+        },
+        "ar": {
+          "image": "assets/guides/s2/day-5/ar.png",
+          "sourceFile": "S2 Day 5 Arabic.png"
+        },
+        "tr": {
+          "image": "assets/guides/s2/day-5/tr.png",
+          "sourceFile": "S2 Day 5 Turkish.png"
+        },
+        "nl": {
+          "image": "assets/guides/s2/day-5/nl.png",
+          "sourceFile": "S2 Day 5 NL.png"
+        },
+        "id": {
+          "image": "assets/guides/s2/day-5/id.png",
+          "sourceFile": "S2 Day 5 Indonesian.png"
+        }
+      }
     },
     {
       "id": "day-6",
@@ -228,8 +281,41 @@
       "title": "S2 Day 6",
       "label": "Day 6",
       "season": "Season 2",
-      "status": "upcoming",
-      "languages": {}
+      "status": "live",
+      "languages": {
+        "en": {
+          "image": "assets/guides/s2/day-6/en.png",
+          "sourceFile": "S2 Day 6 English.png"
+        },
+        "es": {
+          "image": "assets/guides/s2/day-6/es.png",
+          "sourceFile": "S2 Day 6 Spanish.png"
+        },
+        "fr": {
+          "image": "assets/guides/s2/day-6/fr.png",
+          "sourceFile": "S2 Day 6 French.png"
+        },
+        "de": {
+          "image": "assets/guides/s2/day-6/de.png",
+          "sourceFile": "S2 Day 6 German.png"
+        },
+        "ar": {
+          "image": "assets/guides/s2/day-6/ar.png",
+          "sourceFile": "S2 Day 6 Arabic.png"
+        },
+        "tr": {
+          "image": "assets/guides/s2/day-6/tr.png",
+          "sourceFile": "S2 Day 6 Turkish.png"
+        },
+        "nl": {
+          "image": "assets/guides/s2/day-6/nl.png",
+          "sourceFile": "S2 Day 6 NL.png"
+        },
+        "id": {
+          "image": "assets/guides/s2/day-6/id.png",
+          "sourceFile": "S2 Day 6 Indonesian.png"
+        }
+      }
     },
     {
       "id": "day-7",
@@ -237,8 +323,41 @@
       "title": "S2 Day 7",
       "label": "Day 7",
       "season": "Season 2",
-      "status": "upcoming",
-      "languages": {}
+      "status": "live",
+      "languages": {
+        "en": {
+          "image": "assets/guides/s2/day-7/en.png",
+          "sourceFile": "S2 Day 7 English.png"
+        },
+        "es": {
+          "image": "assets/guides/s2/day-7/es.png",
+          "sourceFile": "S2 Day 7 Spanish.png"
+        },
+        "fr": {
+          "image": "assets/guides/s2/day-7/fr.png",
+          "sourceFile": "S2 Day 7 French.png"
+        },
+        "de": {
+          "image": "assets/guides/s2/day-7/de.png",
+          "sourceFile": "S2 Day 7 German.png"
+        },
+        "ar": {
+          "image": "assets/guides/s2/day-7/ar.png",
+          "sourceFile": "S2 Day 7 Arabic.png"
+        },
+        "tr": {
+          "image": "assets/guides/s2/day-7/tr.png",
+          "sourceFile": "S2 Day 7 Turkish.png"
+        },
+        "nl": {
+          "image": "assets/guides/s2/day-7/nl.png",
+          "sourceFile": "S2 Day 7 NL.png"
+        },
+        "id": {
+          "image": "assets/guides/s2/day-7/id.png",
+          "sourceFile": "S2 Day 7 Indonesian.png"
+        }
+      }
     }
   ],
   "uploads": [

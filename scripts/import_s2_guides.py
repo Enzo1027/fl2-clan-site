@@ -32,6 +32,7 @@ LANGUAGES = [
     {"code": "ar", "name": "Arabic", "native": "العربية", "short": "AR", "flag": "🇸🇦", "dir": "rtl"},
     {"code": "tr", "name": "Turkish", "native": "Türkçe", "short": "TR", "flag": "🇹🇷", "dir": "ltr"},
     {"code": "nl", "name": "Dutch", "native": "Nederlands", "short": "NL", "flag": "🇳🇱", "dir": "ltr"},
+    {"code": "id", "name": "Indonesian", "native": "Bahasa Indonesia", "short": "ID", "flag": "🇮🇩", "dir": "ltr"},
 ]
 
 LANGUAGE_ALIASES = {
@@ -42,6 +43,7 @@ LANGUAGE_ALIASES = {
     "ar": ["arabic"],
     "tr": ["turkish"],
     "nl": [" nl ", " dutch ", " nederlands "],
+    "id": ["indonesian", " indonesia ", " bahasa indonesia "],
 }
 
 TOTAL_DAYS = 7
@@ -56,6 +58,7 @@ IMAGE_SOURCES = {
         "ar": "Arabic Day 1.png",
         "tr": "Turkish.png",
         "nl": "NL.png",
+        "id": "Indonesian.png",
     },
     2: {
         "en": "S2 Day 2 English.png",
@@ -65,6 +68,7 @@ IMAGE_SOURCES = {
         "ar": "S2 Day 2 Arabic.png",
         "tr": "S2 Day 2 Turkish.png",
         "nl": "S2 Day 2 NL.png",
+        "id": "S2 Day 2 Indonesian.png",
     },
     3: {
         "en": "S2 Day 3 English.png",
@@ -74,6 +78,7 @@ IMAGE_SOURCES = {
         "ar": "S2 Day 3 Arabic.png",
         "tr": "S2 Day 3 Turkish.png",
         "nl": "S2 Day 3 NL.png",
+        "id": "S2 Day 3 Indonesian.png",
     },
     4: {
         "en": "S2 Day 4 English.png",
@@ -83,6 +88,36 @@ IMAGE_SOURCES = {
         "ar": "S2 Day 4 Arabic.png",
         "tr": "S2 Day 4 Turkish.png",
         "nl": "S2 Day 4 NL.png",
+        "id": "S2 Day 4 Indonesian.png",
+    },
+    5: {
+        "en": "S2 Day 5 English.png",
+        "es": "S2 Day 5 Spanish.png",
+        "de": "S2 Day 5 German.png",
+        "ar": "S2 Day 5 Arabic.png",
+        "tr": "S2 Day 5 Turkish.png",
+        "nl": "S2 Day 5 NL.png",
+        "id": "S2 Day 5 Indonesian.png",
+    },
+    6: {
+        "en": "S2 Day 6 English.png",
+        "es": "S2 Day 6 Spanish.png",
+        "fr": "S2 Day 6 French.png",
+        "de": "S2 Day 6 German.png",
+        "ar": "S2 Day 6 Arabic.png",
+        "tr": "S2 Day 6 Turkish.png",
+        "nl": "S2 Day 6 NL.png",
+        "id": "S2 Day 6 Indonesian.png",
+    },
+    7: {
+        "en": "S2 Day 7 English.png",
+        "es": "S2 Day 7 Spanish.png",
+        "fr": "S2 Day 7 French.png",
+        "de": "S2 Day 7 German.png",
+        "ar": "S2 Day 7 Arabic.png",
+        "tr": "S2 Day 7 Turkish.png",
+        "nl": "S2 Day 7 NL.png",
+        "id": "S2 Day 7 Indonesian.png",
     },
 }
 
@@ -92,21 +127,37 @@ DOCX_SOURCES = {
         "FL2_Day1_Alliance_Mail_With_Icons.docx",
         "FL2_Day1_Master_Plan_Word_Outputs_DE_ES_AR_FR.docx",
         "FL2_Day1_Master_Plan_NL.docx",
+        "FL2_Day1_Master_Plan_Indonesian.docx",
     ],
     2: [
         "S2 Day 2 English.docx",
         "FL2_Day2_Master_Plan_All_Languages.docx",
         "FL2_Day2_Master_Plan_NL.docx",
+        "FL2_Day2_Master_Plan_Indonesian.docx",
     ],
     3: [
         "S2 Day 3 English.docx",
         "FL2_Day3_Master_Plan_All_Languages.docx",
         "FL2_Day3_Master_Plan_NL.docx",
+        "FL2_Day3_Master_Plan_Indonesian.docx",
     ],
     4: [
         "FL2_Day4_Alliance_Mail_With_Icons.docx",
         "FL2_Day4_Master_Plan_All_Languages.docx",
         "FL2_Day4_Master_Plan_NL.docx",
+        "FL2_Day4_Master_Plan_Indonesian.docx",
+    ],
+    5: [
+        "FL2_Day5_Alliance_Mail_With_Icons.docx",
+        "FL2_Day5_Master_Plan_All_Languages.docx",
+    ],
+    6: [
+        "FL2_Day6_Alliance_Mail_With_Icons.docx",
+        "FL2_Day6_Master_Plan_All_Languages.docx",
+    ],
+    7: [
+        "FL2_Day7_Alliance_Mail_With_Icons.docx",
+        "FL2_Day7_Master_Plan_All_Languages.docx",
     ],
 }
 
@@ -205,10 +256,17 @@ def split_ranges(blocks: list[dict], ranges: list[BlockRange]) -> dict[str, list
 def split_labeled_sections(blocks: list[dict]) -> dict[str, list[dict]]:
     labels = {
         "ARABIC": "ar",
+        "Arabic / العربية": "ar",
         "GERMAN": "de",
+        "German / Deutsch": "de",
         "SPANISH": "es",
+        "Spanish / Español": "es",
         "FRENCH": "fr",
+        "French / Français": "fr",
         "TURKISH": "tr",
+        "Turkish / Türkçe": "tr",
+        "Dutch / Nederlands": "nl",
+        "Indonesian / Bahasa Indonesia": "id",
     }
     sections: dict[str, list[dict]] = {}
     current = None
@@ -220,6 +278,18 @@ def split_labeled_sections(blocks: list[dict]) -> dict[str, list[dict]]:
             continue
         if current:
             sections[current].append(block)
+    return sections
+
+
+def split_fixed_sections(blocks: list[dict], codes: list[str]) -> dict[str, list[dict]]:
+    if not codes:
+        return {}
+    section_size = len(blocks) // len(codes)
+    sections = {}
+    for index, code in enumerate(codes):
+        start = index * section_size
+        end = (index + 1) * section_size if index < len(codes) - 1 else None
+        sections[code] = blocks[start:end]
     return sections
 
 
@@ -261,7 +331,7 @@ def copy_assets() -> list[dict]:
                 "title": f"S2 Day {day}",
                 "label": f"Day {day}",
                 "season": "Season 2",
-                "status": "live" if len(entries) == len(LANGUAGES) else "upcoming",
+                "status": "live" if entries else "upcoming",
                 "languages": entries,
             }
         )
@@ -307,6 +377,14 @@ def extract_docs() -> dict:
             "blocks": iter_blocks(day1_nl),
         }
 
+    day1_id = SOURCE / "S2 Day 1" / "FL2_Day1_Master_Plan_Indonesian.docx"
+    if day1_id.exists():
+        docs["day-1"]["id"] = {
+            "source": day1_id.name,
+            "title": "S2 Day 1 Master Plan",
+            "blocks": iter_blocks(day1_id),
+        }
+
     day2_en = SOURCE / "S2 Day 2" / "S2 Day 2 English.docx"
     docs["day-2"]["en"] = {
         "source": day2_en.name,
@@ -330,6 +408,14 @@ def extract_docs() -> dict:
             "blocks": iter_blocks(day2_nl),
         }
 
+    day2_id = SOURCE / "S2 Day 2" / "FL2_Day2_Master_Plan_Indonesian.docx"
+    if day2_id.exists():
+        docs["day-2"]["id"] = {
+            "source": day2_id.name,
+            "title": "S2 Day 2 Master Plan",
+            "blocks": iter_blocks(day2_id),
+        }
+
     day3_en = SOURCE / "S2 Day 3" / "S2 Day 3 English.docx"
     docs["day-3"]["en"] = {
         "source": day3_en.name,
@@ -351,6 +437,14 @@ def extract_docs() -> dict:
             "source": day3_nl.name,
             "title": "S2 Day 3 Master Plan",
             "blocks": iter_blocks(day3_nl),
+        }
+
+    day3_id = SOURCE / "S2 Day 3" / "FL2_Day3_Master_Plan_Indonesian.docx"
+    if day3_id.exists():
+        docs["day-3"]["id"] = {
+            "source": day3_id.name,
+            "title": "S2 Day 3 Master Plan",
+            "blocks": iter_blocks(day3_id),
         }
 
     day4_en = SOURCE / "S2 Day 4" / "FL2_Day4_Alliance_Mail_With_Icons.docx"
@@ -377,6 +471,68 @@ def extract_docs() -> dict:
             "title": "S2 Day 4 Master Plan",
             "blocks": iter_blocks(day4_nl),
         }
+
+    day4_id = SOURCE / "S2 Day 4" / "FL2_Day4_Master_Plan_Indonesian.docx"
+    if day4_id.exists():
+        docs["day-4"]["id"] = {
+            "source": day4_id.name,
+            "title": "S2 Day 4 Master Plan",
+            "blocks": iter_blocks(day4_id),
+        }
+
+    day5_en = SOURCE / "S2 Day 5" / "FL2_Day5_Alliance_Mail_With_Icons.docx"
+    if day5_en.exists():
+        docs["day-5"]["en"] = {
+            "source": day5_en.name,
+            "title": "S2 Day 5 Master Plan",
+            "blocks": iter_blocks(day5_en),
+        }
+
+    day5_all = SOURCE / "S2 Day 5" / "FL2_Day5_Master_Plan_All_Languages.docx"
+    if day5_all.exists():
+        for code, blocks in split_labeled_sections(iter_blocks(day5_all)).items():
+            docs["day-5"][code] = {
+                "source": day5_all.name,
+                "title": "S2 Day 5 Master Plan",
+                "blocks": blocks,
+            }
+
+    day6_en = SOURCE / "S2 Day 6" / "FL2_Day6_Alliance_Mail_With_Icons.docx"
+    if day6_en.exists():
+        docs["day-6"]["en"] = {
+            "source": day6_en.name,
+            "title": "S2 Day 6 Master Plan",
+            "blocks": iter_blocks(day6_en),
+        }
+
+    day6_all = SOURCE / "S2 Day 6" / "FL2_Day6_Master_Plan_All_Languages.docx"
+    if day6_all.exists():
+        for code, blocks in split_fixed_sections(
+            iter_blocks(day6_all),
+            ["ar", "de", "es", "fr", "tr", "nl", "id"],
+        ).items():
+            docs["day-6"][code] = {
+                "source": day6_all.name,
+                "title": "S2 Day 6 Master Plan",
+                "blocks": blocks,
+            }
+
+    day7_en = SOURCE / "S2 Day 7" / "FL2_Day7_Alliance_Mail_With_Icons.docx"
+    if day7_en.exists():
+        docs["day-7"]["en"] = {
+            "source": day7_en.name,
+            "title": "S2 Day 7 Master Plan",
+            "blocks": iter_blocks(day7_en),
+        }
+
+    day7_all = SOURCE / "S2 Day 7" / "FL2_Day7_Master_Plan_All_Languages.docx"
+    if day7_all.exists():
+        for code, blocks in split_labeled_sections(iter_blocks(day7_all)).items():
+            docs["day-7"][code] = {
+                "source": day7_all.name,
+                "title": "S2 Day 7 Master Plan",
+                "blocks": blocks,
+            }
 
     return docs
 

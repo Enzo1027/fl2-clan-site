@@ -1,4 +1,4 @@
-const APP_VERSION = "20260510-nl-cachefix";
+const APP_VERSION = "20260514-id-seven-days";
 window.FL2_BUILD = APP_VERSION;
 
 const state = {
@@ -169,6 +169,7 @@ const I18N = {
     pages: "Pages",
     page: "Page",
     englishOnly: "English only",
+    notYetAvailable: "Not available in this language yet",
   },
   es: {
     season2: "Temporada 2",
@@ -578,6 +579,75 @@ const I18N = {
     page: "Pagina",
     englishOnly: "Alleen Engels",
   },
+  id: {
+    season2: "Musim 2",
+    fieldLibrary: "Perpustakaan Lapangan",
+    live: "Live",
+    poster: "Poster",
+    text: "Teks",
+    upcoming: "Segera hadir",
+    currentFile: "File saat ini",
+    language: "Bahasa",
+    format: "Format",
+    browserView: "Tampilan browser",
+    image: "Gambar",
+    library: "Perpustakaan",
+    s2GuideSet: "Panduan S2",
+    allDays: "Semua hari",
+    clanRepository: "Repositori klan",
+    otherUploads: "Unggahan lain",
+    browserFirst: "Utama di browser",
+    chooseLanguage: "Pilih bahasa",
+    chooseDay: "Pilih hari S2",
+    libraryStatus: "Status perpustakaan",
+    guideDetails: "Detail panduan",
+    savePoster: "Simpan poster",
+    openPosterReader: "Buka pembaca poster",
+    posterReader: "Pembaca poster",
+    zoomOut: "Perkecil",
+    fitPoster: "Sesuaikan poster",
+    zoomIn: "Perbesar",
+    closePosterReader: "Tutup pembaca poster",
+    day: "Hari",
+    guide: "Panduan",
+    posterNoun: "Poster",
+    days: "hari",
+    season2Guides: "Panduan Musim 2",
+    allianceMailText: "Teks mail aliansi",
+    uploadQueue: "Antrean unggahan",
+    readyInBrowser: "Siap di browser",
+    preparedForUploads: "Siap untuk unggahan",
+    readyForFullGuide: "Siap untuk panduan S2 lengkap",
+    dropUploads: "Tambahkan file baru yang bisa dilihat di browser ke repo dan masukkan ke manifest unggahan saat sudah ada.",
+    extraResources: "sumber tambahan",
+    resource: "Sumber",
+    liveStatus: "Live",
+    viewOnline: "Lihat online",
+    readOnlyTextView: "teks baca-saja",
+    posterOnlyView: "hanya poster",
+    browserPosterAnd: "poster browser dan",
+    noSourceFolder: "File sumber belum ada untuk pilihan ini.",
+    noTextReader: "Bahasa ini tersedia sebagai poster asli. Konten teks untuk hari ini belum disediakan.",
+    isUpcoming: "segera hadir",
+    openText: "Buka tampilan teks baca-saja",
+    openPosterOnlyNote: "Buka catatan poster saja",
+    unableToLoad: "Tidak dapat memuat data panduan",
+    visitCounter: "Penghitung kunjungan",
+    visits: "Kunjungan",
+    uniqueVisitors: "Pengunjung unik",
+    everfrostArchive: "Arsip Everfrost",
+    masterGuide: "Panduan Master",
+    visualReader: "Pembaca visual",
+    completeSeasonGuide: "Panduan Musim 2 Lengkap",
+    readGuide: "Baca panduan",
+    hideGuide: "Sembunyikan panduan",
+    downloadPdf: "Unduh PDF",
+    sourcePdf: "PDF sumber",
+    pages: "Halaman",
+    page: "Halaman",
+    englishOnly: "Hanya Inggris",
+    notYetAvailable: "Belum tersedia dalam bahasa ini",
+  },
 };
 
 function normalizeHash() {
@@ -629,7 +699,7 @@ function getFeaturedUpload() {
 }
 
 function getUploadEntry(upload, language = state.language) {
-  return upload?.languages?.[language] ?? upload?.languages?.en ?? upload;
+  return upload?.languages?.[language] ?? (upload?.languages ? null : upload);
 }
 
 function isLiveDay(day = getDay(), language = state.language) {
@@ -919,7 +989,7 @@ function renderUploads() {
       <span>
         <strong>${upload.title}</strong>
         <span>${upload.type ?? t("resource")} · ${
-          entry?.pageCount ? `${entry.pageCount} ${t("pages")}` : upload.status ?? t("liveStatus")
+          entry?.pageCount ? `${entry.pageCount} ${t("pages")}` : t("notYetAvailable")
         }</span>
       </span>
     `;
@@ -934,21 +1004,25 @@ function renderGuideGrid() {
 
   for (const day of state.manifest.days) {
     const entry = getEntry(day, language.code);
-    const live = Boolean(entry?.image);
+    const hasPoster = Boolean(entry?.image);
+    const hasText = Boolean(state.docs[day.id]?.[language.code]);
+    const live = hasPoster || hasText;
     const card = document.createElement("button");
     card.type = "button";
     card.className = `guide-card${day.id === state.day ? " is-active" : ""}${live ? "" : " is-upcoming"}`;
     card.innerHTML = `
       <span class="guide-thumb">${
-        live
+        hasPoster
           ? `<img src="${entry.image}" alt="${dayTitle(day)} ${language.native} ${t("posterNoun")}" loading="lazy">`
           : `<span class="upcoming-thumb"><img src="assets/brand/fl2-mark.svg" alt=""><strong>${t("upcoming")}</strong></span>`
       }</span>
       <span class="guide-card-body">
         <h3>${dayTitle(day)}</h3>
         <p>${
-          live
-            ? `${language.native} ${t("browserPosterAnd")} ${state.docs[day.id]?.[language.code] ? t("readOnlyTextView") : t("posterOnlyView")}.`
+          hasPoster
+            ? `${language.native} ${t("browserPosterAnd")} ${hasText ? t("readOnlyTextView") : t("posterOnlyView")}.`
+            : hasText
+              ? `${language.native} ${t("readOnlyTextView")}.`
             : t("noSourceFolder")
         }</p>
         <span class="card-tags"><span>${language.short}</span><span>${live ? t("viewOnline") : t("upcoming")}</span></span>
@@ -977,30 +1051,35 @@ function updateCurrentGuide() {
   const day = getDay();
   const entry = getEntry(day, language.code);
   const title = `${dayTitle(day)} ${language.native}`;
-  const live = isLiveDay(day, language.code);
   const textAvailable = Boolean(state.docs[day.id]?.[language.code]);
-  if (!live && state.view !== "poster") {
+  const hasPoster = isLiveDay(day, language.code);
+  const hasAnyContent = hasPoster || textAvailable;
+  if (!hasAnyContent && state.view !== "poster") {
     state.view = "poster";
     history.replaceState(null, "", `#${new URLSearchParams({ lang: state.language, day: state.day, view: state.view })}`);
   }
 
   document.documentElement.lang = language.code;
-  document.documentElement.dir = "ltr";
+  document.documentElement.dir = language.dir;
   els.guideMeta.textContent = `${t("season2")} / ${language.native}`;
   els.guideTitle.textContent = guideTitle(day);
-  els.guideImage.hidden = !live;
-  els.upcomingPoster.hidden = live;
+  els.guideImage.hidden = !hasPoster;
+  els.upcomingPoster.hidden = hasPoster;
   els.upcomingTitle.textContent = guideTitle(day);
-  els.currentFileTitle.textContent = live ? `${dayTitle(day)} ${t("posterNoun")}` : `${dayTitle(day)} ${t("upcoming")}`;
+  els.currentFileTitle.textContent = hasPoster
+    ? `${dayTitle(day)} ${t("posterNoun")}`
+    : textAvailable
+      ? `${dayTitle(day)} ${t("text")}`
+      : `${dayTitle(day)} ${t("upcoming")}`;
   els.currentLanguage.textContent = `${language.flag} ${language.native}`;
-  if (live) {
+  if (hasPoster) {
     els.downloadPoster.removeAttribute("aria-disabled");
   } else {
     els.downloadPoster.setAttribute("aria-disabled", "true");
   }
-  els.downloadPoster.classList.toggle("is-disabled", !live);
-  els.expandGuide.disabled = !live;
-  if (live) {
+  els.downloadPoster.classList.toggle("is-disabled", !hasPoster);
+  els.expandGuide.disabled = !hasPoster;
+  if (hasPoster) {
     els.guideImage.src = entry.image;
     els.guideImage.alt = `${title} ${t("guide")} ${t("posterNoun")}`;
     els.downloadPoster.href = entry.image;
@@ -1021,7 +1100,7 @@ function updateCurrentGuide() {
   els.dialogTitle.textContent = `${dayTitle(day)} ${t("posterReader")}`;
 
   const textButton = els.modeButtons.find((button) => button.dataset.view === "text");
-  textButton.disabled = !live;
+  textButton.disabled = !hasAnyContent;
   textButton.title = textAvailable ? t("openText") : t("openPosterOnlyNote");
 
   renderDocument();
