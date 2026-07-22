@@ -128,19 +128,20 @@ function serveStatic(req, res) {
   const ext = path.extname(filePath).toLowerCase();
   const contentType = mimeTypes[ext] || "application/octet-stream";
   const relativePath = path.relative(publicDir, filePath).split(path.sep).join("/");
-  const noStore =
-    ext === ".html" ||
-    [".css", ".js", ".json"].includes(ext) ||
-    relativePath === "robots.txt";
-  const cacheHeaders = noStore
-    ? {
+  const noStore = ext === ".html" || relativePath === "robots.txt";
+  const versioned = /[?&]v=[a-z0-9._-]+/i.test(req.url || "");
+  let cacheHeaders;
+  if (noStore) {
+    cacheHeaders = {
         "Cache-Control": "no-store, max-age=0, must-revalidate",
         Pragma: "no-cache",
         Expires: "0",
-      }
-    : {
-        "Cache-Control": "public, max-age=31536000, immutable",
-      };
+    };
+  } else if (versioned || ![".css", ".js", ".json"].includes(ext)) {
+    cacheHeaders = { "Cache-Control": "public, max-age=31536000, immutable" };
+  } else {
+    cacheHeaders = { "Cache-Control": "public, max-age=300, must-revalidate" };
+  }
 
   res.writeHead(200, {
     "Content-Type": contentType,

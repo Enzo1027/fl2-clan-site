@@ -8,7 +8,9 @@ Static, mobile-friendly guide library for FL2 clan resources.
 - `/research.html` tracks all 10 research trees, prerequisites, goals, stats, and published badge costs.
 - `/tank.html` tracks the 49-stage tank path, wrench totals, vehicle milestones, and completion pace.
 
-Research and tank progress is stored only in the visitor's browser. The checked-in requirement snapshots live in `public/data/research-trees.json` and `public/data/tank-modifications.json`. Refresh and normalize those public community datasets with:
+Research, tank, and Merit Calculator progress is stored only in the visitor's browser; no per-user progress database is required. The Research and Tank pages can download and restore a small JSON backup containing all three tools, which gives users a manual way to move devices or protect against cleared browser data.
+
+The checked-in requirement snapshots live in `public/data/research-trees.json` and `public/data/tank-modifications.json`. Their versioned browser requests are cached for repeat visits, while HTML stays uncached so deployments appear immediately. Refresh and normalize those public community datasets with:
 
 ```bash
 node scripts/snapshot_lastz_tools.mjs

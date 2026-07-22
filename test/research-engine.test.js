@@ -27,12 +27,17 @@ test("auto-complete fills every transitive prerequisite", () => {
   assert.equal(Object.keys(result).length, unitTree.nodes.length);
 });
 
-test("lowering a prerequisite clears every dependent node", () => {
-  let progress = research.applyNodeLevel(unitTree, {}, "unit-special-training", 1, true);
-  progress = research.applyNodeLevel(unitTree, progress, "fire-up", 0, true);
-  assert.equal(progress["fire-up"], 0);
-  assert.equal(progress["unit-special-training"], undefined);
-  assert.equal(Object.values(progress).filter((level) => level > 0).length, 1);
+test("nodes keep independent partial levels when auto-fill is off", () => {
+  const peaceTree = data.trees.find((tree) => tree.id === "peace-shield");
+  let progress = research.applyNodeLevel(peaceTree, {}, "stronger-armor", 6, false);
+  progress = research.applyNodeLevel(peaceTree, progress, "shield-upgrade", 6, false);
+  progress = research.applyNodeLevel(peaceTree, progress, "tactical-cover", 6, false);
+  progress = research.applyNodeLevel(peaceTree, progress, "combat-policy-2", 5, false);
+  assert.equal(progress["stronger-armor"], 6);
+  assert.equal(progress["shield-upgrade"], 6);
+  assert.equal(progress["tactical-cover"], 6);
+  assert.equal(progress["combat-policy-2"], 5);
+  assert.equal(progress["urgent-rescue"], undefined);
 });
 
 test("tree summary tracks levels, badges, and unknowns", () => {
@@ -43,13 +48,13 @@ test("tree summary tracks levels, badges, and unknowns", () => {
   assert.equal(summary.completedUnknown, 0);
 });
 
-test("goal cost includes unfinished prerequisite nodes once", () => {
+test("a goal counts only the node levels the user selected", () => {
   const goal = research.getGoalRequirement(unitTree, {}, { "unit-special-training": 1 });
-  assert.equal(goal.known, unitTree.totalBadges);
-  assert.equal(goal.levels, unitTree.totalLevels);
+  assert.equal(goal.known, 54_900);
+  assert.equal(goal.levels, 1);
 });
 
-test("multiple goals are order-independent and never lower prerequisites", () => {
+test("multiple independent goals are order-independent", () => {
   const first = research.getGoalRequirement(unitTree, {}, {
     "unit-special-training": 1,
     "fire-up": 1,
@@ -58,9 +63,9 @@ test("multiple goals are order-independent and never lower prerequisites", () =>
     "fire-up": 1,
     "unit-special-training": 1,
   });
-  assert.equal(first.known, unitTree.totalBadges);
-  assert.equal(first.levels, unitTree.totalLevels);
-  assert.equal(first.targetProgress["fire-up"], 10);
+  assert.equal(first.known, 54_900 + 700);
+  assert.equal(first.levels, 2);
+  assert.equal(first.targetProgress["fire-up"], 1);
   assert.deepEqual(first, reversed);
 });
 

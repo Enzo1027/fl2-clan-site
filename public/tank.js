@@ -50,7 +50,14 @@
   }
 
   function saveState() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      const status = document.querySelector("#localSaveStatus");
+      if (status) status.textContent = "Saved on this browser";
+    } catch {
+      const status = document.querySelector("#localSaveStatus");
+      if (status) status.textContent = "Browser saving is unavailable";
+    }
   }
 
   function format(value) {
@@ -293,7 +300,7 @@
     if (event.target === elements.tankDialog) elements.tankDialog.close();
   });
 
-  fetch("data/tank-modifications.json")
+  fetch("data/tank-modifications.json?v=20260722-research-tank-v2")
     .then((response) => {
       if (!response.ok) throw new Error(`Tank data returned ${response.status}`);
       return response.json();

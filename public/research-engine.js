@@ -48,37 +48,13 @@
     return ordered;
   }
 
-  function getDependentIds(tree, nodeId) {
-    const children = new Map();
-    tree.nodes.forEach((node) => {
-      node.parents.forEach((parentId) => {
-        if (!children.has(parentId)) children.set(parentId, []);
-        children.get(parentId).push(node.id);
-      });
-    });
-    const visited = new Set();
-    function visit(id) {
-      (children.get(id) || []).forEach((childId) => {
-        if (visited.has(childId)) return;
-        visited.add(childId);
-        visit(childId);
-      });
-    }
-    visit(nodeId);
-    return Array.from(visited);
-  }
-
   function applyNodeLevel(tree, progress = {}, nodeId, levelValue, autoComplete = false) {
     const nodeMap = new Map(tree.nodes.map((node) => [node.id, node]));
     const node = nodeMap.get(nodeId);
     if (!node) return { ...progress };
 
-    const previousLevel = clampLevel(progress[nodeId], node.maxLevel);
     const nextLevel = clampLevel(levelValue, node.maxLevel);
     const next = { ...progress, [nodeId]: nextLevel };
-    if (nextLevel < previousLevel) {
-      getDependentIds(tree, nodeId).forEach((id) => { delete next[id]; });
-    }
     if (autoComplete && next[nodeId] > 0) {
       getPrerequisiteIds(tree, nodeId).forEach((id) => {
         const prerequisite = nodeMap.get(id);
@@ -126,13 +102,6 @@
         clampLevel(targetProgress[nodeId], node.maxLevel),
         clampLevel(targetLevel, node.maxLevel),
       );
-      getPrerequisiteIds(tree, nodeId).forEach((id) => {
-        const prerequisite = nodeMap.get(id);
-        targetProgress[id] = Math.max(
-          clampLevel(targetProgress[id], prerequisite.maxLevel),
-          prerequisite.maxLevel,
-        );
-      });
     });
 
     return tree.nodes.reduce(
@@ -177,7 +146,6 @@
     sumCostRange,
     getNodeProgress,
     getPrerequisiteIds,
-    getDependentIds,
     applyNodeLevel,
     getTreeSummary,
     getGoalRequirement,

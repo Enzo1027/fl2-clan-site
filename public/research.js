@@ -2,6 +2,7 @@
   "use strict";
 
   const STORAGE_KEY = "fl2-research-planner-v1";
+  const MODEL_VERSION = 2;
   const engine = window.FL2Research;
   const number = new Intl.NumberFormat();
   let bundle = null;
@@ -55,7 +56,7 @@
         return {
           activeTreeId: saved.activeTreeId || "unit-special-training",
           view: saved.view === "table" ? "table" : "map",
-          autoComplete: saved.autoComplete !== false,
+          autoComplete: saved.modelVersion === MODEL_VERSION ? Boolean(saved.autoComplete) : false,
           progress: saved.progress || {},
           goals: saved.goals || {},
           search: "",
@@ -65,7 +66,7 @@
     return {
       activeTreeId: "unit-special-training",
       view: "map",
-      autoComplete: true,
+      autoComplete: false,
       progress: {},
       goals: {},
       search: "",
@@ -73,13 +74,21 @@
   }
 
   function saveState() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      activeTreeId: state.activeTreeId,
-      view: state.view,
-      autoComplete: state.autoComplete,
-      progress: state.progress,
-      goals: state.goals,
-    }));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        modelVersion: MODEL_VERSION,
+        activeTreeId: state.activeTreeId,
+        view: state.view,
+        autoComplete: state.autoComplete,
+        progress: state.progress,
+        goals: state.goals,
+      }));
+      const status = document.querySelector("#localSaveStatus");
+      if (status) status.textContent = "Saved on this browser";
+    } catch {
+      const status = document.querySelector("#localSaveStatus");
+      if (status) status.textContent = "Browser saving is unavailable";
+    }
   }
 
   function activeTree() {
@@ -99,8 +108,8 @@
   }
 
   function formatCost(cost, unknown = 0) {
-    if (unknown && cost) return `${format(cost)} + ${unknown}?`;
-    if (unknown) return `${unknown} unknown`;
+    if (unknown && cost) return `${format(cost)} known + ${unknown} unpublished`;
+    if (unknown) return `${unknown} cost${unknown === 1 ? "" : "s"} unpublished`;
     return format(cost);
   }
 
@@ -139,11 +148,11 @@
       goalUnknown += goal.unknown;
     });
 
-    elements.allSpent.textContent = formatCost(spent, spentUnknown);
-    elements.allSpentMeta.textContent = spentUnknown ? `${spentUnknown} completed costs remain unknown` : "Published costs";
-    elements.allRemaining.textContent = formatCost(remaining, remainingUnknown);
+    elements.allSpent.textContent = format(spent);
+    elements.allSpentMeta.textContent = spentUnknown ? `Plus ${spentUnknown} completed cost${spentUnknown === 1 ? "" : "s"} not published` : "All completed costs published";
+    elements.allRemaining.textContent = format(remaining);
     elements.allRemainingMeta.textContent = remainingUnknown
-      ? `${remainingUnknown} level cost${remainingUnknown === 1 ? "" : "s"} unpublished`
+      ? `Plus ${remainingUnknown} level cost${remainingUnknown === 1 ? "" : "s"} not published yet`
       : "All remaining costs published";
     elements.allLevels.textContent = `${format(levels)} / ${format(totalLevels)}`;
     elements.allPercent.textContent = `${totalLevels ? Math.floor((levels / totalLevels) * 100) : 0}% complete`;
@@ -162,8 +171,8 @@
       button.setAttribute("aria-pressed", String(tree.id === state.activeTreeId));
       button.innerHTML = `
         <span class="tree-glyph" aria-hidden="true">${initials(tree.name)}</span>
-        <span class="tree-card-copy"><strong>${tree.name}</strong><small>${summary.completedLevels}/${tree.totalLevels} levels · ${Math.floor(summary.levelPercent)}%</small></span>
-        <em>${formatCost(summary.remainingKnown, summary.remainingUnknown)}</em>`;
+        <span class="tree-card-copy"><strong>${tree.name}</strong><small>${summary.completedLevels}/${tree.totalLevels} levels · ${Math.floor(summary.levelPercent)}%${summary.remainingUnknown ? ` · ${summary.remainingUnknown} unpublished` : ""}</small></span>
+        <em>${format(summary.remainingKnown)}<small>known</small></em>`;
       button.addEventListener("click", () => {
         state.activeTreeId = tree.id;
         state.search = "";
@@ -183,7 +192,7 @@
       ? `Unlocks with ${tree.unlockRequirements.join(" · ")}`
       : "No recorded unlock requirement";
     elements.treeProgressLabel.textContent = `${summary.completedLevels} / ${tree.totalLevels} levels`;
-    elements.treeBadgeLabel.textContent = `${formatCost(summary.spentKnown, summary.completedUnknown)} spent · ${formatCost(summary.remainingKnown, summary.remainingUnknown)} left`;
+    elements.treeBadgeLabel.textContent = `${format(summary.spentKnown)} known spent · ${format(summary.remainingKnown)} known left${summary.remainingUnknown ? ` · ${summary.remainingUnknown} costs unpublished` : ""}`;
     elements.treeProgressBar.style.width = `${Math.min(100, summary.levelPercent)}%`;
     elements.treeProgressTrack.setAttribute("aria-valuemax", String(tree.totalLevels));
     elements.treeProgressTrack.setAttribute("aria-valuenow", String(summary.completedLevels));
@@ -206,7 +215,7 @@
     const achieved = requirement.levels === 0;
     elements.goalDescription.textContent = achieved
       ? "Goal achieved — choose another target whenever you are ready"
-      : `${requirement.levels} unfinished level${requirement.levels === 1 ? "" : "s"}, including prerequisites`;
+      : `${requirement.levels} selected level${requirement.levels === 1 ? "" : "s"} remaining — previous nodes stay exactly as entered`;
     elements.goalCost.textContent = achieved ? "✓ Achieved" : `${formatCost(requirement.known, requirement.unknown)} badges`;
   }
 
@@ -252,7 +261,8 @@
       <span class="node-level"><span>Level</span><b>${progress.level}/${node.maxLevel}</b></span>
       <h3>${node.name}</h3>
       <span>
-        <span class="node-cost"><span>${progress.complete ? "Complete" : "Remaining"}</span><strong>${progress.complete ? "✓" : formatCost(progress.remaining.known, progress.remaining.unknown)}</strong></span>
+        <span class="node-cost"><span>${progress.complete ? "Complete" : "Known remaining"}</span><strong>${progress.complete ? "✓" : format(progress.remaining.known)}</strong></span>
+        ${progress.remaining.unknown ? `<span class="node-unknown">Plus ${progress.remaining.unknown} unpublished cost${progress.remaining.unknown === 1 ? "" : "s"}</span>` : ""}
         <span class="node-meter"><span style="width:${node.maxLevel ? (progress.level / node.maxLevel) * 100 : 0}%"></span></span>
       </span>`;
     button.addEventListener("click", () => openNode(tree, node.id));
@@ -286,7 +296,7 @@
     wrap.className = "data-table-wrap";
     wrap.innerHTML = `
       <table class="data-table">
-        <thead><tr><th>Research</th><th>Prerequisites</th><th class="right">Level</th><th class="right">Remaining</th></tr></thead>
+        <thead><tr><th>Research</th><th>Previous map path</th><th class="right">Level</th><th class="right">Remaining</th></tr></thead>
         <tbody>${nodes.map((node) => {
           const progress = engine.getNodeProgress(node, treeProgress(tree)[node.id]);
           const parentNames = node.parents.map((id) => tree.nodes.find((item) => item.id === id)?.name || id).join(", ") || "None";
@@ -329,7 +339,7 @@
     const progress = engine.getNodeProgress(node, treeProgress(tree)[node.id]);
     const parents = node.parents.map((id) => tree.nodes.find((item) => item.id === id)?.name || id);
     elements.dialogNodeTitle.textContent = node.name;
-    elements.dialogNodeParents.textContent = parents.length ? `Requires ${parents.join(" · ")}` : "Starting node — no prerequisites";
+    elements.dialogNodeParents.textContent = parents.length ? `Previous map path: ${parents.join(" · ")}` : "Starting node — no previous path";
     elements.nodeSummary.innerHTML = `
       <div><span>Current level</span><strong>${progress.level} / ${node.maxLevel}</strong></div>
       <div><span>Spent</span><strong>${formatCost(progress.spent.known, progress.spent.unknown)}</strong></div>
@@ -402,7 +412,7 @@
     if (event.target === elements.nodeDialog) elements.nodeDialog.close();
   });
 
-  fetch("data/research-trees.json")
+  fetch("data/research-trees.json?v=20260722-research-tank-v2")
     .then((response) => {
       if (!response.ok) throw new Error(`Research data returned ${response.status}`);
       return response.json();
