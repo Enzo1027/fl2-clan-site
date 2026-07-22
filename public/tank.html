@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#061015" />
+    <meta name="description" content="Track all Last Z tank modification wrench requirements, vehicle milestones, and completion pace with FL2." />
+    <title>Tank Requirements | FL2 Last Z Tools</title>
+    <link rel="icon" href="assets/brand/fl2-mark.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="tools.css?v=20260722-research-tank-v1" />
+  </head>
+  <body class="tank-page">
+    <div class="tool-shell">
+      <header class="topbar">
+        <a class="brand" href="index.html" aria-label="FrostBorn Lions home">
+          <img src="assets/brand/fl2-mark.svg" alt="" />
+          <span><strong>FrostBorn Lions</strong><em>[FL2]</em></span>
+        </a>
+        <nav class="tool-nav" aria-label="FL2 tools">
+          <a href="index.html">Library</a>
+          <a href="calculator.html">Merit Calculator</a>
+          <a href="research.html">Research</a>
+          <a href="tank.html" aria-current="page">Tank</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="tool-hero" aria-labelledby="pageTitle">
+          <div class="tool-hero-copy">
+            <p class="eyebrow">Every wrench accounted for</p>
+            <h1 id="pageTitle">Tank requirements</h1>
+            <p>Tell FL2 the last sub-level you finished. You’ll instantly see your exact wrench total, the distance to every vehicle, and your estimated arrival date at your current pace.</p>
+          </div>
+          <div class="hero-art tank-art" aria-hidden="true">
+            <div class="tank-silhouette"><div class="tank-body"></div><div class="tank-track"></div><div class="tank-level">LV 240</div></div>
+          </div>
+        </section>
+
+        <section class="summary-strip" aria-label="Tank progress">
+          <article class="summary-card accent"><span>Wrenches spent</span><strong id="tankSpent">0</strong><small id="tankStageLabel">Starting path</small></article>
+          <article class="summary-card gold"><span>Wrenches remaining</span><strong id="tankRemaining">70,700</strong><small>Through level 240</small></article>
+          <article class="summary-card green"><span>Next vehicle</span><strong id="nextVehicle">Cheetah</strong><small id="nextVehicleMeta">150 wrenches away</small></article>
+          <article class="summary-card"><span>Path complete</span><strong id="tankPercent">0%</strong><small id="tankLevelProgress">0 stages started</small></article>
+        </section>
+
+        <div class="tank-command-grid">
+          <section class="quick-entry-card" aria-labelledby="quickEntryTitle">
+            <p class="eyebrow">Fast setup</p><h2 id="quickEntryTitle">Where are you now?</h2>
+            <p>Choose the modification showing in your game and the last green sub-level.</p>
+            <div class="field-grid">
+              <label class="field"><span>Current modification</span><select class="select-input" id="quickStage"></select></label>
+              <label class="field"><span>Finished sub-level</span><select class="select-input" id="quickSubLevel"></select></label>
+            </div>
+            <div class="quick-stage-readout" id="quickStageReadout"></div>
+          </section>
+
+          <section class="pace-card" aria-labelledby="paceTitle">
+            <p class="eyebrow">Your real pace</p><h2 id="paceTitle">When will I reach it?</h2>
+            <p>Using your game start date and recorded wrenches, FL2 estimates your weekly pace and remaining milestones.</p>
+            <div class="field-grid">
+              <label class="field"><span>Game start date</span><input class="date-input" id="gameStartDate" type="date" /></label>
+              <div class="field"><span>&nbsp;</span><button class="danger-button" id="clearTankButton" type="button">Clear progress</button></div>
+            </div>
+            <div class="pace-result" id="paceResult" aria-live="polite"></div>
+          </section>
+        </div>
+
+        <section class="milestone-section" aria-labelledby="milestoneTitle">
+          <div class="section-title"><div><p class="eyebrow">Vehicle unlocks</p><h2 id="milestoneTitle">Your road ahead</h2></div><p>Requirements are cumulative from the start.</p></div>
+          <div class="milestone-grid" id="milestoneGrid"></div>
+        </section>
+
+        <section class="tank-path-card" aria-labelledby="tankPathTitle">
+          <header class="tank-path-head">
+            <div><p class="eyebrow">49 modification stages</p><h2 id="tankPathTitle">Full wrench path</h2></div>
+            <div class="workspace-actions">
+              <button class="view-button is-active" id="tankCardsButton" type="button">Cards</button>
+              <button class="view-button" id="tankTableButton" type="button">Table</button>
+            </div>
+          </header>
+          <div class="tank-stage-groups" id="tankWorkspace"></div>
+        </section>
+
+        <section class="source-card" aria-labelledby="tankSourcesTitle">
+          <div><p class="eyebrow">Source checked</p><h2 id="tankSourcesTitle">All 70,700 published wrench requirements</h2><p>The four named vehicle milestones and all 49 per-stage costs are taken from the current Last Z Helper tank dataset. Independent community charts corroborate the mid-game wrench bands, though older charts may start at a later level and show different partial totals.</p><small id="tankFreshness"></small></div>
+          <nav class="source-links" aria-label="Tank sources">
+            <a href="https://lastz.stresswar.com/tank" target="_blank" rel="noreferrer">Last Z Helper</a>
+            <a href="https://lastzsurvivalshooter.com/guides/tank-wrench/" target="_blank" rel="noreferrer">Wrench chart</a>
+            <a href="https://www.packsify.com/blogs/last-z-survival-shooter-vehicle-modification-guide" target="_blank" rel="noreferrer">Vehicle guide</a>
+          </nav>
+        </section>
+      </main>
+
+      <footer><span>FrostBorn Lions [FL2]</span><span>Unofficial community planner. Progress is saved only in this browser.</span></footer>
+    </div>
+
+    <dialog id="tankDialog" aria-labelledby="dialogTankTitle">
+      <div class="dialog-shell">
+        <header class="dialog-head">
+          <div><p class="eyebrow">Tank modification</p><h2 id="dialogTankTitle"></h2><p id="dialogTankRating"></p><p class="dialog-hint">Tap the last green sub-level shown in your game.</p></div>
+          <button class="dialog-close" id="closeTankDialog" type="button" aria-label="Close">×</button>
+        </header>
+        <div class="dialog-body">
+          <div class="dialog-summary" id="tankDialogSummary"></div>
+          <div class="dialog-controls"><div></div><button class="danger-button" id="clearStageButton" type="button">Clear this stage</button></div>
+          <div class="level-list" id="tankLevelList"></div>
+        </div>
+      </div>
+    </dialog>
+
+    <script src="tank-engine.js?v=20260722-research-tank-v1"></script>
+    <script src="tank.js?v=20260722-research-tank-v1"></script>
+  </body>
+</html>

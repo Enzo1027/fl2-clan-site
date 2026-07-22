@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#061015" />
+    <meta name="description" content="Track Last Z research badge requirements, prerequisites, goals, stats, and saved progress with the FL2 Research Planner." />
+    <title>Research Planner | FL2 Last Z Tools</title>
+    <link rel="icon" href="assets/brand/fl2-mark.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="tools.css?v=20260722-research-tank-v1" />
+  </head>
+  <body>
+    <div class="tool-shell">
+      <header class="topbar">
+        <a class="brand" href="index.html" aria-label="FrostBorn Lions home">
+          <img src="assets/brand/fl2-mark.svg" alt="" />
+          <span><strong>FrostBorn Lions</strong><em>[FL2]</em></span>
+        </a>
+        <nav class="tool-nav" aria-label="FL2 tools">
+          <a href="index.html">Library</a>
+          <a href="calculator.html">Merit Calculator</a>
+          <a href="research.html" aria-current="page">Research</a>
+          <a href="tank.html">Tank</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="tool-hero" aria-labelledby="pageTitle">
+          <div class="tool-hero-copy">
+            <p class="eyebrow">Your badge roadmap</p>
+            <h1 id="pageTitle">Research planner</h1>
+            <p>Tap what you have finished. FL2 remembers every level, fills prerequisites when you want it to, and shows the badges and stats between you and your next goal.</p>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <div class="research-orbit">
+              <div class="research-core">R&amp;D</div>
+              <i class="orbit-node"></i><i class="orbit-node"></i><i class="orbit-node"></i>
+              <i class="orbit-node"></i><i class="orbit-node"></i><i class="orbit-node"></i>
+            </div>
+          </div>
+        </section>
+
+        <section class="summary-strip" aria-label="Overall research progress">
+          <article class="summary-card accent"><span>Badges spent</span><strong id="allSpent">0</strong><small id="allSpentMeta">Published costs</small></article>
+          <article class="summary-card gold"><span>Badges remaining</span><strong id="allRemaining">5,595,164 + 27?</strong><small id="allRemainingMeta">27 level costs unpublished</small></article>
+          <article class="summary-card green"><span>Levels finished</span><strong id="allLevels">0 / 1,745</strong><small id="allPercent">0% complete</small></article>
+          <article class="summary-card"><span>Active goal</span><strong id="allGoal">None</strong><small id="allGoalMeta">Choose a node goal below</small></article>
+        </section>
+
+        <div class="research-layout">
+          <aside class="tree-browser" aria-label="Research trees">
+            <div class="panel-heading"><div><p class="eyebrow">10 live trees</p><h2>Choose a tree</h2></div></div>
+            <div class="tree-list" id="treeList"></div>
+          </aside>
+
+          <article class="workspace-card">
+            <header class="workspace-head">
+              <div>
+                <p class="eyebrow" id="treeKicker">Research tree</p>
+                <h2 id="treeTitle">Loading…</h2>
+                <p id="treeRequirements"></p>
+              </div>
+              <div class="workspace-actions" aria-label="Research view controls">
+                <button class="view-button is-active" id="mapViewButton" type="button">Roadmap</button>
+                <button class="view-button" id="tableViewButton" type="button">Table</button>
+                <button class="danger-button" id="clearTreeButton" type="button">Clear tree</button>
+              </div>
+            </header>
+
+            <div class="workspace-toolbar">
+              <div class="progress-stack">
+                <div class="progress-labels"><span id="treeProgressLabel">0 / 0 levels</span><strong id="treeBadgeLabel">0 badges spent</strong></div>
+                <div class="progress-track" id="treeProgressTrack" role="progressbar" aria-label="Tree levels completed" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0"><span id="treeProgressBar"></span></div>
+              </div>
+              <div class="toolbar-controls">
+                <label class="switch"><input id="autoComplete" type="checkbox" /> Auto-fill prerequisites</label>
+                <input class="search-input" id="nodeSearch" type="search" placeholder="Find a research node" aria-label="Find a research node" />
+              </div>
+            </div>
+
+            <div class="goal-banner" id="goalBanner" hidden>
+              <div><strong>Path to your active goals</strong><span id="goalDescription"></span></div>
+              <b id="goalCost">0</b>
+            </div>
+
+            <details class="stat-panel" id="statPanel">
+              <summary>Stat totals earned from this tree</summary>
+              <div class="stat-grid" id="statGrid"></div>
+            </details>
+
+            <p class="unknown-note" id="unknownNote" hidden></p>
+            <p class="sr-only" id="researchStatus" aria-live="polite"></p>
+            <div class="research-workspace" id="researchWorkspace"></div>
+          </article>
+        </div>
+
+        <section class="source-card" aria-labelledby="researchSourcesTitle">
+          <div><p class="eyebrow">Evidence + honesty</p><h2 id="researchSourcesTitle">Known numbers stay known. Missing numbers stay visible.</h2><p>The planner uses Stresswar’s current public research totals and May 2026 corrections. Shooter Training and Army Building still include 27 level costs shown as “?” by the source; those values stay visibly unknown instead of being guessed.</p><small id="researchFreshness"></small></div>
+          <nav class="source-links" aria-label="Research sources">
+            <a href="https://lastz.stresswar.com/research" target="_blank" rel="noreferrer">Last Z Helper</a>
+            <a href="https://last-z.net/guides/laboratory-research-guide/" target="_blank" rel="noreferrer">Research strategy</a>
+            <a href="https://lastz.gg/basics/technologies" target="_blank" rel="noreferrer">Lab overview</a>
+          </nav>
+        </section>
+      </main>
+
+      <footer><span>FrostBorn Lions [FL2]</span><span>Unofficial community planner. Progress is saved only in this browser.</span></footer>
+    </div>
+
+    <dialog id="nodeDialog" aria-labelledby="dialogNodeTitle">
+      <div class="dialog-shell">
+        <header class="dialog-head">
+          <div><p class="eyebrow">Research node</p><h2 id="dialogNodeTitle"></h2><p id="dialogNodeParents"></p><p class="dialog-hint">Tap your highest completed level.</p></div>
+          <button class="dialog-close" id="closeNodeDialog" type="button" aria-label="Close">×</button>
+        </header>
+        <div class="dialog-body">
+          <div class="dialog-summary" id="nodeSummary"></div>
+          <div class="dialog-controls">
+            <label><span>Plan a target level</span><select class="select-input" id="nodeGoalSelect"></select></label>
+            <button class="danger-button" id="clearNodeButton" type="button">Clear node</button>
+          </div>
+          <div class="level-list" id="nodeLevelList"></div>
+        </div>
+      </div>
+    </dialog>
+
+    <script src="research-engine.js?v=20260722-research-tank-v1"></script>
+    <script src="research.js?v=20260722-research-tank-v1"></script>
+  </body>
+</html>

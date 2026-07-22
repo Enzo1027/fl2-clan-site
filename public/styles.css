@@ -132,7 +132,8 @@ button {
   min-width: 0;
 }
 
-.calculator-link {
+.calculator-link,
+.tools-menu > summary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -150,9 +151,66 @@ button {
 }
 
 .calculator-link:hover,
-.calculator-link:focus-visible {
+.calculator-link:focus-visible,
+.tools-menu > summary:hover,
+.tools-menu > summary:focus-visible {
   border-color: var(--gold-2);
   background: rgba(212, 164, 71, 0.16);
+}
+
+.tools-menu {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.tools-menu > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.tools-menu > summary::-webkit-details-marker {
+  display: none;
+}
+
+.tools-menu nav {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 40;
+  display: grid;
+  width: 258px;
+  overflow: hidden;
+  border: 1px solid rgba(79, 195, 238, 0.34);
+  border-radius: 10px;
+  background: rgba(8, 19, 25, 0.98);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.52);
+}
+
+.tools-menu nav a {
+  display: grid;
+  gap: 3px;
+  padding: 13px 14px;
+  border-top: 1px solid rgba(79, 195, 238, 0.14);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.tools-menu nav a:first-child {
+  border-top: 0;
+}
+
+.tools-menu nav a:hover,
+.tools-menu nav a:focus-visible {
+  background: rgba(79, 195, 238, 0.11);
+}
+
+.tools-menu nav strong {
+  font-size: 0.82rem;
+}
+
+.tools-menu nav span {
+  color: var(--muted);
+  font-size: 0.7rem;
 }
 
 .language-tabs::-webkit-scrollbar {
@@ -1084,12 +1142,13 @@ button.upload-item {
   }
 
   .topbar-actions {
+    width: 100%;
     justify-content: flex-start;
-    overflow-x: auto;
+    overflow: visible;
   }
 
   .language-tabs {
-    flex: 1 0 auto;
+    flex: 1 1 280px;
   }
 
   .reader-grid {
@@ -1132,7 +1191,8 @@ button.upload-item {
     padding: 10px 12px;
   }
 
-  .calculator-link {
+  .calculator-link,
+  .tools-menu > summary {
     min-height: 48px;
   }
 

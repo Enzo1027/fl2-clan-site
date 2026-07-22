@@ -2,6 +2,20 @@
 
 Static, mobile-friendly guide library for FL2 clan resources.
 
+## Last Z Tools
+
+- `/calculator.html` recommends whether merit badges should go to Legendary Gear Cores or Forging Stones.
+- `/research.html` tracks all 10 research trees, prerequisites, goals, stats, and published badge costs.
+- `/tank.html` tracks the 49-stage tank path, wrench totals, vehicle milestones, and completion pace.
+
+Research and tank progress is stored only in the visitor's browser. The checked-in requirement snapshots live in `public/data/research-trees.json` and `public/data/tank-modifications.json`. Refresh and normalize those public community datasets with:
+
+```bash
+node scripts/snapshot_lastz_tools.mjs
+```
+
+The refresh script preserves unknown research values as unknown and applies the currently verified Stresswar Shooter Training correction documented in the script.
+
 ## Local Preview
 
 ```bash
@@ -11,6 +25,12 @@ npm run serve
 Open `http://localhost:4173`.
 
 The local preview uses the same Node server as production. It serves `public/` and exposes `/api/visit` for the footer visit counter.
+
+Run all calculator, research, and tank correctness checks with:
+
+```bash
+npm test
+```
 
 ## Content Model
 
