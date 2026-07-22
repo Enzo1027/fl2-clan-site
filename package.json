@@ -6,6 +6,7 @@
   "scripts": {
     "import:s2": "python3 scripts/import_s2_guides.py",
     "serve": "node server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test"
   }
 }

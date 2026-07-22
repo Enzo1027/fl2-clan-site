@@ -12,12 +12,15 @@ const port = Number(process.env.PORT || 4173);
 const mimeTypes = {
   ".css": "text/css; charset=utf-8",
   ".html": "text/html; charset=utf-8",
+  ".jpeg": "image/jpeg",
+  ".jpg": "image/jpeg",
   ".js": "text/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
   ".pdf": "application/pdf",
   ".png": "image/png",
   ".svg": "image/svg+xml; charset=utf-8",
   ".txt": "text/plain; charset=utf-8",
+  ".webp": "image/webp",
 };
 
 function readCounter() {
@@ -126,7 +129,7 @@ function serveStatic(req, res) {
   const contentType = mimeTypes[ext] || "application/octet-stream";
   const relativePath = path.relative(publicDir, filePath).split(path.sep).join("/");
   const noStore =
-    filePath.endsWith("index.html") ||
+    ext === ".html" ||
     [".css", ".js", ".json"].includes(ext) ||
     relativePath === "robots.txt";
   const cacheHeaders = noStore

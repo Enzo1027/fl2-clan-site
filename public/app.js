@@ -1,4 +1,4 @@
-const APP_VERSION = "20260514-id-seven-days";
+const APP_VERSION = "20260721-merit-calculator";
 window.FL2_BUILD = APP_VERSION;
 
 const state = {
