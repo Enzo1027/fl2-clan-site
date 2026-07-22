@@ -2,6 +2,7 @@
   "use strict";
 
   const BACKUP_FORMAT = "fl2-last-z-tools-backup";
+  const profileStore = window.fl2Profiles;
   const STORAGE_KEYS = [
     "fl2-merit-calculator-level-aware-v3",
     "fl2-research-planner-v1",
@@ -32,7 +33,7 @@
 
   function downloadBackup() {
     try {
-      const payload = {
+      const payload = profileStore ? profileStore.exportSnapshot() : {
         format: BACKUP_FORMAT,
         version: 1,
         exportedAt: new Date().toISOString(),
@@ -42,7 +43,7 @@
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `fl2-progress-${new Date().toISOString().slice(0, 10)}.json`;
+      link.download = `${profileStore ? "fl2-all-profiles" : "fl2-progress"}-${new Date().toISOString().slice(0, 10)}.json`;
       document.body.append(link);
       link.click();
       link.remove();
@@ -56,6 +57,12 @@
   async function restoreBackup(file) {
     try {
       const payload = JSON.parse(await file.text());
+      if (profileStore) {
+        profileStore.importSnapshot(payload);
+        setStatus("All profiles restored — reloading…");
+        window.setTimeout(() => window.location.reload(), 450);
+        return;
+      }
       if (payload?.format !== BACKUP_FORMAT || !payload.data || typeof payload.data !== "object") {
         throw new Error("Unrecognized backup");
       }

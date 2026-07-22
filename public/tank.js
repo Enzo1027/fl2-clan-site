@@ -3,10 +3,11 @@
 
   const STORAGE_KEY = "fl2-tank-planner-v1";
   const engine = window.FL2Tank;
+  const profileStore = window.fl2Profiles;
   const number = new Intl.NumberFormat();
   let data = null;
   let openStageId = null;
-  const state = loadState();
+  let state = loadState();
 
   const elements = {
     tankSpent: document.querySelector("#tankSpent"),
@@ -20,6 +21,7 @@
     quickSubLevel: document.querySelector("#quickSubLevel"),
     quickStageReadout: document.querySelector("#quickStageReadout"),
     gameStartDate: document.querySelector("#gameStartDate"),
+    accountAgeDays: document.querySelector("#accountAgeDays"),
     paceResult: document.querySelector("#paceResult"),
     clearTankButton: document.querySelector("#clearTankButton"),
     milestoneGrid: document.querySelector("#milestoneGrid"),
@@ -38,7 +40,7 @@
 
   function loadState() {
     try {
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      const saved = profileStore?.getFeatureState("tank") || JSON.parse(localStorage.getItem(STORAGE_KEY));
       if (saved && typeof saved === "object") return {
         completions: saved.completions || {},
         selectedStageId: saved.selectedStageId || "",
@@ -51,9 +53,10 @@
 
   function saveState() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      if (profileStore) profileStore.setFeatureState("tank", state);
+      else localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       const status = document.querySelector("#localSaveStatus");
-      if (status) status.textContent = "Saved on this browser";
+      if (status) status.textContent = profileStore ? `${profileStore.getProfile().name} saved on this device` : "Saved on this browser";
     } catch {
       const status = document.querySelector("#localSaveStatus");
       if (status) status.textContent = "Browser saving is unavailable";
@@ -112,6 +115,9 @@
   function renderPace(summary) {
     elements.gameStartDate.value = state.gameStartDate;
     elements.gameStartDate.max = localDateValue();
+    const accountAge = engine.accountAgeFromStartDate(state.gameStartDate);
+    elements.accountAgeDays.value = accountAge.error ? "" : String(accountAge.consecutiveDays);
+    elements.accountAgeDays.setCustomValidity("");
     const pace = engine.estimatePace(state.gameStartDate, summary.completed, summary.remaining, summary.milestones);
     if (pace.error) {
       elements.paceResult.innerHTML = `<p class="pace-error">${pace.error}</p>`;
@@ -129,7 +135,7 @@
 
   function renderMilestones(summary) {
     elements.milestoneGrid.innerHTML = summary.milestones.map((milestone) => `
-      <button type="button" class="milestone-card${milestone.complete ? " is-complete" : ""}" data-stage-id="${milestone.id}" aria-label="Jump to ${milestone.name}, level ${milestone.level}">
+      <button type="button" class="milestone-card${milestone.complete ? " is-complete" : ""}" data-stage-id="${milestone.id}" aria-pressed="${state.selectedStageId === milestone.id}" aria-label="Jump to ${milestone.name}, level ${milestone.level}">
         <div class="milestone-level"><span>Level ${milestone.level}</span><b>${milestone.complete ? "Unlocked" : format(milestone.total)}</b></div>
         <h3>${milestone.name}</h3>
         <p>${milestone.complete ? "✓ Vehicle milestone completed" : `<strong>${format(milestone.remaining)}</strong> more wrenches`}</p>
@@ -138,7 +144,7 @@
       card.addEventListener("click", () => {
         state.selectedStageId = card.dataset.stageId;
         saveState();
-        renderQuickEntry();
+        render();
         document.querySelector(`#stage-${CSS.escape(card.dataset.stageId)}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
       });
     });
@@ -155,6 +161,7 @@
       complete === stage.subLevels ? "is-complete" : "",
       stage.isSpecialVehicle ? "is-milestone" : "",
     ].filter(Boolean).join(" ");
+    button.setAttribute("aria-haspopup", "dialog");
     button.innerHTML = `
       <span class="tank-stage-top"><span>Lv ${stage.level}</span><strong>${complete}/${stage.subLevels}</strong></span>
       <h3>${stage.name}</h3>
@@ -196,7 +203,7 @@
         <thead><tr><th>Level</th><th>Modification</th><th>Rank</th><th class="right">Progress</th><th class="right">Each</th><th class="right">Cumulative</th></tr></thead>
         <tbody>${data.modifications.map((stage) => {
           const current = currentSubLevel(stage);
-          return `<tr data-stage-id="${stage.id}" role="button" tabindex="0"><td><strong>Lv ${stage.level}</strong></td><td>${stage.name}</td><td>${rankName(stage)}</td><td class="right ${current === stage.subLevels ? "green" : ""}">${current}/${stage.subLevels}</td><td class="right gold">${format(stage.wrenchesPerSubLevel)}</td><td class="right">${format(stage.cumulativeTotal)}</td></tr>`;
+          return `<tr data-stage-id="${stage.id}" role="button" tabindex="0" aria-haspopup="dialog" aria-label="Open level ${stage.level} ${stage.name}, ${current} of ${stage.subLevels} complete"><td><strong>Lv ${stage.level}</strong></td><td>${stage.name}</td><td>${rankName(stage)}</td><td class="right ${current === stage.subLevels ? "green" : ""}">${current}/${stage.subLevels}</td><td class="right gold">${format(stage.wrenchesPerSubLevel)}</td><td class="right">${format(stage.cumulativeTotal)}</td></tr>`;
         }).join("")}</tbody>
       </table>`;
     wrap.querySelectorAll("tbody tr").forEach((row) => {
@@ -241,6 +248,7 @@
       const row = document.createElement("button");
       row.type = "button";
       row.className = `level-row${complete ? " is-complete" : ""}`;
+      row.setAttribute("aria-pressed", String(complete));
       row.innerHTML = `<span class="level-check">${complete ? "✓" : ""}</span><span class="level-number">${subLevel}/${stage.subLevels}</span><span class="level-cost">${format(stage.wrenchesPerSubLevel)} wrenches</span><span class="level-stats">${format(stage.cumulativeTotal - ((stage.subLevels - subLevel) * stage.wrenchesPerSubLevel))} cumulative after this step</span>`;
       row.addEventListener("click", () => {
         state.completions = engine.applyStageProgress(data.modifications, state.completions, stage.id, subLevel);
@@ -280,6 +288,31 @@
     saveState();
     renderPace(engine.getTankSummary(data, state.completions));
   });
+  elements.accountAgeDays.addEventListener("input", () => {
+    const rawValue = elements.accountAgeDays.value;
+    if (!rawValue) {
+      elements.accountAgeDays.setCustomValidity("");
+      state.gameStartDate = "";
+      saveState();
+      renderPace(engine.getTankSummary(data, state.completions));
+      return;
+    }
+
+    const conversion = engine.startDateFromAccountAge(rawValue);
+    if (conversion.error) {
+      elements.accountAgeDays.setCustomValidity(conversion.error);
+      state.gameStartDate = "";
+      elements.gameStartDate.value = "";
+      elements.paceResult.innerHTML = `<p class="pace-error">${conversion.error}</p>`;
+      saveState();
+      return;
+    }
+
+    elements.accountAgeDays.setCustomValidity("");
+    state.gameStartDate = conversion.startDate;
+    saveState();
+    renderPace(engine.getTankSummary(data, state.completions));
+  });
   elements.clearTankButton.addEventListener("click", () => {
     if (!window.confirm("Clear all saved tank progress?")) return;
     state.completions = {};
@@ -298,6 +331,12 @@
   elements.tankDialog.addEventListener("close", () => { openStageId = null; });
   elements.tankDialog.addEventListener("click", (event) => {
     if (event.target === elements.tankDialog) elements.tankDialog.close();
+  });
+  window.addEventListener("fl2:profilechange", () => {
+    state = loadState();
+    openStageId = null;
+    if (elements.tankDialog.open) elements.tankDialog.close();
+    if (data) render();
   });
 
   fetch("data/tank-modifications.json?v=20260722-research-tank-v2")

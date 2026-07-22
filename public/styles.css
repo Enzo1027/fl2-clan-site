@@ -179,7 +179,9 @@ button {
   z-index: 40;
   display: grid;
   width: 258px;
+  max-height: min(70vh, 560px);
   overflow: hidden;
+  overflow-y: auto;
   border: 1px solid rgba(79, 195, 238, 0.34);
   border-radius: 10px;
   background: rgba(8, 19, 25, 0.98);

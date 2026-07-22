@@ -5,6 +5,8 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function createTankEngine() {
   "use strict";
 
+  const DAY_MS = 86_400_000;
+
   function clampSubLevel(value, maximum) {
     const number = Number(value);
     if (!Number.isFinite(number)) return 0;
@@ -69,24 +71,73 @@
     };
   }
 
-  function estimatePace(startDateValue, completedWrenches, remainingWrenches, milestones = [], todayValue = new Date()) {
-    if (!startDateValue) return { error: "Choose your game start date." };
-    const dateParts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(startDateValue);
-    if (!dateParts) return { error: "Choose a valid start date." };
+  function localCalendarDay(todayValue = new Date()) {
+    const today = new Date(todayValue);
+    if (Number.isNaN(today.getTime())) return null;
+    return Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+  }
+
+  function parseStartDate(startDateValue) {
+    const dateParts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(startDateValue || "");
+    if (!dateParts) return null;
     const startDay = Date.UTC(Number(dateParts[1]), Number(dateParts[2]) - 1, Number(dateParts[3]));
     const parsedStart = new Date(startDay);
     if (
       parsedStart.getUTCFullYear() !== Number(dateParts[1])
       || parsedStart.getUTCMonth() !== Number(dateParts[2]) - 1
       || parsedStart.getUTCDate() !== Number(dateParts[3])
-    ) return { error: "Choose a valid start date." };
-    const today = new Date(todayValue);
-    const todayDay = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+    ) return null;
+    return startDay;
+  }
+
+  function formatDateInput(dayValue) {
+    const date = new Date(dayValue);
+    const year = date.getUTCFullYear();
+    if (!Number.isFinite(dayValue) || Number.isNaN(date.getTime()) || year < 1 || year > 9999) return null;
+    return `${String(year).padStart(4, "0")}-${String(date.getUTCMonth() + 1).padStart(2, "0")}-${String(date.getUTCDate()).padStart(2, "0")}`;
+  }
+
+  function accountAgeFromStartDate(startDateValue, todayValue = new Date()) {
+    if (!startDateValue) return { error: "Choose your game start date or enter your consecutive login day." };
+    const startDay = parseStartDate(startDateValue);
+    if (startDay === null) return { error: "Choose a valid start date." };
+    const todayDay = localCalendarDay(todayValue);
+    if (todayDay === null) return { error: "The current date is unavailable." };
     if (startDay > todayDay) return { error: "Start date cannot be in the future." };
 
-    const daysPlayed = Math.floor((todayDay - startDay) / 86_400_000);
-    if (daysPlayed < 1) return { error: "At least one day of progress is needed." };
+    const daysPlayed = Math.floor((todayDay - startDay) / DAY_MS);
+    return {
+      startDate: startDateValue,
+      consecutiveDays: daysPlayed + 1,
+      daysPlayed,
+    };
+  }
+
+  function startDateFromAccountAge(accountAgeValue, todayValue = new Date()) {
+    if (accountAgeValue === "" || accountAgeValue === null || accountAgeValue === undefined) {
+      return { error: "Enter the consecutive login day shown in Last Z." };
+    }
+    const consecutiveDays = Number(accountAgeValue);
+    if (!Number.isSafeInteger(consecutiveDays) || consecutiveDays < 1) {
+      return { error: "Consecutive login day must be a whole number of 1 or more." };
+    }
+    const todayDay = localCalendarDay(todayValue);
+    if (todayDay === null) return { error: "The current date is unavailable." };
+
+    const daysPlayed = consecutiveDays - 1;
+    const startDate = formatDateInput(todayDay - (daysPlayed * DAY_MS));
+    if (!startDate) return { error: "Enter a smaller consecutive login day." };
+    return { startDate, consecutiveDays, daysPlayed };
+  }
+
+  function estimatePace(startDateValue, completedWrenches, remainingWrenches, milestones = [], todayValue = new Date()) {
+    const accountAge = accountAgeFromStartDate(startDateValue, todayValue);
+    if (accountAge.error) return accountAge;
+    const { consecutiveDays, daysPlayed } = accountAge;
+    if (daysPlayed < 1) return { error: "Pace is available from consecutive login day 2." };
     if (completedWrenches <= 0) return { error: "Record some tank progress to calculate your pace." };
+
+    const today = new Date(todayValue);
 
     const weeksPlayed = daysPlayed / 7;
     const wrenchesPerWeek = completedWrenches / weeksPlayed;
@@ -101,6 +152,7 @@
 
     return {
       daysPlayed,
+      consecutiveDays,
       weeksPlayed,
       wrenchesPerWeek,
       weeksRemaining,
@@ -121,6 +173,8 @@
     getMilestones,
     getCurrentStage,
     getTankSummary,
+    accountAgeFromStartDate,
+    startDateFromAccountAge,
     estimatePace,
   };
 });

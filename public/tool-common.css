@@ -1,0 +1,63 @@
+.topbar { flex-wrap: wrap; }
+.tool-nav { order: 2; display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none; }
+.tool-nav::-webkit-scrollbar { display: none; }
+.tool-nav a { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 12px; border: 1px solid rgba(89, 210, 255, .23); border-radius: 9px; color: #9eb3bd; background: rgba(13, 28, 36, .88); font-size: .74rem; font-weight: 850; text-decoration: none; white-space: nowrap; }
+.tool-nav a:hover, .tool-nav a:focus-visible, .tool-nav a[aria-current="page"] { border-color: rgba(89, 210, 255, .58); color: #effaff; background: rgba(89, 210, 255, .12); }
+.profile-switcher {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 42px;
+  margin-left: auto;
+  padding: 4px;
+  border: 1px solid rgba(116, 221, 166, 0.28);
+  border-radius: 11px;
+  background: rgba(8, 24, 27, 0.9);
+}
+.profile-switcher label { display: grid; gap: 1px; padding-left: 8px; }
+.profile-switcher label span { color: #74dda6; font-size: 0.58rem; font-weight: 950; letter-spacing: 0.09em; text-transform: uppercase; }
+.profile-switcher select {
+  max-width: 130px;
+  border: 0;
+  outline: 0;
+  color: #effaff;
+  background: transparent;
+  font-size: 0.76rem;
+  font-weight: 850;
+}
+.profile-switcher button {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid rgba(89, 210, 255, 0.24);
+  border-radius: 8px;
+  color: #9eb3bd;
+  background: #091a21;
+  font-weight: 900;
+}
+.profile-switcher button:hover, .profile-switcher button:focus-visible { border-color: #59d2ff; color: #effaff; }
+.profile-toast {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 100;
+  max-width: min(380px, calc(100vw - 36px));
+  padding: 12px 15px;
+  border: 1px solid rgba(116, 221, 166, 0.38);
+  border-radius: 11px;
+  color: #effaff;
+  background: rgba(8, 24, 27, 0.97);
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.4);
+  font-size: 0.75rem;
+}
+@media (max-width: 900px) {
+  .tool-nav { order: 3; width: 100%; }
+  .profile-switcher { order: 2; }
+}
+@media (max-width: 560px) {
+  .profile-switcher { width: 100%; margin: 0; }
+  .profile-switcher label { min-width: 0; flex: 1; }
+  .profile-switcher select { width: 100%; max-width: none; }
+}

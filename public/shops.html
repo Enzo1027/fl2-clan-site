@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="theme-color" content="#061015" />
+    <meta name="description" content="Account-aware buy, hold, and skip guidance for seven Last Z shops." /><title>Shop Advisor | FL2 Last Z Tools</title>
+    <link rel="icon" href="assets/brand/fl2-mark.svg" type="image/svg+xml" /><link rel="manifest" href="app.webmanifest" />
+    <link rel="stylesheet" href="tools.css?v=20260722-command-v2" /><link rel="stylesheet" href="tool-common.css?v=20260722-command-v2" /><link rel="stylesheet" href="command-center.css?v=20260722-command-v2" />
+  </head>
+  <body>
+    <div class="tool-shell">
+      <header class="topbar"><a class="brand" href="tools.html" aria-label="FL2 command center"><img src="assets/brand/fl2-mark.svg" alt="" /><span><strong>FrostBorn Lions</strong><em>[FL2]</em></span></a><nav class="tool-nav" aria-label="FL2 tools"></nav></header>
+      <main>
+        <section class="command-hero" aria-labelledby="pageTitle"><div><p class="eyebrow">Stop spending rare currency on filler</p><h1 id="pageTitle">Shop advisor</h1><p>Tell FL2 what is happening in your account. Every shelf becomes a simple Buy, Hold, Situational, or Skip—without pretending rotating stock and community strategy are official rules.</p></div><aside class="hero-profile-card"><span>Covered shops</span><strong>7</strong><small>Glory, Merit, VIP, Camilla’s, Time-Limited, Power Core, Black Market</small></aside></section>
+        <div class="planner-grid">
+          <form class="command-card planner-form" id="shopForm"><p class="eyebrow">Four quick checks</p><h2>What is true right now?</h2><p>Your answers change the advice immediately.</p><div class="toggle-grid">
+            <label class="toggle-card"><input type="checkbox" name="stateRuler" /><strong>State Ruler is active</strong><small>Changes the Merit Shop decision.</small></label>
+            <label class="toggle-card"><input type="checkbox" name="orangeGearComplete" /><strong>Formation 1 has full orange gear</strong><small>Changes orange equipment priority.</small></label>
+            <label class="toggle-card"><input type="checkbox" name="warSoon" /><strong>War or relocation is near</strong><small>Makes teleporters situationally useful.</small></label>
+            <label class="toggle-card"><input type="checkbox" name="vehicleEvent" /><strong>Vehicle Boost is active</strong><small>Good timing for saved wrench use.</small></label>
+          </div><div class="form-grid"><label class="field"><span>VIP level</span><input type="number" name="vipLevel" min="0" max="20" value="0" /></label></div><div class="button-row"><button class="button accent" type="submit">Show my shops</button><button class="danger-button" id="clearShops" type="button">Clear this profile</button></div><div class="warning-box"><strong>Live shelf wins.</strong> Prices, stock, and event currencies rotate. FL2 intentionally does not hard-code unsupported shop prices.</div></form>
+          <section class="command-card result-panel"><p class="eyebrow">Fast answer</p><h2 id="shopHeadline">Start with Glory Shop</h2><p id="shopSummary">Orange hero fragments and Golden Wrenches are the clearest recurring priorities.</p><div class="compact-list" id="buyFirst" style="padding:12px 0 0"></div><div class="button-row"><a class="button accent" href="calculator.html">Open exact Merit advisor →</a></div></section>
+        </div>
+        <section class="shop-grid" id="shopGrid" aria-label="Shop recommendations"></section>
+        <section class="source-card" aria-labelledby="shopSourcesTitle"><div><p class="eyebrow">Community strategy, clearly labeled</p><h2 id="shopSourcesTitle">Account-aware—not universal</h2><p>The current seven-shop taxonomy comes from LDShop’s May 2026 guide. Recent community discussion agrees on several scarce materials but disputes some orderings, so FL2 changes advice by event, gear completion, VIP level, and war need.</p><small>Verified July 22, 2026 · Medium confidence strategy · Check the live shelf before purchase</small></div><nav class="source-links"><a href="https://www.ldshop.gg/blog/last-z/store-guide.html" target="_blank" rel="noreferrer">LDShop store guide</a><a href="calculator.html">FL2 Merit calculator</a></nav></section>
+      </main>
+      <footer><span>FrostBorn Lions [FL2]</span><span>Shop context is saved only in the active browser profile.</span></footer>
+    </div>
+    <script src="profile-store.js?v=20260722-command-v2"></script><script src="shop-engine.js?v=20260722-command-v2"></script><script src="tool-common.js?v=20260722-command-v2"></script><script src="shops.js?v=20260722-command-v2"></script>
+  </body>
+</html>

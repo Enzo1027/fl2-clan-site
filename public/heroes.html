@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="theme-color" content="#061015" />
+    <meta name="description" content="Plan Last Z hero XP, stars, skill books, exclusive equipment, and role-aware gear priorities." />
+    <title>Hero & Equipment Planner | FL2 Last Z Tools</title>
+    <link rel="icon" href="assets/brand/fl2-mark.svg" type="image/svg+xml" /><link rel="manifest" href="app.webmanifest" />
+    <link rel="stylesheet" href="tools.css?v=20260722-command-v2" /><link rel="stylesheet" href="tool-common.css?v=20260722-command-v2" /><link rel="stylesheet" href="command-center.css?v=20260722-command-v2" />
+  </head>
+  <body>
+    <div class="tool-shell">
+      <header class="topbar"><a class="brand" href="tools.html" aria-label="FL2 command center"><img src="assets/brand/fl2-mark.svg" alt="" /><span><strong>FrostBorn Lions</strong><em>[FL2]</em></span></a><nav class="tool-nav" aria-label="FL2 tools"></nav></header>
+      <main>
+        <section class="command-hero" aria-labelledby="pageTitle">
+          <div><p class="eyebrow">Build the hero, not a spreadsheet</p><h1 id="pageTitle">Hero planner</h1><p>Choose the hero you are actually developing. FL2 totals XP, universal fragments, skill books, and season-hero exclusive fragments—and carries the hero into the gear advisor.</p></div>
+          <aside class="hero-profile-card"><span>Selected hero</span><strong id="selectedHeroName">Yu Chan</strong><small id="selectedHeroMeta">Season 4 · Orange</small></aside>
+        </section>
+        <section class="command-card roster-panel" style="margin-top:14px" aria-labelledby="rosterTitle"><header class="command-card-head" style="margin:-22px -22px 0"><div><p class="eyebrow">Real in-game hero art</p><h2 id="rosterTitle">Who are you building?</h2></div><p>Tap one hero</p></header><div class="hero-selector" id="heroSelector"></div></section>
+        <div class="planner-grid">
+          <form class="command-card planner-form" id="heroForm">
+            <p class="eyebrow">Current → target</p><h2>Hero progress</h2><p>Only published values through level 175 and five stars are used.</p>
+            <input type="hidden" name="heroId" id="heroId" value="yu-chan" />
+            <div class="form-grid"><label class="field"><span>Current hero level</span><input name="level" type="number" min="1" max="175" value="150" /></label><label class="field"><span>Target hero level</span><input name="targetLevel" type="number" min="1" max="175" value="175" /></label></div>
+            <div class="form-grid"><label class="field"><span>Current stars / fifths</span><select name="starStep" id="starStep"></select></label><label class="field"><span>Target stars / fifths</span><select name="targetStarStep" id="targetStarStep"></select></label></div>
+            <div class="form-grid"><label class="field"><span>Current skill level</span><input name="skillLevel" type="number" min="1" max="30" value="20" /></label><label class="field"><span>Target skill level</span><input name="targetSkillLevel" type="number" min="1" max="30" value="30" /></label><label class="field"><span>Skills to upgrade</span><select name="skills"><option value="1">1 skill</option><option value="2">2 skills</option><option value="3" selected>All 3 skills</option></select></label></div>
+            <div class="form-grid"><label class="field"><span>Current exclusive level</span><select name="exclusiveStep" id="exclusiveStep"></select></label><label class="field"><span>Target exclusive level</span><select name="targetExclusiveStep" id="targetExclusiveStep"></select></label></div>
+            <p class="fieldset-label" style="margin-top:18px">Materials already owned <small>(optional)</small></p>
+            <div class="form-grid"><label class="field"><span>Hero EXP</span><input name="ownedExp" inputmode="numeric" value="0" /></label><label class="field"><span>Orange fragments</span><input name="ownedFragments" inputmode="numeric" value="0" /></label><label class="field"><span>Orange skill books</span><input name="ownedBooks" inputmode="numeric" value="0" /></label><label class="field"><span>Exclusive fragments</span><input name="ownedExclusive" inputmode="numeric" value="0" /></label></div>
+            <div class="button-row"><button class="button accent" type="submit">Show what I need</button><button class="danger-button" id="clearHero" type="button">Clear this profile</button></div>
+          </form>
+          <section class="command-card result-panel" aria-labelledby="heroResultTitle"><p class="eyebrow">One clean shopping list</p><h2 id="heroResultTitle">Materials still needed</h2><p id="heroResultIntro"></p><div class="resource-results" id="heroResources"></div><div class="evidence-box" id="heroEvidence"></div></section>
+        </div>
+        <section class="command-card" style="margin-top:14px" aria-labelledby="gearTitle">
+          <header class="command-card-head"><div><p class="eyebrow">Carry this hero into Merit</p><h2 id="gearTitle">Which gear gets attention?</h2></div><p>Role-aware starting point</p></header>
+          <div class="planner-form"><div class="form-grid"><label class="field"><span>Hero job</span><select id="heroRole"><option value="unknown">Not sure</option><option value="damage">Back row / damage</option><option value="defense">Front row / tank</option><option value="support">Support</option></select></label><label class="field"><span>Weakest orange gear</span><select id="gearSlot"><option value="gun">Gun</option><option value="helmet">Helmet</option><option value="armor">Armor</option><option value="boots">Boots</option></select></label><label class="field"><span>Equipment level</span><input id="equipmentLevel" type="number" min="0" max="100" value="40" /></label></div><div class="warning-box" id="gearGuidance">If you are unsure, choose the lowest-level orange piece in Formation 1.</div><div class="button-row"><button class="button accent" id="openMerit" type="button">Open this hero in Merit advisor →</button></div></div>
+        </section>
+        <section class="source-card" aria-labelledby="heroSourcesTitle"><div><p class="eyebrow">Exact progression arrays</p><h2 id="heroSourcesTitle">Published through level 175</h2><p>Hero XP, five-star fragments, skill books, and season-hero exclusive fragments come from Stresswar’s current calculator data and are independently readable in Last-Z.net’s table. FL2 intentionally excludes higher-level projections and the unverified initial exclusive unlock cost.</p><small>Verified July 22, 2026 · High community confidence · Season-specific systems can raise later caps</small></div><nav class="source-links"><a href="https://lastz.stresswar.com/calculators" target="_blank" rel="noreferrer">Stresswar calculator</a><a href="https://last-z.net/tables/hero-leveling-requirements/" target="_blank" rel="noreferrer">Last-Z.net table</a></nav></section>
+      </main>
+      <footer><span>FrostBorn Lions [FL2]</span><span>Hero progress is saved only in the active browser profile.</span></footer>
+    </div>
+    <script src="profile-store.js?v=20260722-command-v2"></script><script src="hero-engine.js?v=20260722-command-v2"></script><script src="tool-common.js?v=20260722-command-v2"></script><script src="heroes.js?v=20260722-command-v2"></script>
+  </body>
+</html>

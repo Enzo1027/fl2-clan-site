@@ -7,6 +7,7 @@ const root = __dirname;
 const publicDir = path.join(root, "public");
 const dataDir = process.env.DATA_DIR || path.join(root, ".data");
 const counterFile = path.join(dataDir, "visits.json");
+const analyticsFile = path.join(dataDir, "analytics.json");
 const port = Number(process.env.PORT || 4173);
 
 const mimeTypes = {
@@ -20,6 +21,7 @@ const mimeTypes = {
   ".png": "image/png",
   ".svg": "image/svg+xml; charset=utf-8",
   ".txt": "text/plain; charset=utf-8",
+  ".webmanifest": "application/manifest+json; charset=utf-8",
   ".webp": "image/webp",
 };
 
@@ -112,6 +114,38 @@ async function handleVisit(req, res) {
   });
 }
 
+function readAnalytics() {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(analyticsFile, "utf8"));
+    return { events: parsed.events && typeof parsed.events === "object" ? parsed.events : {}, updatedAt: parsed.updatedAt || null };
+  } catch {
+    return { events: {}, updatedAt: null };
+  }
+}
+
+async function handleEvent(req, res) {
+  if (req.method === "GET") {
+    sendJson(res, 200, readAnalytics());
+    return;
+  }
+  if (req.method !== "POST") {
+    sendJson(res, 405, { error: "Method not allowed" });
+    return;
+  }
+  let eventName = "";
+  try { eventName = String(JSON.parse(await readBody(req)).event || "").toLowerCase(); } catch { eventName = ""; }
+  if (!/^[a-z0-9][a-z0-9:_-]{0,63}$/.test(eventName)) {
+    sendJson(res, 400, { error: "Invalid event" });
+    return;
+  }
+  const analytics = readAnalytics();
+  analytics.events[eventName] = Math.min(Number.MAX_SAFE_INTEGER, Number(analytics.events[eventName] || 0) + 1);
+  analytics.updatedAt = new Date().toISOString();
+  fs.mkdirSync(dataDir, { recursive: true });
+  fs.writeFileSync(analyticsFile, `${JSON.stringify(analytics, null, 2)}\n`);
+  sendJson(res, 200, { ok: true });
+}
+
 function safePublicPath(urlPath) {
   const decoded = decodeURIComponent(urlPath.split("?")[0]);
   const normalized = path.normalize(decoded).replace(/^(\.\.[/\\])+/, "");
@@ -154,6 +188,10 @@ function serveStatic(req, res) {
 const server = http.createServer((req, res) => {
   if (req.url && req.url.startsWith("/api/visit")) {
     handleVisit(req, res);
+    return;
+  }
+  if (req.url && req.url.startsWith("/api/event")) {
+    handleEvent(req, res);
     return;
   }
   serveStatic(req, res);

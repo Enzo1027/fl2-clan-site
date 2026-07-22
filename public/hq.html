@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="theme-color" content="#061015" />
+    <meta name="description" content="Plan Last Z HQ upgrades through HQ 35 with sourced resources, prerequisites, shortages, and hero caps." />
+    <title>HQ Upgrade Planner | FL2 Last Z Tools</title>
+    <link rel="icon" href="assets/brand/fl2-mark.svg" type="image/svg+xml" /><link rel="manifest" href="app.webmanifest" />
+    <link rel="stylesheet" href="tools.css?v=20260722-command-v2" /><link rel="stylesheet" href="tool-common.css?v=20260722-command-v2" /><link rel="stylesheet" href="command-center.css?v=20260722-command-v2" />
+  </head>
+  <body>
+    <div class="tool-shell">
+      <header class="topbar"><a class="brand" href="tools.html" aria-label="FL2 command center"><img src="assets/brand/fl2-mark.svg" alt="" /><span><strong>FrostBorn Lions</strong><em>[FL2]</em></span></a><nav class="tool-nav" aria-label="FL2 tools"></nav></header>
+      <main>
+        <section class="tool-hero" aria-labelledby="pageTitle">
+          <div class="tool-hero-copy"><p class="eyebrow">No more upgrade-screen surprises</p><h1 id="pageTitle">HQ upgrade planner</h1><p>Choose where you are and where you want to go. Enter the resources already in your bag using numbers like 850m or 1.2g, and FL2 shows the HQ-only shortage and every prerequisite on the route.</p></div>
+          <div class="hero-art" aria-hidden="true"><div class="research-orbit"><div class="research-core">HQ</div><i class="orbit-node"></i><i class="orbit-node"></i><i class="orbit-node"></i><i class="orbit-node"></i><i class="orbit-node"></i><i class="orbit-node"></i></div></div>
+        </section>
+        <section class="summary-strip" aria-label="HQ plan summary">
+          <article class="summary-card accent"><span>Upgrade path</span><strong id="hqPath">1 → 2</strong><small id="hqSteps">1 HQ upgrade</small></article>
+          <article class="summary-card gold"><span>Hero cap</span><strong id="heroCap">10</strong><small>After reaching the target</small></article>
+          <article class="summary-card green"><span>Resources ready</span><strong id="readyCount">0 / 4</strong><small>Based on what you entered</small></article>
+          <article class="summary-card"><span>Data ceiling</span><strong>HQ 35</strong><small>HQ 36+ intentionally excluded</small></article>
+        </section>
+        <div class="planner-grid">
+          <form class="command-card planner-form" id="hqForm">
+            <p class="eyebrow">Thirty-second setup</p><h2>Your route</h2><p>Resource totals do not include the separate cost of upgrading prerequisite buildings.</p>
+            <div class="form-grid">
+              <label class="field"><span>Current HQ</span><select id="currentHq" name="current"></select></label>
+              <label class="field"><span>Target HQ</span><select id="targetHq" name="target"></select></label>
+            </div>
+            <p class="fieldset-label" style="margin-top:18px">Resources already owned <small>(optional)</small></p>
+            <div class="form-grid">
+              <label class="field"><span>Wood</span><input name="wood" inputmode="decimal" placeholder="e.g. 1.2g" /></label>
+              <label class="field"><span>Food</span><input name="food" inputmode="decimal" placeholder="e.g. 850m" /></label>
+              <label class="field"><span>Zent</span><input name="zent" inputmode="decimal" placeholder="e.g. 120m" /></label>
+              <label class="field"><span>Steel</span><input name="steel" inputmode="decimal" placeholder="e.g. 4.5m" /></label>
+            </div>
+            <div class="warning-box"><strong>Account modifiers matter.</strong> These are community-displayed estimates. Confirm the live upgrade screen before spending, especially if Sophia or another construction modifier is active.</div>
+            <div class="button-row"><button class="button accent" type="submit">Show my shortage</button><button class="danger-button" id="clearHq" type="button">Clear this profile</button></div>
+          </form>
+          <section class="command-card result-panel" aria-labelledby="resultTitle">
+            <p class="eyebrow">Your exact route from published rows</p><h2 id="resultTitle">HQ-only resources</h2><p id="resultIntro">Enter what you own to turn totals into shortages.</p>
+            <div class="resource-results" id="resourceResults"></div>
+            <div id="seasonWarning" class="warning-box" hidden>HQ 31–35 can be season or server gated. A newer state may remain capped at HQ 30.</div>
+            <table class="route-table"><thead><tr><th>Reach</th><th>Prerequisite buildings</th><th>HQ-only resources</th><th>Hero cap</th></tr></thead><tbody id="hqRoute"></tbody></table>
+          </section>
+        </div>
+        <section class="source-card" aria-labelledby="hqSourcesTitle">
+          <div><p class="eyebrow">Verified community dataset</p><h2 id="hqSourcesTitle">Corroborated through HQ 35</h2><p>Stresswar, Z Tools, and the Last Z Fandom table agree on the published HQ path. Last-Z.net is not used here because its resource rows are offset and conflict at later levels. HQ 36+ remains excluded until repeatable in-game evidence exists.</p><small>Verified July 22, 2026 · High community confidence through HQ 35 · Live game screen remains final authority</small></div>
+          <nav class="source-links" aria-label="HQ sources"><a href="https://lastz.stresswar.com/hq" target="_blank" rel="noreferrer">Stresswar HQ</a><a href="https://ztools.co.uk/tools/hq/" target="_blank" rel="noreferrer">Z Tools HQ</a><a href="https://last-z.fandom.com/wiki/Headquarters" target="_blank" rel="noreferrer">Fandom corroboration</a></nav>
+        </section>
+      </main>
+      <footer><span>FrostBorn Lions [FL2]</span><span>HQ progress is saved only in the active browser profile.</span></footer>
+    </div>
+    <script src="profile-store.js?v=20260722-command-v2"></script><script src="hq-engine.js?v=20260722-command-v2"></script><script src="tool-common.js?v=20260722-command-v2"></script><script src="hq.js?v=20260722-command-v2"></script>
+  </body>
+</html>

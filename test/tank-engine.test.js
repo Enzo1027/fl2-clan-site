@@ -51,8 +51,53 @@ test("pace projection reports rate and milestone dates", () => {
   const milestone = { name: "Hercules", remaining: 730, complete: false };
   const estimate = tank.estimatePace("2026-01-01", 1_000, 2_000, [milestone], new Date("2026-01-29T00:00:00"));
   assert.equal(estimate.wrenchesPerWeek, 250);
+  assert.equal(estimate.consecutiveDays, 29);
   assert.equal(estimate.weeksRemaining, 8);
   assert.equal(estimate.milestoneEstimates[0].weeks, 2.92);
+});
+
+test("start date and consecutive login day convert with day 1 inclusive", () => {
+  const today = new Date(2026, 0, 29);
+  const fromDate = tank.accountAgeFromStartDate("2026-01-01", today);
+  assert.deepEqual(fromDate, {
+    startDate: "2026-01-01",
+    consecutiveDays: 29,
+    daysPlayed: 28,
+  });
+
+  const fromLoginDay = tank.startDateFromAccountAge(29, today);
+  assert.deepEqual(fromLoginDay, fromDate);
+
+  assert.deepEqual(tank.startDateFromAccountAge(1, today), {
+    startDate: "2026-01-29",
+    consecutiveDays: 1,
+    daysPlayed: 0,
+  });
+});
+
+test("consecutive login day validates whole positive numbers", () => {
+  const today = new Date(2026, 0, 29);
+  for (const value of [0, -1, 1.5, "abc"]) {
+    assert.match(tank.startDateFromAccountAge(value, today).error, /whole number of 1 or more/);
+  }
+  assert.match(tank.startDateFromAccountAge("", today).error, /Enter the consecutive login day/);
+});
+
+test("either account-age input produces the same pace", () => {
+  const today = new Date(2026, 0, 29);
+  const startDate = tank.startDateFromAccountAge(29, today).startDate;
+  const byDate = tank.estimatePace("2026-01-01", 1_000, 2_000, [], today);
+  const byLoginDay = tank.estimatePace(startDate, 1_000, 2_000, [], today);
+  assert.equal(byLoginDay.daysPlayed, byDate.daysPlayed);
+  assert.equal(byLoginDay.consecutiveDays, byDate.consecutiveDays);
+  assert.equal(byLoginDay.wrenchesPerWeek, byDate.wrenchesPerWeek);
+});
+
+test("consecutive login day 1 maps to today but cannot estimate pace yet", () => {
+  const today = new Date(2026, 0, 29);
+  const startDate = tank.startDateFromAccountAge(1, today).startDate;
+  assert.equal(startDate, "2026-01-29");
+  assert.match(tank.estimatePace(startDate, 100, 100, [], today).error, /day 2/);
 });
 
 test("pace uses calendar days across daylight-saving changes", () => {
@@ -61,7 +106,7 @@ test("pace uses calendar days across daylight-saving changes", () => {
     1_000,
     2_000,
     [],
-    new Date("2026-03-09T00:00:00-04:00"),
+    new Date(2026, 2, 9),
   );
   assert.equal(estimate.daysPlayed, 2);
   assert.equal(estimate.wrenchesPerWeek, 3_500);

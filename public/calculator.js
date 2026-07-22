@@ -7,6 +7,7 @@
   const form = document.getElementById("calculatorForm");
   const answerPanel = document.getElementById("answerPanel");
   const storageKey = "fl2-merit-calculator-level-aware-v3";
+  const profileStore = window.fl2Profiles;
   const formatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
   const byId = (id) => document.getElementById(id);
   const format = (value) => formatter.format(Number.isFinite(value) ? value : 0);
@@ -234,7 +235,8 @@
           values[element.name] = element.value;
         }
       });
-      localStorage.setItem(storageKey, JSON.stringify(values));
+      if (profileStore) profileStore.setFeatureState("calculator", values);
+      else localStorage.setItem(storageKey, JSON.stringify(values));
     } catch {
       // Local storage is a convenience only.
     }
@@ -242,7 +244,7 @@
 
   function restoreState() {
     try {
-      const values = JSON.parse(localStorage.getItem(storageKey) || "null");
+      const values = profileStore?.getFeatureState("calculator") || JSON.parse(localStorage.getItem(storageKey) || "null");
       if (!values) return;
       Object.entries(values).forEach(([name, value]) => {
         const field = form.elements.namedItem(name);
@@ -271,9 +273,16 @@
   });
 
   byId("resetCalculator").addEventListener("click", () => {
-    localStorage.removeItem(storageKey);
+    if (profileStore) profileStore.removeFeatureState("calculator");
+    else localStorage.removeItem(storageKey);
     form.reset();
     byId("advancedDetails").open = false;
+    update();
+  });
+
+  window.addEventListener("fl2:profilechange", () => {
+    form.reset();
+    restoreState();
     update();
   });
 

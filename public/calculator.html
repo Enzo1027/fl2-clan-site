@@ -10,7 +10,9 @@
     />
     <title>Cores or Red Stones? | FL2 Merit Calculator</title>
     <link rel="icon" href="assets/brand/fl2-mark.svg" type="image/svg+xml" />
+    <link rel="manifest" href="app.webmanifest" />
     <link rel="stylesheet" href="calculator.css?v=20260722-level-aware-v3" />
+    <link rel="stylesheet" href="tool-common.css?v=20260722-command-v2" />
   </head>
   <body>
     <div class="calculator-shell">
@@ -19,7 +21,7 @@
           <img src="assets/brand/fl2-mark.svg" alt="" />
           <span><strong>FrostBorn Lions</strong><em>[FL2]</em></span>
         </a>
-        <a class="library-link" href="index.html">Field Library <span aria-hidden="true">→</span></a>
+        <nav class="tool-nav" aria-label="FL2 tools"></nav>
       </header>
 
       <main>
@@ -223,7 +225,9 @@
       </footer>
     </div>
 
-    <script src="calculator-engine.js?v=20260722-level-aware-v3"></script>
-    <script src="calculator.js?v=20260722-level-aware-v3"></script>
+    <script src="profile-store.js?v=20260722-command-v2"></script>
+    <script src="calculator-engine.js?v=20260722-command-v2"></script>
+    <script src="tool-common.js?v=20260722-command-v2"></script>
+    <script src="calculator.js?v=20260722-command-v2"></script>
   </body>
 </html>

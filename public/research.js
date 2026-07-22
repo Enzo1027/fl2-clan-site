@@ -4,11 +4,12 @@
   const STORAGE_KEY = "fl2-research-planner-v1";
   const MODEL_VERSION = 2;
   const engine = window.FL2Research;
+  const profileStore = window.fl2Profiles;
   const number = new Intl.NumberFormat();
   let bundle = null;
   let openNodeId = null;
 
-  const state = loadState();
+  let state = loadState();
   const elements = {
     treeList: document.querySelector("#treeList"),
     allSpent: document.querySelector("#allSpent"),
@@ -51,7 +52,7 @@
 
   function loadState() {
     try {
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      const saved = profileStore?.getFeatureState("research") || JSON.parse(localStorage.getItem(STORAGE_KEY));
       if (saved && typeof saved === "object") {
         return {
           activeTreeId: saved.activeTreeId || "unit-special-training",
@@ -75,16 +76,18 @@
 
   function saveState() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      const snapshot = {
         modelVersion: MODEL_VERSION,
         activeTreeId: state.activeTreeId,
         view: state.view,
         autoComplete: state.autoComplete,
         progress: state.progress,
         goals: state.goals,
-      }));
+      };
+      if (profileStore) profileStore.setFeatureState("research", snapshot);
+      else localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
       const status = document.querySelector("#localSaveStatus");
-      if (status) status.textContent = "Saved on this browser";
+      if (status) status.textContent = profileStore ? `${profileStore.getProfile().name} saved on this device` : "Saved on this browser";
     } catch {
       const status = document.querySelector("#localSaveStatus");
       if (status) status.textContent = "Browser saving is unavailable";
@@ -257,6 +260,7 @@
       progress.complete ? "is-complete" : "",
       goal ? "has-goal" : "",
     ].filter(Boolean).join(" ");
+    button.setAttribute("aria-haspopup", "dialog");
     button.innerHTML = `
       <span class="node-level"><span>Level</span><b>${progress.level}/${node.maxLevel}</b></span>
       <h3>${node.name}</h3>
@@ -300,7 +304,7 @@
         <tbody>${nodes.map((node) => {
           const progress = engine.getNodeProgress(node, treeProgress(tree)[node.id]);
           const parentNames = node.parents.map((id) => tree.nodes.find((item) => item.id === id)?.name || id).join(", ") || "None";
-          return `<tr data-node-id="${node.id}" role="button" tabindex="0"><td><strong>${node.name}</strong></td><td>${parentNames}</td><td class="right ${progress.complete ? "green" : ""}">${progress.level}/${node.maxLevel}</td><td class="right gold">${formatCost(progress.remaining.known, progress.remaining.unknown)}</td></tr>`;
+          return `<tr data-node-id="${node.id}" role="button" tabindex="0" aria-haspopup="dialog" aria-label="Open ${node.name}, level ${progress.level} of ${node.maxLevel}"><td><strong>${node.name}</strong></td><td>${parentNames}</td><td class="right ${progress.complete ? "green" : ""}">${progress.level}/${node.maxLevel}</td><td class="right gold">${formatCost(progress.remaining.known, progress.remaining.unknown)}</td></tr>`;
         }).join("")}</tbody>
       </table>`;
     wrap.querySelectorAll("tbody tr").forEach((row) => {
@@ -351,6 +355,7 @@
       const row = document.createElement("button");
       row.type = "button";
       row.className = `level-row${level <= progress.level ? " is-complete" : ""}`;
+      row.setAttribute("aria-pressed", String(level <= progress.level));
       const statText = node.stats.map((stat) => {
         const value = stat.values?.[index];
         if (value === null || value === undefined) return "";
@@ -402,7 +407,7 @@
   });
   elements.clearNodeButton.addEventListener("click", () => {
     const tree = activeTree();
-    state.progress[tree.id] = engine.applyNodeLevel(tree, treeProgress(tree), openNodeId, 0, false);
+    state.progress[tree.id] = engine.applyNodeLevel(tree, treeProgress(tree), openNodeId, 0, state.autoComplete);
     saveState();
     render();
   });
@@ -410,6 +415,12 @@
   elements.nodeDialog.addEventListener("close", () => { openNodeId = null; });
   elements.nodeDialog.addEventListener("click", (event) => {
     if (event.target === elements.nodeDialog) elements.nodeDialog.close();
+  });
+  window.addEventListener("fl2:profilechange", () => {
+    state = loadState();
+    openNodeId = null;
+    if (elements.nodeDialog.open) elements.nodeDialog.close();
+    if (bundle) render();
   });
 
   fetch("data/research-trees.json?v=20260722-research-tank-v2")

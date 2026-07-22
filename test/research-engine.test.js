@@ -40,6 +40,22 @@ test("nodes keep independent partial levels when auto-fill is off", () => {
   assert.equal(progress["urgent-rescue"], undefined);
 });
 
+test("lowering a prerequisite clears dependents only when auto-fill is on", () => {
+  let progress = research.applyNodeLevel(unitTree, {}, "unit-special-training", 1, true);
+  progress = research.applyNodeLevel(unitTree, progress, "fire-up", 0, true);
+  assert.equal(progress["fire-up"], 0);
+  assert.equal(progress["unit-special-training"], undefined);
+
+  const independent = research.applyNodeLevel(
+    unitTree,
+    { "fire-up": 10, "unit-special-training": 1 },
+    "fire-up",
+    0,
+    false,
+  );
+  assert.equal(independent["unit-special-training"], 1);
+});
+
 test("tree summary tracks levels, badges, and unknowns", () => {
   const progress = { "fire-up": 5, "armor-upgrade": 10 };
   const summary = research.getTreeSummary(unitTree, progress);
@@ -67,6 +83,17 @@ test("multiple independent goals are order-independent", () => {
   assert.equal(first.levels, 2);
   assert.equal(first.targetProgress["fire-up"], 1);
   assert.deepEqual(first, reversed);
+});
+
+test("goal merging never lowers saved progress", () => {
+  const goal = research.getGoalRequirement(
+    unitTree,
+    { "fire-up": 8 },
+    { "fire-up": 3 },
+  );
+  assert.equal(goal.known, 0);
+  assert.equal(goal.levels, 0);
+  assert.equal(goal.targetProgress["fire-up"], 8);
 });
 
 test("stat totals use each node's cumulative value at its selected level", () => {

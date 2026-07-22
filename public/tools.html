@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#061015" />
+    <meta name="description" content="The FL2 Last Z player command center: local profiles, upgrade planners, daily guidance, and sourced calculators." />
+    <title>Player Command Center | FL2 Last Z Tools</title>
+    <link rel="icon" href="assets/brand/fl2-mark.svg" type="image/svg+xml" />
+    <link rel="manifest" href="app.webmanifest" />
+    <link rel="stylesheet" href="tools.css?v=20260722-command-v2" />
+    <link rel="stylesheet" href="tool-common.css?v=20260722-command-v2" />
+    <link rel="stylesheet" href="command-center.css?v=20260722-command-v2" />
+  </head>
+  <body>
+    <div class="tool-shell">
+      <header class="topbar">
+        <a class="brand" href="index.html" aria-label="FrostBorn Lions home"><img src="assets/brand/fl2-mark.svg" alt="" /><span><strong>FrostBorn Lions</strong><em>[FL2]</em></span></a>
+        <nav class="tool-nav" aria-label="FL2 tools"></nav>
+      </header>
+
+      <main>
+        <section class="command-hero" aria-labelledby="pageTitle">
+          <div>
+            <p class="eyebrow">Your Last Z account, one clear answer</p>
+            <h1 id="pageTitle">Command center</h1>
+            <p>Pick your player profile once. FL2 remembers the account on this device, connects every planner, and shows the next useful move without a login or a giant database.</p>
+          </div>
+          <aside class="hero-profile-card" aria-label="Active local profile">
+            <span>Active local player</span><strong id="activeProfileName">Main</strong><small id="profileSaveMeta">Saved privately in this browser</small>
+            <button class="button accent" id="focusProfile" type="button">Manage at the top</button>
+          </aside>
+        </section>
+
+        <section class="summary-strip" aria-label="Account setup summary">
+          <article class="summary-card accent"><span>HQ</span><strong id="summaryHq">Not set</strong><small id="summaryHqMeta">Add your account level</small></article>
+          <article class="summary-card gold"><span>Lead hero</span><strong id="summaryHero">Not set</strong><small id="summaryHeroMeta">Plan XP and fragments</small></article>
+          <article class="summary-card green"><span>Tank</span><strong id="summaryTank">0%</strong><small id="summaryTankMeta">70,700 wrenches remain</small></article>
+          <article class="summary-card"><span>Today</span><strong id="summaryToday">0 done</strong><small id="summaryTodayMeta">Open the daily plan</small></article>
+        </section>
+
+        <div class="dashboard-grid">
+          <section class="command-card next-action" aria-labelledby="nextActionTitle">
+            <span class="next-action-badge">Best next move</span><h2 id="nextActionTitle">Set your HQ level</h2><p id="nextActionCopy">That unlocks useful account-aware recommendations across the rest of the command center.</p><a class="button accent" id="nextActionLink" href="hq.html">Do this now →</a>
+          </section>
+          <section class="command-card privacy-card" aria-labelledby="privacyTitle">
+            <p class="eyebrow">No account database</p><h2 id="privacyTitle">Your data stays yours</h2><p><strong>Profiles live only on this device.</strong> Download one small backup to move phones or protect progress before clearing browser data.</p>
+            <div class="button-row"><button class="button" id="exportAll" type="button">Download backup</button><label class="button" for="importAll">Restore backup</label><input class="sr-only" id="importAll" type="file" accept="application/json,.json" /></div>
+          </section>
+        </div>
+
+        <section class="command-card" style="margin-top:14px" aria-labelledby="toolGridTitle">
+          <header class="command-card-head"><div><p class="eyebrow">Everything connected</p><h2 id="toolGridTitle">Choose a quick answer</h2></div><p>Progress follows the active profile</p></header>
+          <div class="tool-card-grid" id="toolGrid">
+            <a class="tool-launch-card" href="hq.html"><span class="tool-launch-icon">HQ</span><h3>HQ upgrade</h3><p>Resources, shortages, prerequisites, and hero cap.</p><small id="cardHq">Set up →</small></a>
+            <a class="tool-launch-card" href="heroes.html"><span class="tool-launch-icon">★</span><h3>Hero planner</h3><p>XP, fragments, skill books, exclusive gear, and real hero art.</p><small id="cardHeroes">Set up →</small></a>
+            <a class="tool-launch-card" href="calculator.html"><span class="tool-launch-icon">M</span><h3>Merit advisor</h3><p>Cores, red stones, both, orange gear, or save.</p><small id="cardMerit">Get answer →</small></a>
+            <a class="tool-launch-card" href="research.html"><span class="tool-launch-icon">R</span><h3>Research</h3><p>Ten independent trees, goals, badges, and missing costs.</p><small id="cardResearch">Track progress →</small></a>
+            <a class="tool-launch-card" href="tank.html"><span class="tool-launch-icon">T</span><h3>Tank path</h3><p>49 stages, account-age pace, and exact vehicle milestones.</p><small id="cardTank">Track progress →</small></a>
+            <a class="tool-launch-card" href="daily.html"><span class="tool-launch-icon">✓</span><h3>Today</h3><p>Alliance Duel actions, reset clock, and a fast daily checklist.</p><small id="cardDaily">Start checklist →</small></a>
+            <a class="tool-launch-card" href="shops.html"><span class="tool-launch-icon">$</span><h3>Shop advisor</h3><p>Buy, hold, skip, or situational advice for all seven shops.</p><small id="cardShops">Check shops →</small></a>
+            <a class="tool-launch-card" href="index.html"><span class="tool-launch-icon">S2</span><h3>Season guides</h3><p>FL2’s visual Everfrost library in eight languages.</p><small>Open library →</small></a>
+            <button class="tool-launch-card" id="reportIssue" type="button"><span class="tool-launch-icon">!</span><h3>Report a number</h3><p>Copy a ready-to-send correction report with page and source date.</p><small>Copy report →</small></button>
+          </div>
+        </section>
+      </main>
+      <footer><span>FrostBorn Lions [FL2]</span><span>Unofficial, source-labeled, browser-local Last Z planning tools.</span></footer>
+    </div>
+    <script src="profile-store.js?v=20260722-command-v2"></script>
+    <script src="calculator-engine.js?v=20260722-command-v2"></script>
+    <script src="hero-engine.js?v=20260722-command-v2"></script>
+    <script src="daily-engine.js?v=20260722-command-v2"></script>
+    <script src="research-engine.js?v=20260722-command-v2"></script>
+    <script src="tank-engine.js?v=20260722-command-v2"></script>
+    <script src="tool-common.js?v=20260722-command-v2"></script>
+    <script src="tools.js?v=20260722-command-v2"></script>
+  </body>
+</html>

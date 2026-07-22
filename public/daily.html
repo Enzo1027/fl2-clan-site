@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="theme-color" content="#061015" />
+    <meta name="description" content="A fast Last Z daily checklist with Apocalypse Time reset, Alliance Duel theme, radar windows, and local progress." />
+    <title>What Should I Do Today? | FL2 Last Z Tools</title>
+    <link rel="icon" href="assets/brand/fl2-mark.svg" type="image/svg+xml" /><link rel="manifest" href="app.webmanifest" />
+    <link rel="stylesheet" href="tools.css?v=20260722-command-v2" /><link rel="stylesheet" href="tool-common.css?v=20260722-command-v2" /><link rel="stylesheet" href="command-center.css?v=20260722-command-v2" />
+  </head>
+  <body>
+    <div class="tool-shell">
+      <header class="topbar"><a class="brand" href="tools.html" aria-label="FL2 command center"><img src="assets/brand/fl2-mark.svg" alt="" /><span><strong>FrostBorn Lions</strong><em>[FL2]</em></span></a><nav class="tool-nav" aria-label="FL2 tools"></nav></header>
+      <main>
+        <section class="command-hero" aria-labelledby="pageTitle"><div><p class="eyebrow">Open it, do it, check it off</p><h1 id="pageTitle">What should I do today?</h1><p>FL2 converts Apocalypse Time into your local clock, matches the Alliance Duel theme, and keeps the daily routine short enough to use while the game is open.</p></div><aside class="hero-profile-card"><span>Today in Apocalypse Time</span><strong id="atDate">Loading…</strong><small>AT is community-reported as UTC−2</small></aside></section>
+        <section class="command-card today-banner" style="margin-top:14px" aria-labelledby="todayTheme"><div><p class="eyebrow" id="duelKicker">Alliance Duel</p><h2 id="todayTheme">Loading today’s theme…</h2><p id="todayAction" style="color:var(--soft);margin:8px 0 0"></p><div class="form-grid" style="max-width:360px;margin-top:14px"><label class="field"><span>Wrong day on your server?</span><select id="duelDay"><option value="auto">Auto from Apocalypse Time</option><option value="1">Day 1 · Vehicle</option><option value="2">Day 2 · Shelter</option><option value="3">Day 3 · Research</option><option value="4">Day 4 · Heroes</option><option value="5">Day 5 · Growth</option><option value="6">Day 6 · Combat</option><option value="7">Day 7 · Rest</option></select></label></div></div><div class="reset-clock"><span>Next server reset</span><strong id="resetCountdown">--:--:--</strong><small id="resetLocal">02:00 UTC</small></div></section>
+        <section class="summary-strip" aria-label="Daily timing summary">
+          <article class="summary-card accent"><span>Checklist</span><strong id="taskProgress">0 / 0</strong><small id="taskPercent">Nothing checked yet</small></article>
+          <article class="summary-card gold"><span>Next radar refresh</span><strong id="nextRadar">--:--</strong><small>Reported 8-hour cadence</small></article>
+          <article class="summary-card green"><span>Full Preparedness</span><strong id="nextFp">--:--</strong><small id="nextFpType">Next four-hour window</small></article>
+          <article class="summary-card"><span>Arena Brawl</span><strong id="arenaTime">--:--</strong><small>Reported daily timing</small></article>
+        </section>
+        <div class="planner-grid">
+          <section class="command-card daily-panel"><p class="eyebrow">Do these for today’s points</p><h2 id="duelTaskTitle">Alliance Duel actions</h2><p>Save off-day materials. Spend them when the matching point event is active.</p><div class="task-groups" id="duelTasks"></div></section>
+          <section class="command-card daily-panel"><p class="eyebrow">Fast daily routine</p><h2>Always worth checking</h2><p>Exact counts can vary with account unlocks, VIP level, and season.</p><div class="task-groups" id="dailyTasks"></div></section>
+        </div>
+        <section class="command-card" style="margin-top:14px" aria-labelledby="fpTitle"><header class="command-card-head"><div><p class="eyebrow">Converted to your clock</p><h2 id="fpTitle">Full Preparedness windows</h2></div><p>Reported AT schedule · six windows</p></header><div class="compact-list" id="fpWindows"></div></section>
+        <section class="source-card" aria-labelledby="dailySourcesTitle"><div><p class="eyebrow">Schedule with provenance</p><h2 id="dailySourcesTitle">Current recurring schedule, not a live game API</h2><p>Z Tools and GAMIDES agree on the weekly Duel rotation, Apocalypse Time, and Full Preparedness cadence. Recent evidence favors an eight-hour radar refresh; an older six-hour article is treated as stale. Manual day override stays available for regional or event exceptions.</p><small>Verified July 22, 2026 · Medium-high community confidence · Event tabs in your account remain final authority</small></div><nav class="source-links"><a href="https://ztools.co.uk/tools/calendar/" target="_blank" rel="noreferrer">Z Tools calendar</a><a href="https://gamides.com/events/" target="_blank" rel="noreferrer">GAMIDES schedule</a><a href="https://www.ldshop.gg/blog/last-z/daily-task-guide.html" target="_blank" rel="noreferrer">Daily routine</a></nav></section>
+      </main>
+      <footer><span>FrostBorn Lions [FL2]</span><span>Daily checks reset per Apocalypse Time day and stay in the active local profile.</span></footer>
+    </div>
+    <script src="profile-store.js?v=20260722-command-v2"></script><script src="daily-engine.js?v=20260722-command-v2"></script><script src="tool-common.js?v=20260722-command-v2"></script><script src="daily.js?v=20260722-command-v2"></script>
+  </body>
+</html>

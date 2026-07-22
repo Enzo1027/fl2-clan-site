@@ -1,0 +1,13 @@
+{
+  "name": "FL2 Last Z Command Center",
+  "short_name": "FL2 Tools",
+  "description": "Browser-local Last Z planners, calculators, and daily guidance from FrostBorn Lions.",
+  "start_url": "/tools.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#061015",
+  "theme_color": "#061015",
+  "icons": [
+    { "src": "/assets/brand/fl2-mark.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

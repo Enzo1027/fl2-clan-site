@@ -7,7 +7,9 @@
     <meta name="description" content="Track all Last Z tank modification wrench requirements, vehicle milestones, and completion pace with FL2." />
     <title>Tank Requirements | FL2 Last Z Tools</title>
     <link rel="icon" href="assets/brand/fl2-mark.svg" type="image/svg+xml" />
+    <link rel="manifest" href="app.webmanifest" />
     <link rel="stylesheet" href="tools.css?v=20260722-research-tank-v2" />
+    <link rel="stylesheet" href="tool-common.css?v=20260722-command-v2" />
   </head>
   <body class="tank-page">
     <div class="tool-shell">
@@ -65,11 +67,12 @@
 
           <section class="pace-card" aria-labelledby="paceTitle">
             <p class="eyebrow">Your real pace</p><h2 id="paceTitle">When will I reach it?</h2>
-            <p>Using your game start date and recorded wrenches, FL2 estimates your weekly pace and remaining milestones.</p>
+            <p id="paceInstructions">Use your actual start date or the consecutive login day shown in Last Z—FL2 keeps them matched. Day 1 is the day your account started; pace estimates begin on day 2.</p>
             <div class="field-grid">
               <label class="field"><span>Game start date</span><input class="date-input" id="gameStartDate" type="date" /></label>
-              <div class="field"><span>&nbsp;</span><button class="danger-button" id="clearTankButton" type="button">Clear progress</button></div>
+              <label class="field"><span>Consecutive login day</span><input class="date-input" id="accountAgeDays" type="number" min="1" step="1" inputmode="numeric" placeholder="e.g. 29" aria-describedby="paceInstructions" /></label>
             </div>
+            <div class="workspace-actions"><button class="danger-button" id="clearTankButton" type="button">Clear tank progress</button></div>
             <div class="pace-result" id="paceResult" aria-live="polite"></div>
           </section>
         </div>
@@ -117,8 +120,10 @@
       </div>
     </dialog>
 
-    <script src="tank-engine.js?v=20260722-research-tank-v2"></script>
-    <script src="tank.js?v=20260722-research-tank-v2"></script>
-    <script src="progress-backup.js?v=20260722-research-tank-v2"></script>
+    <script src="profile-store.js?v=20260722-command-v2"></script>
+    <script src="tank-engine.js?v=20260722-command-v2"></script>
+    <script src="tool-common.js?v=20260722-command-v2"></script>
+    <script src="tank.js?v=20260722-command-v2"></script>
+    <script src="progress-backup.js?v=20260722-command-v2"></script>
   </body>
 </html>

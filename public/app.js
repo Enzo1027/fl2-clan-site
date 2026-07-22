@@ -1,5 +1,9 @@
-const APP_VERSION = "20260721-merit-calculator";
+const APP_VERSION = "20260722-command-center-v2";
 window.FL2_BUILD = APP_VERSION;
+
+if ("serviceWorker" in navigator && location.protocol !== "file:") {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
 
 const state = {
   manifest: null,

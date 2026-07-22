@@ -1,14 +1,21 @@
-# FrostBorn Lions [FL2] Season 2 Library
+# FrostBorn Lions [FL2] Last Z Command Center
 
-Static, mobile-friendly guide library for FL2 clan resources.
+Mobile-first Last Z planning tools and FL2's eight-language Season 2 guide library.
 
-## Last Z Tools
+## Connected Last Z Tools
 
-- `/calculator.html` recommends whether merit badges should go to Legendary Gear Cores or Forging Stones.
-- `/research.html` tracks all 10 research trees, prerequisites, goals, stats, and published badge costs.
-- `/tank.html` tracks the 49-stage tank path, wrench totals, vehicle milestones, and completion pace.
+- `/tools.html` is the player command center and all-profile backup/restore screen.
+- `/calculator.html` recommends Cores, Red Stones, both, orange gear, or saving Merit Medals using the selected hero, role, equipment level, stars, sections, forge stage, owned materials, and current shelf stock.
+- `/research.html` tracks 10 trees with independent node levels by default, optional path auto-fill, goals, stats, and visibly unpublished costs.
+- `/tank.html` tracks all 49 stages and 70,700 published wrenches, vehicle milestones, and pace from either an account start date or the consecutive login day shown in Last Z.
+- `/hq.html` plans HQ 1–35 resource deficits, required buildings, and hero-level caps.
+- `/heroes.html` plans hero XP, universal fragments, skill books, and season-exclusive fragments through the verified level-175/five-star boundary, with real hero art and Merit handoff.
+- `/daily.html` converts Apocalypse Time, shows the Alliance Duel theme and Full Preparedness windows, and saves a per-profile daily checklist.
+- `/shops.html` gives account-aware Buy/Hold/Situational/Skip guidance across seven community-documented shops without hard-coding rotating prices.
 
-Research, tank, and Merit Calculator progress is stored only in the visitor's browser; no per-user progress database is required. The Research and Tank pages can download and restore a small JSON backup containing all three tools, which gives users a manual way to move devices or protect against cleared browser data.
+All user progress is stored in `localStorage` under separate Main, Farm, Alt, or custom profiles. No login or per-user server database is required. The command center exports and restores one small versioned JSON backup containing every local profile; the Research and Tank pages retain compatible focused backup controls. A service worker keeps the core planners usable after they have been installed/visited.
+
+The only server-side analytics added for the command center are aggregate page-event counts at `/api/event`; the endpoint receives no player profile, form values, device identifier, or IP-derived key. Existing visit-counter behavior remains separate at `/api/visit`.
 
 The checked-in requirement snapshots live in `public/data/research-trees.json` and `public/data/tank-modifications.json`. Their versioned browser requests are cached for repeat visits, while HTML stays uncached so deployments appear immediately. Refresh and normalize those public community datasets with:
 
@@ -28,7 +35,7 @@ Open `http://localhost:4173`.
 
 The local preview uses the same Node server as production. It serves `public/` and exposes `/api/visit` for the footer visit counter.
 
-Run all calculator, research, and tank correctness checks with:
+Run all calculator, profile, HQ, hero, shop, daily, research, and tank correctness checks with:
 
 ```bash
 npm test
