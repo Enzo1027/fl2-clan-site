@@ -1,24 +1,22 @@
-(function initializeMeritCalculator() {
+(function initializeQuickCalculator() {
   "use strict";
 
   const Engine = window.MeritCalculator;
   if (!Engine) return;
 
   const form = document.getElementById("calculatorForm");
-  const resultCard = document.querySelector(".result-card");
-  const numberFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
-  const integerFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
-  const storageKey = "fl2-merit-calculator-v1";
-  let calculatorMode = "quick";
-  let priceMode = "discount";
-  let suppressPriceModeChange = false;
+  const answerPanel = document.getElementById("answerPanel");
+  const storageKey = "fl2-merit-calculator-simple-v2";
+  const formatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
 
   const byId = (id) => document.getElementById(id);
   const readNumber = (id) => {
     const value = Number(byId(id).value);
     return Number.isFinite(value) ? Math.max(0, value) : 0;
   };
-  const format = (value) => integerFormatter.format(Number.isFinite(value) ? value : 0);
+  const format = (value) => formatter.format(Number.isFinite(value) ? value : 0);
+  const checkedValue = (name) => form.elements.namedItem(name).value;
+  const gearSlot = () => checkedValue("gearSlot") || "gun";
   const powerGain = (beforeId, afterId) => {
     const before = readNumber(beforeId);
     const after = readNumber(afterId);
@@ -26,220 +24,283 @@
   };
 
   function stageLabel(stage) {
+    if (stage < 0) return "Locked";
     if (stage === 0) return "Base";
     if (stage === 6) return "Mythic";
     return `+${stage}`;
   }
 
-  function setMode(nextMode) {
-    calculatorMode = nextMode === "exact" ? "exact" : "quick";
-    document.querySelectorAll("[data-mode]").forEach((button) => {
-      const active = button.dataset.mode === calculatorMode;
-      button.classList.toggle("is-active", active);
-      button.setAttribute("aria-pressed", String(active));
-    });
-    document.querySelectorAll(".exact-only").forEach((element) => {
-      element.hidden = calculatorMode !== "exact";
-    });
-    byId("benchmarkRow").hidden = calculatorMode === "exact" || !byId("forgeUnlocked").checked;
-    byId("modeHelp").textContent = calculatorMode === "exact"
-      ? "Exact compares your in-game Promote and Forge power previews."
-      : "Quick gives a break-even threshold and can use the verified 80-stone example.";
-    update();
+  function rawForgeStage() {
+    const parsed = Number(byId("forgeStage").value);
+    return Number.isFinite(parsed) ? parsed : -1;
   }
 
-  function setPriceMode(nextMode, applyDefaults = true) {
-    priceMode = ["discount", "regular", "custom"].includes(nextMode) ? nextMode : "custom";
-    document.querySelectorAll("[data-price-mode]").forEach((button) => {
-      const active = button.dataset.priceMode === priceMode;
-      button.classList.toggle("is-active", active);
-      button.setAttribute("aria-pressed", String(active));
-    });
-    if (applyDefaults && priceMode !== "custom") {
-      suppressPriceModeChange = true;
-      byId("coreCost").value = priceMode === "discount" ? "30" : "100";
-      byId("stoneCost").value = priceMode === "discount" ? "600" : "1500";
-      suppressPriceModeChange = false;
-    }
-    update();
-  }
-
-  function normalizeForgeTarget() {
-    const current = Math.min(6, readNumber("forgeStage"));
+  function normalizeForgeTarget(forceNext = false) {
+    const current = rawForgeStage();
     const target = byId("forgeTarget");
+    const unlocked = current >= 0 && current < 6;
+
     [...target.options].forEach((option) => {
-      option.disabled = Number(option.value) <= current;
+      option.disabled = unlocked && Number(option.value) <= current;
     });
-    if (current >= 6) {
-      target.value = "6";
-      target.disabled = true;
-      return;
+    target.disabled = !unlocked;
+
+    if (!unlocked) return;
+    if (forceNext) {
+      target.value = String(current < 2 ? 2 : current + 1);
+    } else if (Number(target.value) <= current) {
+      target.value = String(current + 1);
     }
-    target.disabled = false;
-    if (Number(target.value) <= current) target.value = String(current + 1);
   }
 
-  function renderRoleAdvice() {
-    const role = byId("heroRole").value;
-    const slot = byId("gearSlot").value;
-    const hero = byId("hero").value;
-    const slotName = Engine.FULL_STAR_DATA[slot].label;
-    let advice = `${hero}: keep the math tied to this ${slotName}; do not reuse its preview for another item.`;
-    if (role === "attack") {
-      advice = slot === "gun" || slot === "helmet"
-        ? `${hero} is set as a damage hero. Gun first, then Helmet, is the usual offensive priority.`
-        : `${hero} is set as a damage hero. ${slotName} improves survival, but compare it against Gun or Helmet before committing.`;
-    } else if (role === "defense") {
-      advice = slot === "armor" || slot === "boots"
-        ? `${hero} is set as a defender. Armor first, then Boots, is the usual durability priority.`
-        : `${hero} is set as a defender. ${slotName} adds offense, but Armor or Boots may fit the hero's job better.`;
-    } else if (role === "support") {
-      advice = `${hero} is set as support. Favor the piece that keeps the hero active long enough to deliver their skill, then use ROI as the tiebreaker.`;
+  function forgeRequirement() {
+    const current = rawForgeStage();
+    if (current < 0 || current >= 6) {
+      return {
+        currentStage: Math.max(0, current),
+        targetStage: Math.max(0, current),
+        stones: 0,
+        pulseModules: 0,
+        attributeGain: 0,
+        transitions: [],
+      };
     }
-    byId("roleAdvice").textContent = advice;
+    return Engine.getForgeRequirement(current, readNumber("forgeTarget"));
   }
 
-  function renderCoreFacts(stats) {
-    const orangeNeeded = Math.max(0, stats.orangePieces - readNumber("orangePieces"));
-    const orangeText = stats.orangePieces > 0
-      ? `${stats.orangePieces} orange piece${stats.orangePieces === 1 ? "" : "s"}`
-      : "No extra orange piece";
-    const warning = orangeNeeded > 0 ? " material-warning" : "";
-    byId("knownCoreChange").innerHTML = `
-      <div>
-        <span>${stats.currentLabel} → ${stats.nextLabel}</span>
-        <strong>${format(stats.cores)} Power Cores</strong>
-        <small>${orangeText}</small>
-      </div>
-      <div>
-        <span>Published promotion stats</span>
-        <strong>+${format(stats.flatDelta)} ${stats.promotionLabel}</strong>
-        <small>+${numberFormatter.format(stats.percentDelta)}% ${stats.troopLabel}</small>
-      </div>
-      <div class="${warning.trim()}">
-        <span>${stats.nextFullStar}★ ${stats.piece.label} reference</span>
-        <strong>${format(stats.targetFullPower)} power</strong>
-        <small>${orangeNeeded > 0 ? `You still need ${orangeNeeded} orange piece${orangeNeeded === 1 ? "" : "s"}.` : "Full-star reference; partial-section power varies."}</small>
-      </div>`;
+  function renderNextStep(coreStats, forge) {
+    const forgeText = rawForgeStage() < 0
+      ? "Not available"
+      : forge.stones > 0
+        ? `${format(forge.stones)} Red Stones`
+        : "Complete";
+    const forgeSmall = rawForgeStage() < 0
+      ? "Choose Cores for now"
+      : forge.stones > 0
+        ? `${stageLabel(forge.currentStage)} → ${stageLabel(forge.targetStage)}`
+        : "Already Mythic";
+
+    byId("nextStepReadout").innerHTML = `
+      <div><span>Next Core section</span><strong>${format(coreStats.cores)} Cores</strong><small>${coreStats.currentLabel} → ${coreStats.nextLabel}</small></div>
+      <div><span>Red path selected</span><strong>${forgeText}</strong><small>${forgeSmall}</small></div>`;
   }
 
-  function renderForgeFacts(requirement) {
-    const finalStep = requirement.transitions.some((transition) => transition.pulseModules > 0);
-    const stoneLabel = `${format(requirement.stones)} red stone${requirement.stones === 1 ? "" : "s"}`;
-    byId("forgeRequirement").textContent = requirement.stones > 0 ? stoneLabel : "Forge path complete";
-    byId("forgeAttribute").textContent = requirement.stones > 0
-      ? `+${format(requirement.attributeGain)}% forging attributes${finalStep ? ` · ${requirement.pulseModules} Pulse Modules` : ""}`
-      : "No additional forge level is listed";
-  }
+  function quickDecision(context) {
+    const { plan, coreStats, forge, reserveActive } = context;
+    const currentStar = readNumber("currentStar");
+    const forgeStage = rawForgeStage();
+    const discounted = readNumber("coreCost") === 30 && readNumber("stoneCost") === 600;
 
-  function comparisonRow(kind, title, power, fullCost, actualCost, efficiency, winner, extra) {
-    const hasPower = power > 0;
-    const roi = hasPower ? `${numberFormatter.format(efficiency * 1000)} power` : "Preview needed";
-    const costText = actualCost === fullCost
-      ? `${format(fullCost)} medals`
-      : `${format(actualCost)} to buy · ${format(fullCost)} full value`;
-    return `
-      <div class="comparison-row${winner === kind || winner === "both" ? " is-winner" : ""}">
-        <div><strong>${title}</strong><small>${costText}${extra ? ` · ${extra}` : ""}</small></div>
-        <div class="roi-value"><strong>${roi}</strong><small>per 1,000 medals</small></div>
-      </div>`;
-  }
-
-  function renderResults(context) {
-    const {
-      plan, coreStats, forgeRequirement, coreGain, forgeGain, forgeUnlocked,
-      reserveActive, coreMaterialReady, forgeMaterialReady, benchmarkActive,
-    } = context;
-    let winner = plan.winner;
-
-    if (!forgeUnlocked && plan.hasCoreData) winner = "core";
-    if (!forgeUnlocked && !plan.hasCoreData) winner = "incomplete";
-    if (forgeRequirement.stones === 0 && plan.hasCoreData) winner = "core";
-
-    let title = "Check the next Core preview";
-    let status = "ONE NUMBER NEEDED";
-    let summary = "Enter the current and preview power from the Promote screen. The calculator already knows this section's material cost and published stat change.";
-
-    if (winner === "both") {
-      title = "Buy both discounted shelves";
-      status = "ENOUGH FOR BOTH";
-      summary = `After the ${format(plan.input.reserveMedals)}-medal reserve, you can clear 1,000 discounted Cores and 50 discounted red stones. You do not need to choose this week.`;
-    } else if (winner === "core") {
-      title = coreMaterialReady ? "Spend on Power Cores" : "Cores win—secure orange gear first";
-      status = coreMaterialReady ? (plan.coreAffordable ? "CORE WINS" : "SAVE FOR CORES") : "MATERIAL BLOCKED";
-      summary = coreMaterialReady
-        ? `${coreStats.piece.label} promotion gives more power per medal for this ${byId("hero").value} comparison.${plan.coreAffordable ? " You can complete the step now." : ` Save ${format(plan.remainingForCore)} more medals after your reserve.`}`
-        : `The Core step has the better return, but it also needs ${coreStats.orangePieces} orange gear piece${coreStats.orangePieces === 1 ? "" : "s"}. Do not strand the Cores without that material.`;
-    } else if (winner === "forge") {
-      title = forgeMaterialReady ? "Spend on red Forging Stones" : "Stones win—save the modules first";
-      status = forgeMaterialReady ? (plan.forgeAffordable ? "RED STONES WIN" : "SAVE FOR STONES") : "MODULE BLOCKED";
-      summary = forgeMaterialReady
-        ? `${stageLabel(forgeRequirement.currentStage)} → ${stageLabel(forgeRequirement.targetStage)} forging gives more power per medal in this comparison.${plan.forgeAffordable ? " You can complete it now." : ` Save ${format(plan.remainingForForge)} more medals after your reserve.`}`
-        : `The forge path has the better return, but the Mythic step also needs ${forgeRequirement.pulseModules} Pulse Modules.`;
-    } else if (winner === "tie") {
-      title = "Returns are effectively tied";
-      status = "WITHIN 5%";
-      summary = "Use event timing and hero role as the tiebreaker. Prefer the upgrade you can complete on Gear Day without weakening Formation 1 balance.";
-    } else if (plan.hasForgeData && !plan.hasCoreData) {
-      title = `Look for at least +${format(plan.coreBreakEvenPower)} power`;
-      status = "CORE BREAK-EVEN";
-      summary = `If the next ${format(coreStats.cores)}-Core section adds at least ${format(plan.coreBreakEvenPower)} power, Cores beat the red-stone comparison. If it adds less, choose the stones.`;
-    } else if (plan.hasCoreData && forgeUnlocked) {
-      title = "Enter the Forge preview";
-      status = "FORGE DATA NEEDED";
-      summary = "The Core side is ready. Add this exact item's Forge before-and-after power to finish the comparison.";
-    } else if (!forgeUnlocked) {
-      title = "Forging is not available yet";
-      status = "CORE PATH ONLY";
-      summary = "Use Cores on the selected gear or save medals. The red-stone option should not be valued until forging is unlocked on this item.";
+    if (plan.canClearBothDiscounts) {
+      return {
+        kind: "both",
+        title: reserveActive ? "Buy all three" : "Buy both",
+        reason: reserveActive
+          ? "You can protect the orange chest and still clear both discounted shelves."
+          : "You have enough medals to clear both discounted shelves, so you do not need to choose.",
+        confidence: "Easy choice",
+      };
     }
 
-    resultCard.dataset.winner = winner;
-    byId("resultStatus").textContent = status;
-    byId("resultTitle").textContent = title;
-    byId("resultSummary").textContent = summary;
-    byId("comparisonTable").innerHTML = [
-      comparisonRow("core", `Power Cores · ${coreStats.piece.label}`, coreGain, plan.fullCoreMedalCost, plan.coreMedalCost, plan.fullCoreEfficiency, winner, `${format(plan.coresToBuy)} to buy`),
-      comparisonRow("forge", `Red stones · ${stageLabel(forgeRequirement.currentStage)} to ${stageLabel(forgeRequirement.targetStage)}`, forgeGain, plan.fullForgeMedalCost, plan.forgeMedalCost, plan.fullForgeEfficiency, winner, `${format(plan.stonesToBuy)} to buy`),
-    ].join("");
+    if (reserveActive) {
+      return {
+        kind: "chest",
+        title: plan.input.currentMedals >= 15000 ? "Orange chest first" : "Save for the chest",
+        reason: "Finish Formation 1's orange gear before choosing between Cores and Red Stones.",
+        confidence: "Formation 1 priority",
+      };
+    }
 
-    if (plan.hasForgeData) {
-      const entered = coreGain > 0 ? ` Your Core preview adds ${format(coreGain)}.` : "";
-      byId("breakEven").innerHTML = `<strong>Core break-even:</strong> this ${format(coreStats.cores)}-Core section must add ${format(plan.coreBreakEvenPower)} power to match the forge return.${entered}`;
-      byId("breakEven").hidden = false;
+    if (readNumber("coreCost") >= 100 || readNumber("stoneCost") >= 1500) {
+      return {
+        kind: "save",
+        title: "Wait for a discount",
+        reason: "At least one item is at the regular shop price. Saving is safer than paying full price.",
+        confidence: "Save medals",
+      };
+    }
+
+    if (forgeStage < 0 || forge.stones === 0) {
+      return {
+        kind: "core",
+        title: "Use Power Cores",
+        reason: forgeStage < 0 ? "Red forging is not unlocked on this item yet." : "This item's red forge path is already complete.",
+        confidence: "Clear choice",
+      };
+    }
+
+    if (currentStar < 2) {
+      return {
+        kind: "core",
+        title: "Buy Power Cores",
+        reason: currentStar < 1
+          ? "Build the first orange star before spending heavily on red forging."
+          : "Build toward two orange stars before pushing this item's red forge path.",
+        confidence: "Strong early-game rule",
+      };
+    }
+
+    if (forgeStage < 2) {
+      return {
+        kind: "forge",
+        title: "Buy Red Stones",
+        reason: "The path to +2 is the strongest normal Red Stone value.",
+        confidence: "Strong mid-game rule",
+      };
+    }
+
+    if (coreStats.cores <= 700) {
+      return {
+        kind: "core",
+        title: "Buy Power Cores",
+        reason: `Your next section costs only ${format(coreStats.cores)} Cores, while red forging gets more expensive after +2.`,
+        confidence: "Good shortcut",
+      };
+    }
+
+    if (forgeStage >= 3) {
+      return {
+        kind: "core",
+        title: "Lean toward Cores",
+        reason: "Late red forge levels have steep Stone costs. Use the exact preview before a very large spend.",
+        confidence: "Preview recommended",
+      };
+    }
+
+    if (!discounted) {
+      return {
+        kind: "save",
+        title: "Wait for a discount",
+        reason: "These are not the usual discounted shop prices. Saving is safer than buying at full price.",
+        confidence: "Save medals",
+      };
+    }
+
+    return {
+      kind: "save",
+      title: "Check the preview",
+      reason: `This ${format(coreStats.cores)}-Core step is close enough that one power preview can change the answer.`,
+      confidence: "One quick check needed",
+    };
+  }
+
+  function exactDecision(plan, reserveActive) {
+    if (plan.winner === "both") {
+      return {
+        kind: "both",
+        title: reserveActive ? "Buy all three" : "Buy both",
+        reason: reserveActive
+          ? "You can buy the orange chest and clear both discounted shelves."
+          : "You can afford both discounted shelves, so there is no need to choose.",
+        confidence: "Exact answer",
+      };
+    }
+    if (plan.winner === "core") {
+      return { kind: "core", title: "Buy Power Cores", reason: "This exact Core preview gives more power for each medal.", confidence: "Uses your preview" };
+    }
+    if (plan.winner === "forge") {
+      return { kind: "forge", title: "Buy Red Stones", reason: "This exact Forge preview gives more power for each medal.", confidence: "Uses your preview" };
+    }
+    return { kind: "tie", title: "Either one works", reason: "The two returns are within 5%. Use event timing as the tiebreaker.", confidence: "Effectively tied" };
+  }
+
+  function applyCompletionChecks(decision, context) {
+    const { plan, coreStats, forge } = context;
+    if (decision.kind === "core") {
+      const missingOrange = Math.max(0, coreStats.orangePieces - readNumber("orangePieces"));
+      if (missingOrange > 0) {
+        return {
+          kind: "save",
+          title: "Get orange gear first",
+          reason: `The Core step wins, but it also needs ${missingOrange} more orange gear piece${missingOrange === 1 ? "" : "s"}.`,
+          confidence: "Material needed",
+          target: "core",
+        };
+      }
+      if (plan.spendableMedals < plan.coreMedalCost) {
+        return {
+          kind: "save",
+          title: "Save for Cores",
+          reason: `Cores are the better move. You need ${format(plan.remainingForCore)} more medals after your reserve.`,
+          confidence: "Best target",
+          target: "core",
+        };
+      }
+    }
+
+    if (decision.kind === "forge") {
+      const missingModules = Math.max(0, forge.pulseModules - readNumber("pulseModules"));
+      if (missingModules > 0) {
+        return {
+          kind: "save",
+          title: "Save the modules first",
+          reason: `The Forge step wins, but Mythic also needs ${missingModules} more Pulse Modules.`,
+          confidence: "Material needed",
+          target: "forge",
+        };
+      }
+      if (plan.spendableMedals < plan.forgeMedalCost) {
+        return {
+          kind: "save",
+          title: "Save for Red Stones",
+          reason: `Red Stones are the better move. You need ${format(plan.remainingForForge)} more medals after your reserve.`,
+          confidence: "Best target",
+          target: "forge",
+        };
+      }
+    }
+    return decision;
+  }
+
+  function renderAction(decision, context) {
+    const { plan, coreStats, forge, exact, reserveActive } = context;
+    let actionTitle = "Keep your medals";
+    let actionDetail = "Do not make a large purchase yet.";
+    const lines = [];
+
+    if (decision.kind === "both") {
+      actionTitle = reserveActive ? "Chest + 1,000 Cores + 50 Stones" : "1,000 Cores + 50 Red Stones";
+      actionDetail = reserveActive ? "75,000 medals total at discounted prices" : "60,000 medals total at discounted prices";
+      if (reserveActive) lines.push("Buy the 15,000-medal orange equipment chest first.");
+      lines.push("Clear both discounted material shelves.");
+    } else if (decision.kind === "chest") {
+      actionTitle = "1 orange equipment chest";
+      actionDetail = "Reserve 15,000 medals";
+      lines.push("Put the chest on Formation 1.");
+      lines.push("Keep the remaining medals for the next completed upgrade.");
+    } else if (decision.kind === "core") {
+      actionTitle = plan.coresToBuy > 0 ? `${format(plan.coresToBuy)} Power Cores` : "Use your owned Power Cores";
+      actionDetail = plan.coresToBuy > 0 ? `${format(plan.coreMedalCost)} medals` : "No medal purchase needed";
+      lines.push(`Promote ${byId("hero").value}'s ${coreStats.piece.label} to ${coreStats.nextLabel}.`);
+      lines.push(`Gain +${format(coreStats.flatDelta)} ${coreStats.promotionLabel} and +${format(coreStats.percentDelta)}% ${coreStats.troopLabel}.`);
+    } else if (decision.kind === "forge") {
+      actionTitle = plan.stonesToBuy > 0 ? `${format(plan.stonesToBuy)} Red Stones` : "Use your owned Red Stones";
+      actionDetail = plan.stonesToBuy > 0 ? `${format(plan.forgeMedalCost)} medals` : "No medal purchase needed";
+      lines.push(`Forge ${byId("hero").value}'s ${coreStats.piece.label} through ${stageLabel(forge.targetStage)}.`);
+      lines.push(`${format(forge.attributeGain)}% total forging-attribute gain on this path.`);
+    } else if (decision.kind === "tie") {
+      actionTitle = "Choose on Gear Day";
+      actionDetail = "The power return is effectively the same";
+      lines.push("Use Cores for broader orange-star progress.");
+      lines.push("Use Red Stones if this is a priority mythic item.");
+    } else if (decision.target === "core") {
+      actionTitle = `Target ${format(coreStats.cores)} Cores`;
+      actionDetail = `You own ${format(plan.input.currentCores)}`;
+      lines.push("Keep buying only at the discounted Core price.");
+    } else if (decision.target === "forge") {
+      actionTitle = `Target ${format(forge.stones)} Red Stones`;
+      actionDetail = `You own ${format(plan.input.currentStones)}`;
+      lines.push("Keep buying only at the discounted Stone price.");
     } else {
-      byId("breakEven").hidden = true;
+      const breakEven = plan.coreBreakEvenPower > 0 ? plan.coreBreakEvenPower : 0;
+      actionTitle = breakEven > 0 ? `Core preview must beat +${format(breakEven)}` : "Save this week's medals";
+      actionDetail = breakEven > 0 ? "Enter the two Core preview numbers below" : "Wait for discounted stock or an exact preview";
+      lines.push("Open the gear's Promote screen before spending.");
     }
 
-    const steps = [];
-    if (reserveActive) steps.push("Keep 15,000 medals untouched for the orange equipment chest.");
-    if (winner === "both") {
-      steps.push("Buy the 1,000 discounted Power Cores for 30,000 medals.");
-      steps.push("Buy the 50 discounted red Forging Stones for 30,000 medals.");
-    } else if (winner === "core") {
-      if (!coreMaterialReady) steps.push(`Obtain ${coreStats.orangePieces - readNumber("orangePieces")} more orange gear piece${coreStats.orangePieces - readNumber("orangePieces") === 1 ? "" : "s"}.`);
-      steps.push(plan.coreMedalCost === 0 ? "Use the Cores already in inventory." : `${plan.coreAffordable ? "Buy" : "Save for"} ${format(plan.coresToBuy)} Cores (${format(plan.coreMedalCost)} medals).`);
-      steps.push(`Promote ${byId("hero").value}'s ${coreStats.piece.label} from ${coreStats.currentLabel} to ${coreStats.nextLabel}.`);
-    } else if (winner === "forge") {
-      if (!forgeMaterialReady) steps.push(`Save ${forgeRequirement.pulseModules - readNumber("pulseModules")} more Pulse Modules.`);
-      steps.push(plan.forgeMedalCost === 0 ? "Use the red stones already in inventory." : `${plan.forgeAffordable ? "Buy" : "Save for"} ${format(plan.stonesToBuy)} red stones (${format(plan.forgeMedalCost)} medals).`);
-      steps.push(`Forge ${byId("hero").value}'s ${coreStats.piece.label} through ${stageLabel(forgeRequirement.targetStage)}.`);
-    } else if (winner === "tie") {
-      steps.push("Wait for the matching scoring day if neither upgrade is urgent.");
-      steps.push("Choose Cores for broader orange-gear progression or stones for the selected mythic path.");
-    } else {
-      steps.push("Open the selected item in Equipment and tap Promote.");
-      steps.push("Copy the current power and the preview power into the Core fields.");
-      if (calculatorMode === "exact" && forgeUnlocked) steps.push("Repeat on the Forge screen for the exact red-stone result.");
-    }
-    byId("shoppingPlan").innerHTML = steps.map((step) => `<li>${step}</li>`).join("");
-
-    const sourceMode = calculatorMode === "exact"
-      ? "Exact mode uses your two in-game previews."
-      : benchmarkActive
-        ? "Quick mode uses the verified 80-stone / 55,155-power armor screenshot as the forge benchmark."
-        : "Quick mode is waiting for an item-specific Forge preview.";
-    byId("confidenceNote").textContent = `${sourceMode} Promotion costs and stat deltas use the June 2026 tables; shop prices are editable in case the game changes.`;
+    byId("answerAction").innerHTML = `<span>Do this</span><strong>${actionTitle}</strong><small>${actionDetail}</small>`;
+    byId("shortList").innerHTML = lines.slice(0, 2).map((line) => `<li>${line}</li>`).join("");
+    byId("precisionButton").hidden = exact || decision.kind === "both" || decision.kind === "chest";
   }
 
   function saveState() {
@@ -247,55 +308,51 @@
       const values = {};
       [...form.elements].forEach((element) => {
         if (!element.name) return;
-        values[element.name] = element.type === "checkbox" ? element.checked : element.value;
+        if (element.type === "radio") {
+          if (element.checked) values[element.name] = element.value;
+        } else {
+          values[element.name] = element.value;
+        }
       });
-      localStorage.setItem(storageKey, JSON.stringify({ values, calculatorMode, priceMode }));
+      localStorage.setItem(storageKey, JSON.stringify(values));
     } catch {
-      // The calculator remains fully functional when local storage is unavailable.
+      // Storage is a convenience, not a requirement.
     }
   }
 
   function restoreState() {
     try {
-      const saved = JSON.parse(localStorage.getItem(storageKey) || "null");
-      if (!saved || !saved.values) return;
-      Object.entries(saved.values).forEach(([name, value]) => {
-        const element = form.elements.namedItem(name);
-        if (!element) return;
-        if (element.type === "checkbox") element.checked = Boolean(value);
-        else element.value = String(value);
+      const values = JSON.parse(localStorage.getItem(storageKey) || "null");
+      if (!values) return;
+      Object.entries(values).forEach(([name, value]) => {
+        const field = form.elements.namedItem(name);
+        if (!field) return;
+        if (field instanceof RadioNodeList) {
+          field.value = String(value);
+        } else {
+          field.value = String(value);
+        }
       });
-      calculatorMode = saved.calculatorMode === "exact" ? "exact" : "quick";
-      priceMode = ["discount", "regular", "custom"].includes(saved.priceMode) ? saved.priceMode : "custom";
     } catch {
-      // Ignore malformed or blocked storage.
+      // Ignore unavailable or malformed saved state.
     }
   }
 
   function update() {
     normalizeForgeTarget();
-    renderRoleAdvice();
-
-    const coreStats = Engine.getNextPromotionStats(
-      readNumber("currentStar"),
-      readNumber("currentWedge"),
-      byId("gearSlot").value,
-    );
-    const forgeRequirement = Engine.getForgeRequirement(readNumber("forgeStage"), readNumber("forgeTarget"));
-    renderCoreFacts(coreStats);
-    renderForgeFacts(forgeRequirement);
-
-    const forgeUnlocked = byId("forgeUnlocked").checked && forgeRequirement.stones > 0;
-    byId("forgeFields").hidden = !byId("forgeUnlocked").checked;
-    byId("forgeRequirement").parentElement.hidden = !byId("forgeUnlocked").checked;
-    byId("benchmarkRow").hidden = calculatorMode === "exact" || !forgeUnlocked;
-
+    const coreStats = Engine.getNextPromotionStats(readNumber("currentStar"), readNumber("currentWedge"), gearSlot());
+    const forge = forgeRequirement();
+    const reserveActive = checkedValue("f1Complete") === "no";
     const coreGain = powerGain("corePowerBefore", "corePowerAfter");
-    const enteredForgeGain = powerGain("forgePowerBefore", "forgePowerAfter");
-    const benchmarkActive = calculatorMode === "quick" && byId("useForgeBenchmark").checked &&
-      forgeRequirement.currentStage === 0 && forgeRequirement.targetStage === 2;
-    const forgeGain = forgeUnlocked ? (enteredForgeGain || (benchmarkActive ? 55155 : 0)) : 0;
-    const reserveActive = byId("reserveChest").checked;
+    const forgeGain = powerGain("forgePowerBefore", "forgePowerAfter");
+    const benchmarkForgeGain = forge.currentStage === 0 && forge.targetStage === 2 && forge.stones === 80 ? 55155 : 0;
+    const exact = coreGain > 0 && forgeGain > 0 && rawForgeStage() >= 0 && forge.stones > 0;
+
+    renderNextStep(coreStats, forge);
+    byId("reserveMessage").textContent = reserveActive ? "We will protect 15,000 medals for the orange chest." : "No reserve needed.";
+
+    const forgeInputsDisabled = rawForgeStage() < 0 || rawForgeStage() >= 6;
+    ["forgePowerBefore", "forgePowerAfter"].forEach((id) => { byId(id).disabled = forgeInputsDisabled; });
 
     const plan = Engine.calculateMeritPlan({
       currentMedals: readNumber("currentMedals"),
@@ -306,86 +363,55 @@
       corePowerGain: coreGain,
       stoneCost: readNumber("stoneCost"),
       currentStones: readNumber("currentStones"),
-      stonesNeeded: forgeRequirement.stones,
-      forgePowerGain: forgeGain,
-      discountedStock: priceMode === "discount" && readNumber("coreCost") === 30 && readNumber("stoneCost") === 600,
+      stonesNeeded: forge.stones,
+      forgePowerGain: forgeGain || benchmarkForgeGain,
+      discountedStock: readNumber("coreCost") === 30 && readNumber("stoneCost") === 600,
     });
 
-    const coreMaterialReady = readNumber("orangePieces") >= coreStats.orangePieces;
-    const forgeMaterialReady = readNumber("pulseModules") >= forgeRequirement.pulseModules;
-    renderResults({
-      plan,
-      coreStats,
-      forgeRequirement,
-      coreGain,
-      forgeGain,
-      forgeUnlocked,
-      reserveActive,
-      coreMaterialReady,
-      forgeMaterialReady,
-      benchmarkActive,
-    });
+    let decision = exact ? exactDecision(plan, reserveActive) : quickDecision({ plan, coreStats, forge, reserveActive });
+    decision = applyCompletionChecks(decision, { plan, coreStats, forge });
+
+    answerPanel.dataset.answer = decision.kind;
+    byId("answerType").textContent = exact ? "EXACT ANSWER" : "QUICK ANSWER";
+    byId("answerConfidence").textContent = decision.confidence;
+    byId("answerTitle").textContent = decision.title;
+    byId("answerReason").textContent = decision.reason;
+    byId("answerFootnote").textContent = exact
+      ? "Compared using your in-game power previews and the full material cost."
+      : "Fast guidance from current community costs. Use the optional preview for large late-game purchases.";
+    renderAction(decision, { plan, coreStats, forge, exact, reserveActive });
     saveState();
   }
 
-  document.querySelectorAll("[data-mode]").forEach((button) => {
-    button.addEventListener("click", () => setMode(button.dataset.mode));
-  });
-  document.querySelectorAll("[data-price-mode]").forEach((button) => {
-    button.addEventListener("click", () => setPriceMode(button.dataset.priceMode));
-  });
-  ["coreCost", "stoneCost"].forEach((id) => {
-    byId(id).addEventListener("input", () => {
-      if (!suppressPriceModeChange) setPriceMode("custom", false);
-    });
-  });
-  ["forgeStage", "forgeTarget"].forEach((id) => {
-    byId(id).addEventListener("change", () => {
-      const baseline = readNumber("forgeStage") === 0 && readNumber("forgeTarget") === 2;
-      if (!baseline) byId("useForgeBenchmark").checked = false;
-    });
-  });
-  byId("useForgeBenchmark").addEventListener("change", () => {
-    if (byId("useForgeBenchmark").checked) {
-      byId("forgeStage").value = "0";
-      byId("forgeTarget").value = "2";
-    }
-  });
-  byId("f1OrangeCount").addEventListener("change", () => {
-    byId("reserveChest").checked = readNumber("f1OrangeCount") < 20;
-  });
   form.addEventListener("input", update);
   form.addEventListener("change", update);
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    update();
+    answerPanel.focus({ preventScroll: true });
+    answerPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  byId("forgeStage").addEventListener("change", () => {
+    normalizeForgeTarget(true);
+    update();
+  });
+
+  byId("precisionButton").addEventListener("click", () => {
+    byId("advancedDetails").open = true;
+    byId("advancedDetails").scrollIntoView({ behavior: "smooth", block: "center" });
+    window.setTimeout(() => byId("corePowerBefore").focus(), 300);
+  });
 
   byId("resetCalculator").addEventListener("click", () => {
     localStorage.removeItem(storageKey);
     form.reset();
-    byId("currentMedals").value = "60000";
-    byId("f1OrangeCount").value = "20";
-    byId("forgeTarget").value = "2";
-    byId("useForgeBenchmark").checked = true;
-    setPriceMode("discount");
-    setMode("quick");
-  });
-
-  byId("loadExample").addEventListener("click", () => {
-    byId("currentMedals").value = "48000";
-    byId("reserveChest").checked = false;
-    byId("gearSlot").value = "armor";
-    byId("currentStar").value = "1";
-    byId("currentWedge").value = "0";
-    byId("forgeStage").value = "0";
-    byId("forgeTarget").value = "2";
-    byId("useForgeBenchmark").checked = true;
-    byId("forgePowerBefore").value = "413421";
-    byId("forgePowerAfter").value = "468576";
-    byId("corePowerBefore").value = "";
-    byId("corePowerAfter").value = "";
-    setPriceMode("discount");
-    setMode("quick");
+    byId("advancedDetails").open = false;
+    normalizeForgeTarget(true);
+    update();
   });
 
   restoreState();
-  setPriceMode(priceMode, false);
-  setMode(calculatorMode);
+  normalizeForgeTarget();
+  update();
 })();
