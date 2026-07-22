@@ -6,11 +6,11 @@
     <meta name="theme-color" content="#071015" />
     <meta
       name="description"
-      content="A fast Last Z Merit Medal calculator that tells you whether to buy Power Cores, red Forging Stones, both, or save."
+      content="A level-aware Last Z Merit Medal calculator that recommends Power Cores, red Forging Stones, both, orange gear, or saving."
     />
-    <title>Cores or Red Stones? | FL2 Quick Calculator</title>
+    <title>Cores or Red Stones? | FL2 Merit Calculator</title>
     <link rel="icon" href="assets/brand/fl2-mark.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="calculator.css?v=20260722-simple-calculator" />
+    <link rel="stylesheet" href="calculator.css?v=20260722-level-aware-v3" />
   </head>
   <body>
     <div class="calculator-shell">
@@ -26,8 +26,8 @@
         <section class="intro" aria-labelledby="pageTitle">
           <div>
             <p class="eyebrow">30-second Merit Medal answer</p>
-            <h1 id="pageTitle">What should I buy?</h1>
-            <p>Pick your gear, enter what you have, and get one clear answer.</p>
+            <h1 id="pageTitle">Cores or red stones?</h1>
+            <p>Choose one orange gear piece. FL2 checks its level, stars, forge progress, your materials, and this week’s discounted stock.</p>
           </div>
           <img src="assets/calculator/power-core.webp" alt="Power Core from Last Z" />
         </section>
@@ -37,10 +37,10 @@
             <section class="question-card" aria-labelledby="targetTitle">
               <div class="question-heading">
                 <span>1</span>
-                <div><p class="eyebrow">Choose the item</p><h2 id="targetTitle">Who are you upgrading?</h2></div>
+                <div><p class="eyebrow">Choose the weakest item</p><h2 id="targetTitle">Who and what are we upgrading?</h2></div>
               </div>
 
-              <div class="compact-grid">
+              <div class="compact-grid compact-grid-3">
                 <label>
                   <span>Hero</span>
                   <select id="hero" name="hero">
@@ -65,15 +65,24 @@
                     <option value="f3">Formation 3</option>
                   </select>
                 </label>
+                <label>
+                  <span>Hero job <small>(optional)</small></span>
+                  <select id="heroRole" name="heroRole">
+                    <option value="unknown">Not sure</option>
+                    <option value="damage">Back row / damage</option>
+                    <option value="defense">Front row / tank</option>
+                    <option value="support">Support</option>
+                  </select>
+                </label>
               </div>
 
               <fieldset class="choice-fieldset">
-                <legend>Gear piece</legend>
+                <legend>Orange gear piece</legend>
                 <div class="gear-choices">
-                  <label><input type="radio" name="gearSlot" value="gun" checked /><span class="gear-choice"><b aria-hidden="true">⌁</b><strong>Gun</strong><small>Attack</small></span></label>
-                  <label><input type="radio" name="gearSlot" value="helmet" /><span class="gear-choice"><b aria-hidden="true">◒</b><strong>Helmet</strong><small>Attack</small></span></label>
-                  <label><input type="radio" name="gearSlot" value="armor" /><span class="gear-choice"><b aria-hidden="true">⬟</b><strong>Armor</strong><small>Defense</small></span></label>
-                  <label><input type="radio" name="gearSlot" value="boots" /><span class="gear-choice"><b aria-hidden="true">⌞</b><strong>Boots</strong><small>Defense</small></span></label>
+                  <label><input type="radio" name="gearSlot" value="gun" checked /><span class="gear-choice"><b class="gear-thumb gear-thumb-gun" aria-hidden="true"></b><strong>Gun</strong><small>Hero ATK + troop damage</small></span></label>
+                  <label><input type="radio" name="gearSlot" value="helmet" /><span class="gear-choice"><b class="gear-thumb gear-thumb-helmet" aria-hidden="true"></b><strong>Helmet</strong><small>Hero ATK + troop damage</small></span></label>
+                  <label><input type="radio" name="gearSlot" value="armor" /><span class="gear-choice"><b class="gear-thumb gear-thumb-armor" aria-hidden="true"></b><strong>Armor</strong><small>Hero DEF + troop HP</small></span></label>
+                  <label><input type="radio" name="gearSlot" value="boots" /><span class="gear-choice"><b class="gear-thumb gear-thumb-boots" aria-hidden="true"></b><strong>Boots</strong><small>Hero DEF + troop HP</small></span></label>
                 </div>
               </fieldset>
             </section>
@@ -81,16 +90,17 @@
             <section class="question-card" aria-labelledby="progressTitle">
               <div class="question-heading">
                 <span>2</span>
-                <div><p class="eyebrow">Current progress</p><h2 id="progressTitle">Where is this gear now?</h2></div>
+                <div><p class="eyebrow">Read these from the item</p><h2 id="progressTitle">Where is this gear now?</h2></div>
               </div>
 
-              <div class="compact-grid compact-grid-3">
+              <div class="compact-grid compact-grid-4 progress-grid">
+                <label><span>Equipment level</span><input id="equipmentLevel" name="equipmentLevel" type="number" min="0" max="100" step="1" value="40" inputmode="numeric" /></label>
                 <label>
                   <span>Orange stars</span>
                   <select id="currentStar" name="currentStar">
                     <option value="0">0 stars</option><option value="1">1 star</option>
                     <option value="2">2 stars</option><option value="3">3 stars</option>
-                    <option value="4">4 stars</option>
+                    <option value="4">4 stars</option><option value="5">5 stars / complete</option>
                   </select>
                 </label>
                 <label>
@@ -108,18 +118,19 @@
                     <option value="0" selected>Base / no +</option><option value="1">+1</option>
                     <option value="2">+2</option><option value="3">+3</option>
                     <option value="4">+4</option><option value="5">+5</option>
-                    <option value="6">Mythic</option>
+                    <option value="6">Mythic / complete</option>
                   </select>
                 </label>
               </div>
 
+              <p class="form-tip"><strong>Equipment level is the “Lv.” number on the item.</strong> It matters because red forging scales existing stats; Power Cores add promotion stats and eventually unlock higher enhancement caps.</p>
               <div class="next-step" id="nextStepReadout" aria-live="polite"></div>
             </section>
 
             <section class="question-card" aria-labelledby="walletTitle">
               <div class="question-heading">
                 <span>3</span>
-                <div><p class="eyebrow">Your wallet</p><h2 id="walletTitle">What do you have?</h2></div>
+                <div><p class="eyebrow">Your wallet</p><h2 id="walletTitle">What do you have right now?</h2></div>
               </div>
 
               <div class="compact-grid compact-grid-3">
@@ -132,51 +143,25 @@
                 <legend>Does Formation 1 have orange gear in all 20 slots?</legend>
                 <label><input type="radio" name="f1Complete" value="yes" checked /><span>Yes</span></label>
                 <label><input type="radio" name="f1Complete" value="no" /><span>No</span></label>
-                <small id="reserveMessage">No reserve needed.</small>
+                <small id="reserveMessage">No orange-chest reserve needed.</small>
               </fieldset>
             </section>
 
             <details class="advanced" id="advancedDetails">
               <summary>
-                <span><strong>Want a more exact answer?</strong><small>Add the two power previews from the game.</small></span>
+                <span><strong>Already bought part of the shop?</strong><small>Change remaining discounted stock or rare late-game materials.</small></span>
                 <span aria-hidden="true">+</span>
               </summary>
               <div class="advanced-body">
-                <p class="advanced-intro">Optional. Leave these blank for the fast recommendation.</p>
-
-                <div class="advanced-block">
-                  <h3>Core preview</h3>
-                  <div class="compact-grid">
-                    <label><span>Power now</span><input id="corePowerBefore" name="corePowerBefore" type="number" min="0" step="1" placeholder="Current power" inputmode="numeric" /></label>
-                    <label><span>Power after Promote</span><input id="corePowerAfter" name="corePowerAfter" type="number" min="0" step="1" placeholder="Preview power" inputmode="numeric" /></label>
-                  </div>
+                <p class="advanced-intro">Most players can leave these alone. Defaults match the supplied Merit Shop screenshots.</p>
+                <div class="compact-grid compact-grid-4">
+                  <label><span>Discounted Cores left</span><input id="coreStock" name="coreStock" type="number" min="0" max="1000" step="1" value="1000" /></label>
+                  <label><span>Medals per Core</span><input id="coreCost" name="coreCost" type="number" min="1" step="1" value="30" /></label>
+                  <label><span>Discounted Stones left</span><input id="stoneStock" name="stoneStock" type="number" min="0" max="50" step="1" value="50" /></label>
+                  <label><span>Medals per Stone</span><input id="stoneCost" name="stoneCost" type="number" min="1" step="1" value="600" /></label>
+                  <label><span>Spare orange pieces</span><input id="orangePieces" name="orangePieces" type="number" min="0" step="1" value="0" /></label>
+                  <label><span>Pulse Modules</span><input id="pulseModules" name="pulseModules" type="number" min="0" step="1" value="0" /></label>
                 </div>
-
-                <div class="advanced-block">
-                  <h3>Red-stone preview</h3>
-                  <div class="compact-grid compact-grid-3">
-                    <label>
-                      <span>Compare through</span>
-                      <select id="forgeTarget" name="forgeTarget">
-                        <option value="1">+1</option><option value="2" selected>+2</option>
-                        <option value="3">+3</option><option value="4">+4</option>
-                        <option value="5">+5</option><option value="6">Mythic</option>
-                      </select>
-                    </label>
-                    <label><span>Power now</span><input id="forgePowerBefore" name="forgePowerBefore" type="number" min="0" step="1" placeholder="Current power" inputmode="numeric" /></label>
-                    <label><span>Power after Forge</span><input id="forgePowerAfter" name="forgePowerAfter" type="number" min="0" step="1" placeholder="Preview power" inputmode="numeric" /></label>
-                  </div>
-                </div>
-
-                <details class="shop-settings">
-                  <summary>Change shop prices or late-game materials</summary>
-                  <div class="compact-grid compact-grid-4">
-                    <label><span>Medals per Core</span><input id="coreCost" name="coreCost" type="number" min="1" step="1" value="30" /></label>
-                    <label><span>Medals per Stone</span><input id="stoneCost" name="stoneCost" type="number" min="1" step="1" value="600" /></label>
-                    <label><span>Orange pieces</span><input id="orangePieces" name="orangePieces" type="number" min="0" step="1" value="0" /></label>
-                    <label><span>Pulse Modules</span><input id="pulseModules" name="pulseModules" type="number" min="0" step="1" value="0" /></label>
-                  </div>
-                </details>
               </div>
             </details>
 
@@ -188,50 +173,57 @@
 
           <aside class="answer-panel" id="answerPanel" aria-live="polite" tabindex="-1">
             <div class="answer-topline">
-              <span class="answer-type" id="answerType">QUICK ANSWER</span>
-              <span class="answer-confidence" id="answerConfidence">Strong starting point</span>
+              <span class="answer-type">FL2 RECOMMENDATION</span>
+              <span class="answer-confidence" id="answerConfidence">High confidence</span>
             </div>
             <p class="eyebrow">Your best next move</p>
             <h2 id="answerTitle">Buy both</h2>
-            <p class="answer-reason" id="answerReason">You have enough medals for both discounted shelves.</p>
+            <p class="answer-reason" id="answerReason">You can clear both discounted shelves without touching an orange-gear reserve.</p>
 
             <div class="answer-action" id="answerAction"></div>
             <ul class="short-list" id="shortList"></ul>
-
-            <button class="precision-button" id="precisionButton" type="button">Make this answer exact</button>
-            <p class="answer-footnote" id="answerFootnote"></p>
+            <div class="honesty-note" id="answerFootnote"></div>
           </aside>
         </div>
 
         <details class="method-card">
-          <summary>How does FL2 decide?</summary>
+          <summary>Why should I trust this answer?</summary>
           <div class="method-body">
             <div>
-              <h2>The short version</h2>
-              <p>Cheap early Core sections usually come first. Red Stones are strongest on the path to +2. If your Formation 1 still needs orange gear, the 15,000-medal chest gets protected first. Exact preview numbers override every shortcut.</p>
-              <p>Costs are based on the linked Reddit shop screenshots and June 2026 community equipment tables. Shop prices stay editable because game updates can change them.</p>
+              <h2>Known numbers first. Community rules second.</h2>
+              <p>FL2 uses the published cost and stat tables for every Core section and Forge step. It then applies the community pattern: spread cheap Core promotions, use the strong Forge path through +2 when the item has enough base stats, and avoid deep forging too early.</p>
+              <p><strong>No made-up future power.</strong> Last Z’s Promote screen shows the next stats and material cost, but not the item’s total power after purchase. This calculator will not ask you for a number the game does not show or pretend it can calculate an unpublished power formula.</p>
               <nav aria-label="Calculator research links">
-                <a href="https://www.reddit.com/r/LastZShooterRun/comments/1uw6fza/sshould_i_keep_prioritizing_cores_over_the_red/" target="_blank" rel="noreferrer">Reddit evidence</a>
-                <a href="https://last-z.net/tables/orange-equipment/" target="_blank" rel="noreferrer">Core table</a>
+                <a href="https://www.reddit.com/r/LastZShooterRun/s/Awd9WHRSyI" target="_blank" rel="noreferrer">Original Reddit thread</a>
+                <a href="https://www.reddit.com/r/LastZShooterRun/comments/1qfy585/power_core_vs_forging_stone/" target="_blank" rel="noreferrer">180-day comparison math</a>
+                <a href="https://last-z.net/tables/orange-equipment/" target="_blank" rel="noreferrer">Core + level table</a>
                 <a href="https://last-z.net/tables/mythic-equipment/" target="_blank" rel="noreferrer">Forge table</a>
-                <a href="https://lastz.stresswar.com/en" target="_blank" rel="noreferrer">Stresswar database</a>
+                <a href="https://ztools.co.uk/wiki/increasing-tank-power/" target="_blank" rel="noreferrer">Level-aware guidance</a>
+                <a href="https://lastz.stresswar.com/heroes" target="_blank" rel="noreferrer">Last Z Helper</a>
+                <a href="https://www.ldshop.gg/blog/last-z/power-core-guide.html" target="_blank" rel="noreferrer">LDShop guide</a>
               </nav>
             </div>
-            <figure>
-              <img src="assets/calculator/merit-prices-reddit.jpeg" alt="Last Z Merit Shop showing Power Core and Forging Stone prices" loading="lazy" />
-              <figcaption>Real in-game Merit Shop screenshot</figcaption>
-            </figure>
+            <div class="evidence-gallery">
+              <figure>
+                <img src="assets/calculator/equipment-promotion.webp" alt="Real Last Z Promote screen showing equipment level, current and next stats, and Core cost" loading="lazy" />
+                <figcaption>Real Promote screen: stats and cost, but no future total power</figcaption>
+              </figure>
+              <figure>
+                <img src="assets/calculator/merit-prices-reddit.jpeg" alt="Real Last Z Merit Shop showing Power Cores and red Forging Stone prices" loading="lazy" />
+                <figcaption>Real Merit Shop screenshot used for default prices and stock</figcaption>
+              </figure>
+            </div>
           </div>
         </details>
       </main>
 
       <footer>
         <span>FrostBorn Lions [FL2]</span>
-        <span>Verify the game preview before a large spend.</span>
+        <span>Unofficial community planner. Verify this week’s shop prices before buying.</span>
       </footer>
     </div>
 
-    <script src="calculator-engine.js?v=20260722-simple-calculator"></script>
-    <script src="calculator.js?v=20260722-simple-calculator"></script>
+    <script src="calculator-engine.js?v=20260722-level-aware-v3"></script>
+    <script src="calculator.js?v=20260722-level-aware-v3"></script>
   </body>
 </html>

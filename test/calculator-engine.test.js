@@ -2,18 +2,6 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const calculator = require("../public/calculator-engine.js");
 
-const forgeBenchmark = {
-  currentMedals: 50000,
-  reserveMedals: 0,
-  coreCost: 30,
-  currentCores: 0,
-  stoneCost: 600,
-  currentStones: 0,
-  stonesNeeded: 80,
-  forgePowerGain: 55155,
-  discountedStock: true,
-};
-
 test("uses the published Core requirement for every promotion band", () => {
   const cases = [
     [0, 0, 100, 0], [0, 1, 100, 0], [0, 2, 200, 0], [0, 4, 200, 0], [0, 5, 300, 0],
@@ -57,85 +45,141 @@ test("returns the exact published stat delta for the selected gear section", () 
   assert.equal(result.targetFullPower, 467830);
 });
 
-test("finds the 300-Core break-even against the 80-stone screenshot", () => {
-  const result = calculator.calculateMeritPlan({
-    ...forgeBenchmark,
-    coresNeeded: 300,
-    corePowerGain: 12000,
-  });
-  assert.equal(result.coreBreakEvenPower, 10342);
-  assert.equal(result.winner, "core");
+test("treats five-star equipment as a completed Core path", () => {
+  const requirement = calculator.getCoreRequirement(5, 0);
+  assert.equal(requirement.complete, true);
+  assert.equal(requirement.cores, 0);
+
+  const stats = calculator.getNextPromotionStats(5, 0, "gun");
+  assert.equal(stats.complete, true);
+  assert.equal(stats.flatDelta, 0);
+  assert.equal(stats.targetFullPower, 760911);
 });
 
-test("prefers red stones when a 500-Core step has the same 12,000 power gain", () => {
-  const result = calculator.calculateMeritPlan({
-    ...forgeBenchmark,
-    coresNeeded: 500,
-    corePowerGain: 12000,
+test("uses equipment level as a real promotion gate", () => {
+  const locked = calculator.recommendMeritSpend({
+    equipmentLevel: 19,
+    currentStar: 0,
+    currentWedge: 0,
+    forgeStage: -1,
+    currentMedals: 30000,
   });
-  assert.equal(result.winner, "forge");
+
+  assert.equal(locked.kind, "core");
+  assert.equal(locked.rule, "level-20-gate");
+  assert.equal(locked.useNow, false);
+  assert.equal(locked.level.levelsToPromotion, 1);
 });
 
-test("treats options within five percent as a tie", () => {
-  const result = calculator.calculateMeritPlan({
-    ...forgeBenchmark,
-    coresNeeded: 300,
-    corePowerGain: 10000,
+test("recommends cheap Core sections before red forging", () => {
+  const result = calculator.recommendMeritSpend({
+    equipmentLevel: 50,
+    currentStar: 0,
+    currentWedge: 5,
+    forgeStage: 0,
+    currentMedals: 30000,
   });
-  assert.equal(result.winner, "tie");
+
+  assert.equal(result.coreStats.cores, 300);
+  assert.equal(result.kind, "core");
+  assert.equal(result.rule, "cheap-core-section");
+  assert.equal(result.confidence, "high");
 });
 
-test("inventory reduces purchase cost but does not distort intrinsic ROI", () => {
-  const result = calculator.calculateMeritPlan({
-    ...forgeBenchmark,
-    currentCores: 200,
-    coresNeeded: 300,
-    corePowerGain: 5000,
+test("moves to the +2 Forge path once Core sections cost 500 at a mature level", () => {
+  const result = calculator.recommendMeritSpend({
+    equipmentLevel: 50,
+    currentStar: 1,
+    currentWedge: 2,
+    forgeStage: 0,
+    currentMedals: 30000,
   });
-  assert.equal(result.coreMedalCost, 3000);
-  assert.equal(result.fullCoreMedalCost, 9000);
-  assert.equal(result.winner, "forge");
+
+  assert.equal(result.coreStats.cores, 500);
+  assert.equal(result.kind, "forge");
+  assert.equal(result.rule, "forge-to-plus-two");
+  assert.equal(result.forge.targetStage, 2);
+  assert.equal(result.forge.stones, 80);
 });
 
-test("protects the orange-chest reserve when checking affordability", () => {
-  const result = calculator.calculateMeritPlan({
-    ...forgeBenchmark,
-    currentMedals: 50000,
-    reserveMedals: 15000,
-    coresNeeded: 300,
-    corePowerGain: 12000,
+test("keeps the same 500-Core item on Cores when its equipment level is still low", () => {
+  const result = calculator.recommendMeritSpend({
+    equipmentLevel: 39,
+    currentStar: 1,
+    currentWedge: 2,
+    forgeStage: 0,
+    currentMedals: 30000,
   });
-  assert.equal(result.spendableMedals, 35000);
-  assert.equal(result.coreAffordable, true);
-  assert.equal(result.forgeAffordable, false);
+
+  assert.equal(result.coreStats.cores, 500);
+  assert.equal(result.kind, "core");
+  assert.equal(result.rule, "low-base-stats");
 });
 
-test("recommends both only when the true discounted shelves can be cleared", () => {
-  const discounted = calculator.calculateMeritPlan({
-    ...forgeBenchmark,
-    currentMedals: 60000,
-    coresNeeded: 300,
-    corePowerGain: 12000,
+test("does not pretend more than 50 Forging Stones are discounted", () => {
+  const result = calculator.recommendMeritSpend({
+    equipmentLevel: 50,
+    currentStar: 1,
+    currentWedge: 2,
+    forgeStage: 0,
+    currentMedals: 48000,
+    currentStones: 0,
   });
-  assert.equal(discounted.winner, "both");
 
-  const custom = calculator.calculateMeritPlan({
-    ...forgeBenchmark,
-    currentMedals: 200000,
-    coresNeeded: 300,
-    corePowerGain: 12000,
-    discountedStock: false,
-  });
-  assert.notEqual(custom.winner, "both");
+  assert.equal(result.kind, "forge");
+  assert.equal(result.recommendedPurchase.stones, 50);
+  assert.equal(result.recommendedPurchase.medals, 30000);
+  assert.equal(result.stoneShortfall, 30);
+  assert.equal(result.canCompleteForgeNow, false);
+});
 
-  const completedForge = calculator.calculateMeritPlan({
-    ...forgeBenchmark,
-    currentMedals: 60000,
-    coresNeeded: 300,
-    corePowerGain: 12000,
-    stonesNeeded: 0,
-    forgePowerGain: 0,
+test("protects the orange chest before clearing both discounted shelves", () => {
+  const result = calculator.recommendMeritSpend({
+    equipmentLevel: 50,
+    currentStar: 1,
+    currentWedge: 2,
+    forgeStage: 0,
+    currentMedals: 75000,
+    f1Complete: false,
   });
-  assert.notEqual(completedForge.winner, "both");
-  assert.equal(completedForge.fullForgeMedalCost, 0);
+
+  assert.equal(result.kind, "both");
+  assert.deepEqual(result.recommendedPurchase, {
+    cores: 1000,
+    stones: 50,
+    chest: 15000,
+    medals: 75000,
+  });
+});
+
+test("does not buy a regular-price material when the other shelf is discounted", () => {
+  const result = calculator.recommendMeritSpend({
+    equipmentLevel: 50,
+    currentStar: 1,
+    currentWedge: 2,
+    forgeStage: 0,
+    currentMedals: 30000,
+    corePrice: 30,
+    stonePrice: 1500,
+  });
+
+  assert.equal(result.kind, "core");
+  assert.equal(result.rule, "stone-full-price");
+});
+
+test("respects a fully sold discounted shelf", () => {
+  const result = calculator.recommendMeritSpend({
+    equipmentLevel: 50,
+    currentStar: 0,
+    currentWedge: 0,
+    forgeStage: 0,
+    currentMedals: 30000,
+    coreStock: 0,
+    stoneStock: 50,
+  });
+
+  assert.equal(result.kind, "forge");
+  assert.equal(result.rule, "core-stock-sold");
+  assert.equal(result.recommendedPurchase.cores, 0);
+  assert.equal(result.recommendedPurchase.stones, 50);
 });
