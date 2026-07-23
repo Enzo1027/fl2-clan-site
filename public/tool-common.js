@@ -16,6 +16,62 @@
   const store = Profiles?.createProfileStore();
   window.fl2Profiles = store || null;
 
+  const automaticCacheState = { offlineReady: false, persistentStorage: false };
+
+  function publishAutomaticCacheState() {
+    document.documentElement.dataset.offlineReady = String(automaticCacheState.offlineReady);
+    document.documentElement.dataset.persistentStorage = String(automaticCacheState.persistentStorage);
+    const profileLabel = store ? `${store.getProfile().name} ` : "";
+    document.querySelectorAll("#localSaveStatus").forEach((status) => {
+      status.textContent = automaticCacheState.offlineReady
+        ? `${profileLabel}auto-saved · offline ready`
+        : `${profileLabel}auto-saved on this device`;
+    });
+    window.dispatchEvent(new CustomEvent("fl2:cachestatus", { detail: { ...automaticCacheState } }));
+  }
+
+  async function requestPersistentStorage() {
+    if (!navigator.storage?.persist) return false;
+    try {
+      if (navigator.storage.persisted && await navigator.storage.persisted()) return true;
+      return Boolean(await navigator.storage.persist());
+    } catch {
+      return false;
+    }
+  }
+
+  async function enableAutomaticCaching() {
+    publishAutomaticCacheState();
+    if ("serviceWorker" in navigator && location.protocol !== "file:") {
+      try {
+        const registration = await navigator.serviceWorker.register("sw.js", { updateViaCache: "none" });
+        registration.update().catch(() => {});
+        await navigator.serviceWorker.ready;
+        automaticCacheState.offlineReady = true;
+      } catch {
+        automaticCacheState.offlineReady = false;
+      }
+    }
+    automaticCacheState.persistentStorage = await requestPersistentStorage();
+    publishAutomaticCacheState();
+    return { ...automaticCacheState };
+  }
+
+  window.fl2CacheReady = enableAutomaticCaching();
+
+  function retryPersistenceAfterInteraction() {
+    const retry = async () => {
+      window.removeEventListener("pointerdown", retry);
+      window.removeEventListener("keydown", retry);
+      if (automaticCacheState.persistentStorage) return;
+      automaticCacheState.persistentStorage = await requestPersistentStorage();
+      publishAutomaticCacheState();
+    };
+    window.addEventListener("pointerdown", retry, { once: true, passive: true });
+    window.addEventListener("keydown", retry, { once: true });
+  }
+  retryPersistenceAfterInteraction();
+
   function toast(message) {
     let element = document.querySelector(".profile-toast");
     if (!element) {
@@ -101,7 +157,4 @@
     else fetch("/api/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: payload, keepalive: true }).catch(() => {});
   }
 
-  if ("serviceWorker" in navigator && location.protocol !== "file:") {
-    navigator.serviceWorker.register("sw.js").catch(() => {});
-  }
 })();

@@ -56,7 +56,12 @@
       if (profileStore) profileStore.setFeatureState("tank", state);
       else localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       const status = document.querySelector("#localSaveStatus");
-      if (status) status.textContent = profileStore ? `${profileStore.getProfile().name} saved on this device` : "Saved on this browser";
+      if (status) {
+        const profileLabel = profileStore ? `${profileStore.getProfile().name} ` : "";
+        status.textContent = document.documentElement.dataset.offlineReady === "true"
+          ? `${profileLabel}auto-saved · offline ready`
+          : `${profileLabel}auto-saved on this device`;
+      }
     } catch {
       const status = document.querySelector("#localSaveStatus");
       if (status) status.textContent = "Browser saving is unavailable";

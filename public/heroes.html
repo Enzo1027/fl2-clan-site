@@ -5,7 +5,7 @@
     <meta name="description" content="Plan Last Z hero XP, stars, skill books, exclusive equipment, and role-aware gear priorities." />
     <title>Hero & Equipment Planner | FL2 Last Z Tools</title>
     <link rel="icon" href="assets/brand/fl2-mark.svg" type="image/svg+xml" /><link rel="manifest" href="app.webmanifest" />
-    <link rel="stylesheet" href="tools.css?v=20260722-command-v2" /><link rel="stylesheet" href="tool-common.css?v=20260722-command-v2" /><link rel="stylesheet" href="command-center.css?v=20260722-command-v2" />
+    <link rel="stylesheet" href="tools.css?v=20260723-auto-cache-v1" /><link rel="stylesheet" href="tool-common.css?v=20260723-auto-cache-v1" /><link rel="stylesheet" href="command-center.css?v=20260723-auto-cache-v1" />
   </head>
   <body>
     <div class="tool-shell">
@@ -31,13 +31,32 @@
           <section class="command-card result-panel" aria-labelledby="heroResultTitle"><p class="eyebrow">One clean shopping list</p><h2 id="heroResultTitle">Materials still needed</h2><p id="heroResultIntro"></p><div class="resource-results" id="heroResources"></div><div class="evidence-box" id="heroEvidence"></div></section>
         </div>
         <section class="command-card" style="margin-top:14px" aria-labelledby="gearTitle">
-          <header class="command-card-head"><div><p class="eyebrow">Carry this hero into Merit</p><h2 id="gearTitle">Which gear gets attention?</h2></div><p>Role-aware starting point</p></header>
-          <div class="planner-form"><div class="form-grid"><label class="field"><span>Hero job</span><select id="heroRole"><option value="unknown">Not sure</option><option value="damage">Back row / damage</option><option value="defense">Front row / tank</option><option value="support">Support</option></select></label><label class="field"><span>Weakest orange gear</span><select id="gearSlot"><option value="gun">Gun</option><option value="helmet">Helmet</option><option value="armor">Armor</option><option value="boots">Boots</option></select></label><label class="field"><span>Equipment level</span><input id="equipmentLevel" type="number" min="0" max="100" value="40" /></label></div><div class="warning-box" id="gearGuidance">If you are unsure, choose the lowest-level orange piece in Formation 1.</div><div class="button-row"><button class="button accent" id="openMerit" type="button">Open this hero in Merit advisor →</button></div></div>
+          <header class="command-card-head"><div><p class="eyebrow">One hero · four saved pieces</p><h2 id="gearTitle">Build the real loadout</h2></div><p id="gearSyncStatus">Synced with Merit</p></header>
+          <div class="gear-planner-shell">
+            <div class="gear-setup-bar">
+              <label class="field"><span>Hero job</span><select id="heroRole"><option value="unknown">Not sure</option><option value="damage">Back row / damage</option><option value="defense">Front row / tank</option><option value="support">Support</option></select></label>
+              <label class="field"><span>Current power shown in game <small>(optional)</small></span><input id="displayedPower" type="number" min="0" step="1" inputmode="numeric" placeholder="Example: 8,450,000" /><small>Needed only for a whole-hero projection.</small></label>
+              <label class="field bulk-level-field"><span>All four equipment levels</span><span class="bulk-level-control"><input id="allGearLevel" type="number" min="0" max="100" value="0" inputmode="numeric" /><button class="button" id="applyAllGearLevel" type="button">Apply</button></span></label>
+            </div>
+            <div class="gear-loadout" id="gearLoadout" aria-label="Four-piece orange equipment loadout"></div>
+            <div class="warning-box" id="gearGuidance">Choose the lowest-level orange piece in Formation 1. Its full state will open in the Merit advisor.</div>
+            <div class="power-dashboard" aria-labelledby="powerTitle">
+              <div class="power-dashboard-head"><div><p class="eyebrow">Evidence-aware answer</p><h3 id="powerTitle">Hero power</h3></div><span class="power-badge" id="powerBadge">Partial</span></div>
+              <div class="power-metrics">
+                <article><span>Current hero power</span><strong id="currentHeroPower">Not entered</strong><small>Read directly from your game</small></article>
+                <article><span id="gearPowerLabel">Documented gear floor</span><strong id="documentedGearPower">0</strong><small id="gearPowerNote">Add completed orange stars to calculate it</small></article>
+                <article class="power-projection"><span>After next star + level cap</span><strong id="projectedHeroPower">Needs baseline</strong><small id="powerProjectionNote">Enter current hero power above</small></article>
+              </div>
+              <div class="power-next-step" id="powerNextStep"></div>
+              <p class="power-honesty" id="powerHonesty">Last Z does not publish a complete formula for hero level, skills, stars, exclusive equipment, buildings, research, and gear together. FL2 will not invent the missing parts.</p>
+            </div>
+            <div class="button-row"><button class="button accent" id="openMerit" type="button">Open selected gear in Merit advisor →</button></div>
+          </div>
         </section>
-        <section class="source-card" aria-labelledby="heroSourcesTitle"><div><p class="eyebrow">Exact progression arrays</p><h2 id="heroSourcesTitle">Published through level 175</h2><p>Hero XP, five-star fragments, skill books, and season-hero exclusive fragments come from Stresswar’s current calculator data and are independently readable in Last-Z.net’s table. FL2 intentionally excludes higher-level projections and the unverified initial exclusive unlock cost.</p><small>Verified July 22, 2026 · High community confidence · Season-specific systems can raise later caps</small></div><nav class="source-links"><a href="https://lastz.stresswar.com/calculators" target="_blank" rel="noreferrer">Stresswar calculator</a><a href="https://last-z.net/tables/hero-leveling-requirements/" target="_blank" rel="noreferrer">Last-Z.net table</a></nav></section>
+        <section class="source-card" aria-labelledby="heroSourcesTitle"><div><p class="eyebrow">Published values + visible limits</p><h2 id="heroSourcesTitle">Power without fake precision</h2><p>Hero requirements come from Stresswar and Last-Z.net. Orange-equipment power rows pair each completed star with its enhancement cap; partial sections, other levels, and red forge are kept separate. The optional current-power box is the only safe whole-hero baseline because no source publishes the complete combined formula.</p><small>Verified July 22, 2026 · Exact milestones are labeled · Partial states stay partial</small></div><nav class="source-links"><a href="https://lastz.stresswar.com/heroes" target="_blank" rel="noreferrer">Stresswar heroes</a><a href="https://last-z.net/tables/hero-leveling-requirements/" target="_blank" rel="noreferrer">Hero requirements</a><a href="https://last-z.net/tables/orange-equipment/" target="_blank" rel="noreferrer">Orange gear power</a><a href="https://lastz.fandom.com/wiki/Hero_Power" target="_blank" rel="noreferrer">Power formula gaps</a></nav></section>
       </main>
       <footer><span>FrostBorn Lions [FL2]</span><span>Hero progress is saved only in the active browser profile.</span></footer>
     </div>
-    <script src="profile-store.js?v=20260722-command-v2"></script><script src="hero-engine.js?v=20260722-command-v2"></script><script src="tool-common.js?v=20260722-command-v2"></script><script src="heroes.js?v=20260722-command-v2"></script>
+    <script src="profile-store.js?v=20260723-auto-cache-v1"></script><script src="calculator-engine.js?v=20260723-auto-cache-v1"></script><script src="hero-engine.js?v=20260723-auto-cache-v1"></script><script src="tool-common.js?v=20260723-auto-cache-v1"></script><script src="heroes.js?v=20260723-auto-cache-v1"></script>
   </body>
 </html>

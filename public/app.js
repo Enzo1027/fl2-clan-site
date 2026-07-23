@@ -1,8 +1,14 @@
-const APP_VERSION = "20260722-command-center-v2";
+const APP_VERSION = "20260723-auto-cache-v1";
 window.FL2_BUILD = APP_VERSION;
 
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
-  navigator.serviceWorker.register("sw.js").catch(() => {});
+  navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).then((registration) => {
+    registration.update().catch(() => {});
+  }).catch(() => {});
+}
+
+if (navigator.storage?.persist) {
+  navigator.storage.persist().catch(() => false);
 }
 
 const state = {

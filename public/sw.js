@@ -1,4 +1,4 @@
-const CACHE_NAME = "fl2-command-center-v6";
+const CACHE_NAME = "fl2-command-center-v8";
 const CORE = [
   "/tools.html", "/hq.html", "/heroes.html", "/daily.html", "/shops.html",
   "/calculator.html", "/research.html", "/tank.html", "/index.html",
@@ -9,6 +9,7 @@ const CORE = [
   "/hq-engine.js", "/hq.js", "/hero-engine.js", "/heroes.js",
   "/daily-engine.js", "/daily.js", "/shop-engine.js", "/shops.js",
   "/assets/brand/fl2-mark.svg",
+  "/assets/calculator/equipment-promotion.webp", "/assets/calculator/power-core.webp", "/assets/calculator/merit-prices-reddit.jpeg",
   "/assets/heroes/alma.png", "/assets/heroes/amelia.png", "/assets/heroes/ava.png", "/assets/heroes/bella.png",
   "/assets/heroes/chinatsu.png", "/assets/heroes/christina.png", "/assets/heroes/dodomeki.png", "/assets/heroes/elizabeth.png",
   "/assets/heroes/evelyn.png", "/assets/heroes/fiona.png", "/assets/heroes/harleyna.png", "/assets/heroes/isabella.png",
@@ -20,7 +21,9 @@ const CORE = [
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE)).then(() => self.skipWaiting()));
+  event.waitUntil(caches.open(CACHE_NAME)
+    .then((cache) => cache.addAll(CORE.map((url) => new Request(url, { cache: "reload" }))))
+    .then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", (event) => {

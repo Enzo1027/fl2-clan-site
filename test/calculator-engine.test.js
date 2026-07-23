@@ -183,3 +183,41 @@ test("respects a fully sold discounted shelf", () => {
   assert.equal(result.recommendedPurchase.cores, 0);
   assert.equal(result.recommendedPurchase.stones, 50);
 });
+
+test("sums exact published full-star gear power and projects an exact milestone delta", () => {
+  const summary = calculator.getLoadoutPowerSummary({
+    gun: { level: 55, promotion: 6, forge: 0 },
+    helmet: { level: 60, promotion: 12, forge: 0 },
+    armor: { level: 65, promotion: 18, forge: 0 },
+    boots: { level: 70, promotion: 24, forge: 0 },
+  }, 10_000_000, "gun");
+
+  assert.equal(summary.exactMilestonePieces, 4);
+  assert.equal(summary.documentedGearFloor, 362_766 + 466_575 + 570_088 + 677_120);
+  assert.equal(summary.projectionDelta, 462_330 - 362_766);
+  assert.equal(summary.projectedHeroPower, 10_099_564);
+  assert.equal(summary.projectionConfidence, "exact-milestone-delta");
+});
+
+test("partial orange sections produce a documented floor instead of fake total power", () => {
+  const summary = calculator.getLoadoutPowerSummary({
+    gun: { level: 55, promotion: 8, forge: 1 },
+  }, 10_000_000, "gun");
+
+  assert.equal(summary.pieces[0].star, 1);
+  assert.equal(summary.pieces[0].wedge, 2);
+  assert.equal(summary.pieces[0].documentedFloor, 362_766);
+  assert.equal(summary.pieces[0].exactDisplayedPower, null);
+  assert.equal(summary.projectedHeroPower, null);
+});
+
+test("off-cap or red-forged gear cannot claim an exact published milestone", () => {
+  const offCap = calculator.getLoadoutPowerSummary({ gun: { level: 54, promotion: 6, forge: 0 } }, 10_000_000, "gun");
+  const forged = calculator.getLoadoutPowerSummary({ gun: { level: 55, promotion: 6, forge: 2 } }, 10_000_000, "gun");
+
+  assert.equal(offCap.documentedGearFloor, 0);
+  assert.equal(offCap.projectedHeroPower, null);
+  assert.equal(forged.documentedGearFloor, 362_766);
+  assert.equal(forged.pieces[0].exactDisplayedPower, null);
+  assert.equal(forged.projectedHeroPower, null);
+});

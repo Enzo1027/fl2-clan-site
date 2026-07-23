@@ -30,6 +30,10 @@
     image: ["amber", "queenie"].includes(name.toLowerCase()) ? null : `assets/heroes/${name.toLowerCase().replaceAll(" ", "-")}.png`,
   })));
 
+  const HERO_STATE_VERSION = 2;
+  const GEAR_SLOTS = Object.freeze(["gun", "helmet", "armor", "boots"]);
+  const HERO_ROLES = Object.freeze(["unknown", "damage", "defense", "support"]);
+
   // EXP needed to advance from level n to n + 1. Index 0 is unused.
   const EXP_COSTS = Object.freeze([
     0, 50, 100, 150, 200, 300, 400, 500, 600, 700, 900, 1_100, 1_300, 1_500, 1_700,
@@ -98,5 +102,135 @@
     return part ? `${stars}\u2605 ${part}/5` : `${stars}\u2605`;
   }
 
-  return Object.freeze({ SOURCE, HEROES, EXP_COSTS, STAR_FRAGMENT_COSTS, EXCLUSIVE_FRAGMENT_COSTS, SKILL_BOOK_COSTS, calculate, starLabel });
+  function heroIdFromName(value) {
+    const normalized = String(value || "").trim().toLowerCase();
+    return HEROES.find((hero) => hero.id === normalized || hero.name.toLowerCase() === normalized)?.id || null;
+  }
+
+  function promotionFromParts(starValue, wedgeValue) {
+    const star = whole(starValue, 0, 5);
+    if (star >= 5) return 30;
+    return (star * 6) + whole(wedgeValue, 0, 5);
+  }
+
+  function promotionParts(promotionValue) {
+    const promotion = whole(promotionValue, 0, 30);
+    if (promotion === 30) return Object.freeze({ star: 5, wedge: 0 });
+    return Object.freeze({ star: Math.floor(promotion / 6), wedge: promotion % 6 });
+  }
+
+  function defaultGearPiece() {
+    return { level: 0, promotion: 0, forge: -1 };
+  }
+
+  function normalizeGearPiece(piece = {}) {
+    const hasPromotion = Number.isFinite(Number(piece.promotion));
+    return {
+      level: whole(piece.level ?? piece.equipmentLevel, 0, 100),
+      promotion: hasPromotion
+        ? whole(piece.promotion, 0, 30)
+        : promotionFromParts(piece.currentStar, piece.currentWedge),
+      forge: whole(piece.forge ?? piece.forgeStage, -1, 6),
+    };
+  }
+
+  function defaultHeroRecord(seed = {}) {
+    const selectedGearSlot = GEAR_SLOTS.includes(seed.selectedGearSlot || seed.gearSlot)
+      ? (seed.selectedGearSlot || seed.gearSlot)
+      : "gun";
+    const gear = Object.fromEntries(GEAR_SLOTS.map((slot) => [slot, normalizeGearPiece(seed.gear?.[slot] || {})]));
+    const role = HERO_ROLES.includes(seed.heroRole) ? seed.heroRole : "unknown";
+    return {
+      level: whole(seed.level, 1, 175),
+      targetLevel: whole(seed.targetLevel ?? 175, 1, 175),
+      starStep: whole(seed.starStep, 0, 25),
+      targetStarStep: whole(seed.targetStarStep ?? 25, 0, 25),
+      skillLevel: whole(seed.skillLevel ?? 20, 1, 30),
+      targetSkillLevel: whole(seed.targetSkillLevel ?? 30, 1, 30),
+      skills: whole(seed.skills ?? 3, 1, 3),
+      exclusiveStep: whole(seed.exclusiveStep, 0, 25),
+      targetExclusiveStep: whole(seed.targetExclusiveStep ?? 25, 0, 25),
+      ownedExp: whole(seed.ownedExp, 0, Number.MAX_SAFE_INTEGER),
+      ownedFragments: whole(seed.ownedFragments, 0, Number.MAX_SAFE_INTEGER),
+      ownedBooks: whole(seed.ownedBooks, 0, Number.MAX_SAFE_INTEGER),
+      ownedExclusive: whole(seed.ownedExclusive, 0, Number.MAX_SAFE_INTEGER),
+      heroRole: role,
+      displayedPower: whole(seed.displayedPower, 0, Number.MAX_SAFE_INTEGER),
+      selectedGearSlot,
+      gear,
+    };
+  }
+
+  function normalizeHeroRecord(seed = {}) {
+    const record = defaultHeroRecord(seed);
+    record.targetLevel = Math.max(record.level, record.targetLevel);
+    record.targetStarStep = Math.max(record.starStep, record.targetStarStep);
+    record.targetSkillLevel = Math.max(record.skillLevel, record.targetSkillLevel);
+    record.targetExclusiveStep = Math.max(record.exclusiveStep, record.targetExclusiveStep);
+    return record;
+  }
+
+  function normalizeHeroState(saved, meritState = {}) {
+    if (saved?.modelVersion === HERO_STATE_VERSION && saved.roster && typeof saved.roster === "object") {
+      const roster = {};
+      Object.entries(saved.roster).forEach(([heroId, record]) => {
+        if (HEROES.some((hero) => hero.id === heroId)) roster[heroId] = normalizeHeroRecord(record);
+      });
+      const activeHeroId = HEROES.some((hero) => hero.id === saved.activeHeroId)
+        ? saved.activeHeroId
+        : Object.keys(roster)[0] || "yu-chan";
+      if (!roster[activeHeroId]) roster[activeHeroId] = normalizeHeroRecord();
+      return { modelVersion: HERO_STATE_VERSION, activeHeroId, roster };
+    }
+
+    const meritHeroId = heroIdFromName(meritState?.hero);
+    const savedHeroId = heroIdFromName(saved?.heroId);
+    const activeHeroId = savedHeroId || meritHeroId || "yu-chan";
+    const legacy = saved && typeof saved === "object" ? saved : {};
+    const record = normalizeHeroRecord(legacy);
+    const selectedGearSlot = GEAR_SLOTS.includes(legacy.gearSlot)
+      ? legacy.gearSlot
+      : GEAR_SLOTS.includes(meritState?.gearSlot) ? meritState.gearSlot : "gun";
+    record.selectedGearSlot = selectedGearSlot;
+
+    const meritMatches = meritHeroId === activeHeroId;
+    const legacyPiece = {
+      equipmentLevel: legacy.equipmentLevel,
+      currentStar: legacy.currentStar,
+      currentWedge: legacy.currentWedge,
+      forgeStage: legacy.forgeStage,
+    };
+    const meritPiece = meritMatches ? meritState : {};
+    if (legacy.equipmentLevel != null || meritMatches) {
+      record.gear[selectedGearSlot] = normalizeGearPiece({ ...legacyPiece, ...meritPiece });
+    }
+    if (meritMatches && HERO_ROLES.includes(meritState.heroRole)) record.heroRole = meritState.heroRole;
+
+    return {
+      modelVersion: HERO_STATE_VERSION,
+      activeHeroId,
+      roster: { [activeHeroId]: record },
+    };
+  }
+
+  function getHeroRecord(state, heroId) {
+    return normalizeHeroRecord(state?.roster?.[heroId] || {});
+  }
+
+  function setHeroRecord(state, heroId, record) {
+    const normalizedState = normalizeHeroState(state);
+    if (!HEROES.some((hero) => hero.id === heroId)) return normalizedState;
+    return {
+      modelVersion: HERO_STATE_VERSION,
+      activeHeroId: heroId,
+      roster: { ...normalizedState.roster, [heroId]: normalizeHeroRecord(record) },
+    };
+  }
+
+  return Object.freeze({
+    SOURCE, HEROES, EXP_COSTS, STAR_FRAGMENT_COSTS, EXCLUSIVE_FRAGMENT_COSTS, SKILL_BOOK_COSTS,
+    HERO_STATE_VERSION, GEAR_SLOTS, calculate, starLabel, heroIdFromName, promotionFromParts,
+    promotionParts, defaultGearPiece, normalizeGearPiece, defaultHeroRecord, normalizeHeroRecord,
+    normalizeHeroState, getHeroRecord, setHeroRecord,
+  });
 });

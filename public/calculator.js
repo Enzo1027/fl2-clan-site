@@ -2,6 +2,7 @@
   "use strict";
 
   const Engine = window.MeritCalculator;
+  const Planner = window.HeroPlanner;
   if (!Engine) return;
 
   const form = document.getElementById("calculatorForm");
@@ -11,6 +12,10 @@
   const formatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
   const byId = (id) => document.getElementById(id);
   const format = (value) => formatter.format(Number.isFinite(value) ? value : 0);
+  let heroState = null;
+  let activeHeroId = null;
+  let activeGearSlot = "gun";
+  let syncingHero = false;
 
   function readNumber(id) {
     const element = byId(id);
@@ -21,6 +26,76 @@
   function checkedValue(name) {
     const field = form.elements.namedItem(name);
     return field ? field.value : "";
+  }
+
+  function setCheckedValue(name, value) {
+    [...form.querySelectorAll(`[name="${name}"]`)].forEach((field) => { field.checked = field.value === value; });
+  }
+
+  function saveHeroState() {
+    if (profileStore && heroState) profileStore.setFeatureState("heroes", heroState);
+  }
+
+  function currentGearPiece() {
+    return Planner.normalizeGearPiece({
+      equipmentLevel: readNumber("equipmentLevel"),
+      currentStar: readNumber("currentStar"),
+      currentWedge: readNumber("currentWedge"),
+      forgeStage: Number(byId("forgeStage").value),
+    });
+  }
+
+  function flushHeroToPlanner() {
+    if (!Planner || syncingHero || !activeHeroId || !heroState) return;
+    const record = Planner.getHeroRecord(heroState, activeHeroId);
+    heroState = Planner.setHeroRecord(heroState, activeHeroId, {
+      ...record,
+      heroRole: byId("heroRole").value,
+      selectedGearSlot: activeGearSlot,
+      gear: { ...record.gear, [activeGearSlot]: currentGearPiece() },
+    });
+    saveHeroState();
+  }
+
+  function loadGearPiece(piece) {
+    const parts = Planner.promotionParts(piece.promotion);
+    byId("equipmentLevel").value = piece.level;
+    byId("currentStar").value = parts.star;
+    byId("currentWedge").value = parts.wedge;
+    byId("forgeStage").value = piece.forge;
+    syncProgressFields();
+  }
+
+  function loadCanonicalHero(heroId, requestedSlot) {
+    if (!Planner || !heroId || !heroState) return;
+    const hero = Planner.HEROES.find((item) => item.id === heroId);
+    if (!hero) return;
+    const record = Planner.getHeroRecord(heroState, heroId);
+    const slot = Planner.GEAR_SLOTS.includes(requestedSlot) ? requestedSlot : record.selectedGearSlot;
+    syncingHero = true;
+    activeHeroId = heroId;
+    activeGearSlot = slot;
+    byId("hero").value = hero.name;
+    byId("heroRole").value = record.heroRole;
+    setCheckedValue("gearSlot", slot);
+    loadGearPiece(record.gear[slot]);
+    byId("heroSyncStatus").textContent = `${hero.name} and all four gear pieces are synced with the Hero Planner.`;
+    syncingHero = false;
+    heroState = Planner.setHeroRecord(heroState, heroId, { ...record, selectedGearSlot: slot });
+    saveHeroState();
+  }
+
+  function initializeHeroSync(restoredValues) {
+    if (!Planner) return;
+    byId("hero").innerHTML = `${Planner.HEROES.map((hero) => `<option>${hero.name}</option>`).join("")}<option>Other hero</option>`;
+    const saved = profileStore?.getFeatureState("heroes");
+    heroState = Planner.normalizeHeroState(saved, restoredValues || {});
+    const restoredHeroId = Planner.heroIdFromName(restoredValues?.hero);
+    const heroId = restoredHeroId || heroState.activeHeroId;
+    const requestedSlot = Planner.GEAR_SLOTS.includes(restoredValues?.gearSlot)
+      ? restoredValues.gearSlot
+      : Planner.getHeroRecord(heroState, heroId).selectedGearSlot;
+    loadCanonicalHero(heroId, requestedSlot);
   }
 
   function stageLabel(stage) {
@@ -243,9 +318,10 @@
   }
 
   function restoreState() {
+    let values = null;
     try {
-      const values = profileStore?.getFeatureState("calculator") || JSON.parse(localStorage.getItem(storageKey) || "null");
-      if (!values) return;
+      values = profileStore?.getFeatureState("calculator") || JSON.parse(localStorage.getItem(storageKey) || "null");
+      if (!values) return null;
       Object.entries(values).forEach(([name, value]) => {
         const field = form.elements.namedItem(name);
         if (field) field.value = String(value);
@@ -253,18 +329,45 @@
     } catch {
       // Ignore unavailable or malformed saved state.
     }
+    return values;
   }
 
   function update() {
     syncProgressFields();
+    flushHeroToPlanner();
     const state = currentState();
     const result = Engine.recommendMeritSpend(state);
     render(result, state);
     saveState();
   }
 
-  form.addEventListener("input", update);
-  form.addEventListener("change", update);
+  form.addEventListener("input", () => {
+    if (!syncingHero) update();
+  });
+  form.addEventListener("change", (event) => {
+    if (syncingHero) return;
+    if (event.target.id === "hero") {
+      flushHeroToPlanner();
+      const heroId = Planner?.heroIdFromName(event.target.value);
+      if (heroId) {
+        if (!heroState.roster[heroId]) heroState = Planner.setHeroRecord(heroState, heroId, Planner.defaultHeroRecord());
+        loadCanonicalHero(heroId);
+      } else {
+        activeHeroId = null;
+        byId("heroSyncStatus").textContent = "Other hero stays in Merit only. Choose a named hero to sync a four-piece loadout.";
+      }
+    } else if (event.target.name === "gearSlot") {
+      flushHeroToPlanner();
+      activeGearSlot = event.target.value;
+      if (activeHeroId) {
+        const record = Planner.getHeroRecord(heroState, activeHeroId);
+        syncingHero = true;
+        loadGearPiece(record.gear[activeGearSlot]);
+        syncingHero = false;
+      }
+    }
+    update();
+  });
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     update();
@@ -277,15 +380,21 @@
     else localStorage.removeItem(storageKey);
     form.reset();
     byId("advancedDetails").open = false;
+    if (Planner) {
+      heroState = Planner.normalizeHeroState(profileStore?.getFeatureState("heroes"), null);
+      loadCanonicalHero(heroState.activeHeroId);
+    }
     update();
   });
 
   window.addEventListener("fl2:profilechange", () => {
     form.reset();
-    restoreState();
+    const restored = restoreState();
+    initializeHeroSync(restored);
     update();
   });
 
-  restoreState();
+  const restored = restoreState();
+  initializeHeroSync(restored);
   update();
 })();

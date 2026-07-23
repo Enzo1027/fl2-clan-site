@@ -234,6 +234,64 @@
     };
   }
 
+  function getLoadoutPowerSummary(loadout = {}, displayedHeroPowerValue = 0, selectedSlotValue = "gun") {
+    const slots = Object.keys(FULL_STAR_DATA);
+    const selectedSlot = FULL_STAR_DATA[selectedSlotValue] ? selectedSlotValue : "gun";
+    const pieces = slots.map((slot) => {
+      const raw = loadout[slot] || {};
+      const rawPromotion = Number(raw.promotion);
+      const promotion = Number.isFinite(rawPromotion)
+        ? Math.min(30, wholeNumber(rawPromotion))
+        : Math.min(30, (Math.min(5, wholeNumber(raw.currentStar)) * 6) + Math.min(5, wholeNumber(raw.currentWedge)));
+      const star = promotion >= 30 ? 5 : Math.floor(promotion / 6);
+      const wedge = promotion >= 30 ? 0 : promotion % 6;
+      const table = FULL_STAR_DATA[slot];
+      const level = Math.min(100, wholeNumber(raw.level ?? raw.equipmentLevel));
+      const publishedMilestoneLevel = star > 0 ? 50 + (star * 5) : null;
+      const rawForge = Number(raw.forge ?? raw.forgeStage);
+      const forge = Number.isFinite(rawForge) ? Math.max(-1, Math.min(6, Math.floor(rawForge))) : -1;
+      const atPublishedLevel = publishedMilestoneLevel !== null && level === publishedMilestoneLevel;
+      const documentedFloor = atPublishedLevel ? table.displayedPower[star - 1] : 0;
+      const exactDisplayedPower = atPublishedLevel && wedge === 0 && forge <= 0 ? documentedFloor : null;
+      return {
+        slot,
+        label: table.label,
+        level,
+        star,
+        wedge,
+        forge,
+        publishedMilestoneLevel,
+        documentedFloor,
+        exactDisplayedPower,
+        confidence: exactDisplayedPower === null ? "floor" : "exact-milestone",
+      };
+    });
+
+    const selected = pieces.find((piece) => piece.slot === selectedSlot);
+    const milestone = getNextPromotionStats(selected.star, selected.wedge, selectedSlot);
+    const displayedHeroPower = wholeNumber(displayedHeroPowerValue);
+    const canProjectNextFullStar = displayedHeroPower > 0
+      && selected.star > 0
+      && selected.star < 5
+      && selected.wedge === 0
+      && selected.exactDisplayedPower !== null
+      && milestone.fullStarPowerDelta !== null;
+    return {
+      displayedHeroPower,
+      selectedSlot,
+      selected,
+      pieces,
+      documentedGearFloor: pieces.reduce((sum, piece) => sum + piece.documentedFloor, 0),
+      documentedPieces: pieces.filter((piece) => piece.documentedFloor > 0).length,
+      exactMilestonePieces: pieces.filter((piece) => piece.exactDisplayedPower !== null).length,
+      milestone,
+      targetMilestoneLevel: milestone.nextFullStar > 0 ? 50 + (milestone.nextFullStar * 5) : null,
+      projectedHeroPower: canProjectNextFullStar ? displayedHeroPower + milestone.fullStarPowerDelta : null,
+      projectionDelta: canProjectNextFullStar ? milestone.fullStarPowerDelta : null,
+      projectionConfidence: canProjectNextFullStar ? "exact-milestone-delta" : "unavailable",
+    };
+  }
+
   function getEquipmentLevelContext(levelValue, starValue, wedgeValue) {
     const level = Math.min(100, wholeNumber(levelValue));
     const star = Math.min(5, wholeNumber(starValue));
@@ -469,6 +527,7 @@
     getCoreRequirement,
     getForgeRequirement,
     getNextPromotionStats,
+    getLoadoutPowerSummary,
     getEquipmentLevelContext,
     recommendMeritSpend,
   };

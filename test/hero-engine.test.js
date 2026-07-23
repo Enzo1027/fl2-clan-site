@@ -30,3 +30,38 @@ test("partial hero progress only counts unfinished sublevels", () => {
   assert.equal(result.exclusiveFragments, 250);
   assert.equal(hero.starLabel(7), "1★ 2/5");
 });
+
+test("legacy hero and Merit selections migrate into one four-piece roster", () => {
+  const state = hero.normalizeHeroState({
+    heroId: "dodomeki",
+    level: "150",
+    targetLevel: "175",
+    heroRole: "defense",
+    gearSlot: "armor",
+    equipmentLevel: "44",
+  }, {
+    hero: "Dodomeki",
+    heroRole: "defense",
+    gearSlot: "armor",
+    equipmentLevel: "62",
+    currentStar: "2",
+    currentWedge: "3",
+    forgeStage: "1",
+  });
+
+  assert.equal(state.modelVersion, 2);
+  assert.equal(state.activeHeroId, "dodomeki");
+  assert.equal(state.roster.dodomeki.level, 150);
+  assert.deepEqual(state.roster.dodomeki.gear.armor, { level: 62, promotion: 15, forge: 1 });
+  assert.deepEqual(state.roster.dodomeki.gear.gun, { level: 0, promotion: 0, forge: -1 });
+});
+
+test("hero records retain separate four-piece loadouts and convert promotion parts", () => {
+  const original = hero.normalizeHeroState(null, null);
+  const yuChan = hero.getHeroRecord(original, "yu-chan");
+  yuChan.gear.helmet = { level: 70, promotion: hero.promotionFromParts(4, 5), forge: 3 };
+  const updated = hero.setHeroRecord(original, "yu-chan", yuChan);
+
+  assert.deepEqual(hero.promotionParts(updated.roster["yu-chan"].gear.helmet.promotion), { star: 4, wedge: 5 });
+  assert.equal(original.roster["yu-chan"].gear.helmet.level, 0);
+});

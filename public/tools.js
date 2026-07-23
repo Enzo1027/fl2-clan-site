@@ -24,15 +24,17 @@
     const tank = state("tank");
     const daily = state("daily");
     byId("activeProfileName").textContent = profile?.name || "This browser";
-    byId("profileSaveMeta").textContent = `${profile?.featureNamespaces?.length || Object.keys(profile?.features || {}).length} tools saved privately`;
+    byId("profileSaveMeta").textContent = `${profile?.featureNamespaces?.length || Object.keys(profile?.features || {}).length} tools auto-saved privately`;
 
     byId("summaryHq").textContent = hq?.current ? `Level ${hq.current}` : "Not set";
     byId("summaryHqMeta").textContent = hq?.target && hq.target > hq.current ? `Planning for HQ ${hq.target}` : "Add your account level";
     byId("cardHq").textContent = hq?.current ? `HQ ${hq.current} saved →` : "Set up →";
 
-    const selectedHero = window.HeroPlanner?.HEROES?.find((item) => item.id === hero?.heroId);
+    const normalizedHeroes = hero && window.HeroPlanner?.normalizeHeroState(hero, merit);
+    const activeHeroRecord = normalizedHeroes && window.HeroPlanner.getHeroRecord(normalizedHeroes, normalizedHeroes.activeHeroId);
+    const selectedHero = window.HeroPlanner?.HEROES?.find((item) => item.id === normalizedHeroes?.activeHeroId);
     byId("summaryHero").textContent = selectedHero?.name || "Not set";
-    byId("summaryHeroMeta").textContent = hero?.level ? `Level ${hero.level} → ${hero.targetLevel || hero.level}` : "Plan XP and fragments";
+    byId("summaryHeroMeta").textContent = activeHeroRecord?.level ? `Level ${activeHeroRecord.level} → ${activeHeroRecord.targetLevel || activeHeroRecord.level}` : "Plan XP and fragments";
     byId("cardHeroes").textContent = selectedHero ? `${selectedHero.name} saved →` : "Set up →";
 
     if (tankData) {
@@ -54,8 +56,8 @@
     byId("cardMerit").textContent = merit?.currentMedals ? `${format(Number(merit.currentMedals))} medals saved →` : "Get answer →";
 
     let next = { title: "Set your HQ level", copy: "That unlocks useful account-aware recommendations across the rest of the command center.", href: "hq.html", label: "Set HQ now →" };
-    if (hq?.current && !hero?.heroId) next = { title: "Add your lead hero", copy: "Get the exact XP, fragment, skill-book, and exclusive-equipment shortages for the hero you are building.", href: "heroes.html", label: "Plan hero →" };
-    else if (hq?.current && hero?.heroId && dailyDone < 5) next = { title: "Open today’s battle plan", copy: "See the current Alliance Duel theme, the next Apocalypse Time reset, and the shortest high-value checklist.", href: "daily.html", label: "See today →" };
+    if (hq?.current && !selectedHero) next = { title: "Add your lead hero", copy: "Get the exact XP, fragment, skill-book, and exclusive-equipment shortages for the hero you are building.", href: "heroes.html", label: "Plan hero →" };
+    else if (hq?.current && selectedHero && dailyDone < 5) next = { title: "Open today’s battle plan", copy: "See the current Alliance Duel theme, the next Apocalypse Time reset, and the shortest high-value checklist.", href: "daily.html", label: "See today →" };
     else if (merit?.currentMedals) {
       const answer = MeritCalculator.recommendMeritSpend({ ...merit, slot: merit.gearSlot });
       next = { title: answer.kind === "forge" ? "Use the Merit advisor for red stones" : answer.kind === "save" ? "Hold your Merit Medals" : "Use the Merit advisor for Power Cores", copy: "Your saved equipment and shop state are ready for a current recommendation.", href: "calculator.html", label: "Open Merit answer →" };
