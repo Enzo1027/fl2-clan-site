@@ -10,6 +10,12 @@ services:
     envVars:
       - key: DATA_DIR
         value: /var/data
+      - key: MASS_COMMS_PASSWORD
+        sync: false
+      - key: MASS_COMMS_CONTENT_KEY
+        sync: false
+      - key: MASS_COMMS_SESSION_SECRET
+        sync: false
     disk:
       name: fl2-counter-data
       mountPath: /var/data

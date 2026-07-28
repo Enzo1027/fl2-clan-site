@@ -1,9 +1,9 @@
-const CACHE_NAME = "fl2-command-center-v8";
+const CACHE_NAME = "fl2-command-center-v10";
 const CORE = [
   "/tools.html", "/hq.html", "/heroes.html", "/daily.html", "/shops.html",
-  "/calculator.html", "/research.html", "/tank.html", "/index.html",
+  "/calculator.html", "/research.html", "/tank.html", "/index.html", "/mass-communications.html",
   "/app.webmanifest", "/styles.css", "/tools.css", "/tool-common.css", "/command-center.css", "/calculator.css",
-  "/app.js", "/profile-store.js", "/tool-common.js", "/tools.js",
+  "/app.js", "/profile-store.js", "/tool-common.js", "/tools.js", "/mass-communications.js", "/mass-communications.css",
   "/calculator-engine.js", "/calculator.js", "/progress-backup.js",
   "/research-engine.js", "/research.js", "/tank-engine.js", "/tank.js",
   "/hq-engine.js", "/hq.js", "/hero-engine.js", "/heroes.js",

@@ -2,13 +2,27 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
+const {
+  clearSessionCookie,
+  createAuthStore,
+  getClientIp,
+  listConversations,
+  loadCatalog,
+  loadConversation,
+  normalizeLanguage,
+  requestIsSecure,
+  safeEqual,
+  sessionCookie,
+} = require("./mass-communications");
 
 const root = __dirname;
 const publicDir = path.join(root, "public");
 const dataDir = process.env.DATA_DIR || path.join(root, ".data");
 const counterFile = path.join(dataDir, "visits.json");
 const analyticsFile = path.join(dataDir, "analytics.json");
+const massCommunicationsDir = path.join(root, "content", "mass-communications");
 const port = Number(process.env.PORT || 4173);
+const massCommunicationsAuth = createAuthStore();
 
 const mimeTypes = {
   ".css": "text/css; charset=utf-8",
@@ -48,10 +62,17 @@ function hashVisitor(value) {
   return crypto.createHash("sha256").update(String(value)).digest("hex");
 }
 
-function sendJson(res, status, payload) {
+function sendJson(res, status, payload, extraHeaders = {}) {
   res.writeHead(status, {
     "Content-Type": "application/json; charset=utf-8",
-    "Cache-Control": "no-store",
+    "Cache-Control": "private, no-store, max-age=0",
+    Pragma: "no-cache",
+    Vary: "Cookie",
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "no-referrer",
+    "X-Frame-Options": "DENY",
+    "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'",
+    ...extraHeaders,
   });
   res.end(JSON.stringify(payload));
 }
@@ -146,11 +167,162 @@ async function handleEvent(req, res) {
   sendJson(res, 200, { ok: true });
 }
 
+function massCommunicationsLanguage(requestUrl) {
+  const catalog = loadCatalog(massCommunicationsDir);
+  const supportedLanguages = new Set(catalog.languages || ["en"]);
+  return normalizeLanguage(new URL(requestUrl, "http://localhost").searchParams.get("lang"), supportedLanguages);
+}
+
+function requireMassCommunicationsAuth(req, res) {
+  if (massCommunicationsAuth.isAuthenticated(req)) return true;
+  sendJson(res, 401, { error: "Authentication required" });
+  return false;
+}
+
+async function handleMassCommunications(req, res) {
+  const pathname = new URL(req.url, "http://localhost").pathname;
+  const secure = requestIsSecure(req);
+
+  if (pathname === "/api/mass-communications/session") {
+    if (req.method !== "GET") {
+      sendJson(res, 405, { error: "Method not allowed" });
+      return;
+    }
+    const authenticated = massCommunicationsAuth.isAuthenticated(req);
+    const headers = {};
+    if (authenticated) {
+      try {
+        const session = massCommunicationsAuth.createSession();
+        headers["Set-Cookie"] = sessionCookie(session.token, session.maxAgeSeconds, secure);
+      } catch {
+        sendJson(res, 503, { authenticated: false, error: "Secure archive is not configured" });
+        return;
+      }
+    }
+    sendJson(res, 200, { authenticated }, headers);
+    return;
+  }
+
+  if (pathname === "/api/mass-communications/login") {
+    if (req.method !== "POST") {
+      sendJson(res, 405, { error: "Method not allowed" });
+      return;
+    }
+    const configuredPassword = process.env.MASS_COMMS_PASSWORD;
+    if (!configuredPassword || !process.env.MASS_COMMS_SESSION_SECRET) {
+      sendJson(res, 503, { error: "Secure archive is not configured" });
+      return;
+    }
+
+    const ip = getClientIp(req);
+    const attempt = massCommunicationsAuth.consumeLoginAttempt(ip);
+    if (!attempt.allowed) {
+      sendJson(
+        res,
+        429,
+        { error: "Too many attempts. Please try again later." },
+        { "Retry-After": String(attempt.retryAfterSeconds) },
+      );
+      return;
+    }
+
+    let password = "";
+    try {
+      password = String(JSON.parse(await readBody(req)).password || "");
+    } catch {
+      password = "";
+    }
+    if (!safeEqual(password, configuredPassword)) {
+      sendJson(res, 401, { error: "Incorrect password" });
+      return;
+    }
+
+    massCommunicationsAuth.clearLoginAttempts(ip);
+    let session;
+    try {
+      session = massCommunicationsAuth.createSession();
+    } catch {
+      sendJson(res, 503, { error: "Secure archive is not configured" });
+      return;
+    }
+    sendJson(
+      res,
+      200,
+      { authenticated: true },
+      { "Set-Cookie": sessionCookie(session.token, session.maxAgeSeconds, secure) },
+    );
+    return;
+  }
+
+  if (pathname === "/api/mass-communications/logout") {
+    if (req.method !== "POST") {
+      sendJson(res, 405, { error: "Method not allowed" });
+      return;
+    }
+    massCommunicationsAuth.destroySession(req);
+    sendJson(res, 200, { authenticated: false }, { "Set-Cookie": clearSessionCookie(secure) });
+    return;
+  }
+
+  if (!requireMassCommunicationsAuth(req, res)) return;
+  if (req.method !== "GET") {
+    sendJson(res, 405, { error: "Method not allowed" });
+    return;
+  }
+
+  let language;
+  try {
+    language = massCommunicationsLanguage(req.url);
+  } catch {
+    sendJson(res, 500, { error: "Unable to load archive catalog" });
+    return;
+  }
+
+  if (pathname === "/api/mass-communications/catalog") {
+    try {
+      sendJson(res, 200, listConversations(massCommunicationsDir, language));
+    } catch {
+      sendJson(res, 500, { error: "Unable to load archive catalog" });
+    }
+    return;
+  }
+
+  const conversationMatch = pathname.match(/^\/api\/mass-communications\/conversations\/([^/]+)$/);
+  if (conversationMatch) {
+    let conversation;
+    try {
+      conversation = loadConversation(massCommunicationsDir, conversationMatch[1], language);
+    } catch (error) {
+      const unavailable = /content key is not configured/i.test(error.message);
+      sendJson(res, unavailable ? 503 : 500, {
+        error: unavailable ? "Secure archive content is not configured" : "Unable to load conversation",
+      });
+      return;
+    }
+    if (!conversation) {
+      sendJson(res, 404, { error: "Conversation not found" });
+      return;
+    }
+    sendJson(res, 200, conversation);
+    return;
+  }
+
+  sendJson(res, 404, { error: "Not found" });
+}
+
 function safePublicPath(urlPath) {
-  const decoded = decodeURIComponent(urlPath.split("?")[0]);
-  const normalized = path.normalize(decoded).replace(/^(\.\.[/\\])+/, "");
-  const requested = path.join(publicDir, normalized === "/" ? "index.html" : normalized);
-  return requested.startsWith(publicDir) ? requested : path.join(publicDir, "index.html");
+  let decoded;
+  try {
+    decoded = decodeURIComponent(urlPath.split("?")[0]);
+  } catch {
+    return path.join(publicDir, "index.html");
+  }
+  const relative = decoded === "/" ? "index.html" : decoded.replace(/^[/\\]+/, "");
+  const requested = path.resolve(publicDir, relative);
+  const containment = path.relative(publicDir, requested);
+  return containment && !containment.startsWith("..") && !path.isAbsolute(containment)
+    ? requested
+    : path.join(publicDir, "index.html");
 }
 
 function serveStatic(req, res) {
@@ -177,15 +349,29 @@ function serveStatic(req, res) {
     cacheHeaders = { "Cache-Control": "public, max-age=300, must-revalidate" };
   }
 
+  const securityHeaders = relativePath === "mass-communications.html"
+    ? {
+        "Content-Security-Policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
+        "Referrer-Policy": "no-referrer",
+        "X-Frame-Options": "DENY",
+        "X-Robots-Tag": "noindex, nofollow, noarchive",
+      }
+    : {};
+
   res.writeHead(200, {
     "Content-Type": contentType,
     ...cacheHeaders,
+    ...securityHeaders,
     "X-Content-Type-Options": "nosniff",
   });
   fs.createReadStream(filePath).pipe(res);
 }
 
 const server = http.createServer((req, res) => {
+  if (req.url && req.url.startsWith("/api/mass-communications")) {
+    handleMassCommunications(req, res);
+    return;
+  }
   if (req.url && req.url.startsWith("/api/visit")) {
     handleVisit(req, res);
     return;
