@@ -1,0 +1,30 @@
+{
+  "languages": ["en", "es", "fr", "de", "ar", "tr", "nl", "id"],
+  "conversations": [
+    {
+      "slug": "irny-and-fl2-group-chat",
+      "title": "IRNY and FL2 Group Chat",
+      "fallbackLanguage": "en",
+      "description": {
+        "en": "Complete alliance conversation with timestamps and speaker names preserved.",
+        "es": "Conversación completa de la alianza con horas y nombres de los participantes.",
+        "fr": "Conversation complète de l’alliance avec les heures et les noms des participants.",
+        "de": "Vollständiges Allianzgespräch mit Zeitstempeln und Sprechernamen.",
+        "ar": "محادثة التحالف الكاملة مع الحفاظ على التوقيت وأسماء المتحدثين.",
+        "tr": "Zaman damgaları ve konuşmacı adları korunmuş eksiksiz ittifak görüşmesi.",
+        "nl": "Volledig alliantiegesprek met behoud van tijdstempels en namen.",
+        "id": "Percakapan aliansi lengkap dengan waktu dan nama pembicara dipertahankan."
+      },
+      "languages": {
+        "en": "en.enc.json",
+        "es": "es.enc.json",
+        "fr": "fr.enc.json",
+        "de": "de.enc.json",
+        "ar": "ar.enc.json",
+        "tr": "tr.enc.json",
+        "nl": "nl.enc.json",
+        "id": "id.enc.json"
+      }
+    }
+  ]
+}

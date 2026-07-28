@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#071015" />
+    <meta name="description" content="Protected FrostBorn Lions mass communications archive." />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <meta name="fl2-build" content="20260728-mass-comms-v2" />
+    <title>Mass Communications | FrostBorn Lions [FL2]</title>
+    <link rel="icon" href="assets/brand/fl2-mark.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css?v=20260728-mass-comms-v2" />
+    <link rel="stylesheet" href="mass-communications.css?v=20260728-mass-comms-v2" />
+    <script src="mass-communications.js?v=20260728-mass-comms-v2" defer></script>
+  </head>
+  <body>
+    <div class="site-shell mass-shell">
+      <header class="topbar">
+        <a class="brand" id="homeLink" href="index.html#lang=en&day=day-1&view=poster" aria-label="FrostBorn Lions home">
+          <img src="assets/brand/fl2-mark.svg" alt="" />
+          <span>
+            <strong>FrostBorn Lions</strong>
+            <em>[FL2]</em>
+          </span>
+        </a>
+        <div class="topbar-actions">
+          <a class="calculator-link" id="libraryLink" href="index.html#lang=en&day=day-1&view=poster">
+            <span aria-hidden="true">←</span>
+            <span id="libraryLinkLabel">Field Library</span>
+          </a>
+          <nav class="language-tabs" id="massLanguageTabs" aria-label="Choose language"></nav>
+        </div>
+      </header>
+
+      <main>
+        <section class="mass-hero" aria-labelledby="massTitle">
+          <div>
+            <p class="season-label" id="secureArchiveLabel">Protected FL2 Archive</p>
+            <h1 id="massTitle">Mass Communications</h1>
+            <p id="massIntro">Alliance conversations, translated and organized for clear reading.</p>
+          </div>
+          <div class="vault-status" aria-label="Archive protection">
+            <span aria-hidden="true">◆</span>
+            <strong id="vaultStatusLabel">Password protected</strong>
+          </div>
+        </section>
+
+        <section class="password-gate" id="passwordGate" aria-labelledby="gateTitle">
+          <div class="gate-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path><path d="M12 14v3"></path></svg>
+          </div>
+          <div class="gate-copy">
+            <p class="season-label" id="restrictedLabel">Restricted access</p>
+            <h2 id="gateTitle">Enter the archive password</h2>
+            <p id="gateDescription">This browser will remain trusted until its site data is cleared or you log out.</p>
+          </div>
+          <form class="password-form" id="passwordForm">
+            <label for="archivePassword" id="passwordLabel">Password</label>
+            <div class="password-row">
+              <input
+                id="archivePassword"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                required
+                spellcheck="false"
+              />
+              <button type="submit" id="unlockButton">Unlock archive</button>
+            </div>
+            <p class="form-status" id="loginStatus" role="status" aria-live="polite"></p>
+          </form>
+        </section>
+
+        <section class="archive-panel" id="archivePanel" aria-labelledby="archiveTitle" hidden>
+          <div class="archive-toolbar">
+            <div>
+              <p class="season-label" id="catalogLabel">Conversation catalog</p>
+              <h2 id="archiveTitle">Mass Communications</h2>
+            </div>
+            <button class="quiet-button" id="logoutButton" type="button">
+              <span aria-hidden="true">↪</span>
+              <span id="logoutLabel">Log out</span>
+            </button>
+          </div>
+
+          <div class="catalog-grid" id="conversationCatalog" aria-live="polite"></div>
+
+          <article class="conversation-reader" id="conversationReader" hidden>
+            <div class="conversation-toolbar">
+              <button class="back-button" id="backToCatalog" type="button">
+                <span aria-hidden="true">←</span>
+                <span id="backLabel">All conversations</span>
+              </button>
+              <div class="conversation-actions">
+                <label class="conversation-search">
+                  <span class="visually-hidden" id="searchLabel">Search conversation</span>
+                  <input id="conversationSearch" type="search" placeholder="Search conversation" />
+                </label>
+                <button class="quiet-button" id="printConversation" type="button">
+                  <span aria-hidden="true">▣</span>
+                  <span id="printLabel">Print</span>
+                </button>
+              </div>
+            </div>
+            <header class="conversation-heading">
+              <p class="season-label" id="conversationKicker">Alliance group chat</p>
+              <h2 id="conversationTitle"></h2>
+              <p id="conversationDescription"></p>
+              <div class="conversation-meta" id="conversationMeta"></div>
+            </header>
+            <div class="conversation-timeline" id="conversationTimeline" aria-live="polite"></div>
+            <p class="empty-search" id="emptySearch" hidden>No messages match your search.</p>
+          </article>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

@@ -1,4 +1,4 @@
-const APP_VERSION = "20260723-auto-cache-v1";
+const APP_VERSION = "20260728-mass-comms-v1";
 window.FL2_BUILD = APP_VERSION;
 
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
@@ -725,6 +725,10 @@ function renderChromeLabels() {
   const brand = document.querySelector(".brand");
   brand?.setAttribute("aria-label", "FrostBorn Lions FL2");
   brand?.setAttribute("href", `#lang=${state.language}&day=day-1&view=poster`);
+  const massCommunicationsLink = document.querySelector("#massCommunicationsLink");
+  massCommunicationsLink?.setAttribute("href", `mass-communications.html?lang=${state.language}`);
+  document.querySelector('.tools-menu a[href^="mass-communications.html"]')
+    ?.setAttribute("href", `mass-communications.html?lang=${state.language}`);
   els.languageTabs.setAttribute("aria-label", t("chooseLanguage"));
   els.dayTabs.setAttribute("aria-label", t("chooseDay"));
   document.querySelector(".signal")?.setAttribute("aria-label", t("libraryStatus"));
