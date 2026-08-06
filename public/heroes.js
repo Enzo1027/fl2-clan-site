@@ -6,8 +6,10 @@
   const store = window.fl2Profiles;
   const form = document.getElementById("heroForm");
   const byId = (id) => document.getElementById(id);
-  const format = (value) => new Intl.NumberFormat().format(Math.max(0, Math.round(Number(value) || 0)));
-  const formatDecimal = (value) => new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(Math.max(0, Number(value) || 0));
+  const i18n = window.fl2I18n;
+  const t = (value) => i18n?.t(value) || value;
+  const format = (value) => new Intl.NumberFormat(i18n?.locale).format(Math.max(0, Math.round(Number(value) || 0)));
+  const formatDecimal = (value) => new Intl.NumberFormat(i18n?.locale, { maximumFractionDigits: 1 }).format(Math.max(0, Number(value) || 0));
   const number = (value) => Math.max(0, Math.floor(Number(String(value ?? 0).replaceAll(",", "")) || 0));
   const gearLabels = { gun: "Gun", helmet: "Helmet", armor: "Armor", boots: "Boots" };
   let heroState;
@@ -47,7 +49,7 @@
 
   function renderRoster() {
     const active = selectedHero();
-    byId("heroSelector").innerHTML = Planner.HEROES.map((hero) => `<button class="hero-chip${hero.id === active.id ? " is-active" : ""}" type="button" data-hero-id="${hero.id}" aria-pressed="${hero.id === active.id}">${hero.image ? `<img src="${hero.image}" alt="" />` : `<span class="hero-avatar-fallback">${hero.name.slice(0, 2).toUpperCase()}</span>`}<strong>${hero.name}</strong><small>${hero.season ? `S${hero.season}` : "Base"} · ${hero.rarity}</small></button>`).join("");
+    byId("heroSelector").innerHTML = Planner.HEROES.map((hero) => `<button class="hero-chip${hero.id === active.id ? " is-active" : ""}" type="button" data-hero-id="${hero.id}" aria-pressed="${hero.id === active.id}">${hero.image ? `<img src="${hero.image}" alt="" />` : `<span class="hero-avatar-fallback">${hero.name.slice(0, 2).toUpperCase()}</span>`}<strong data-i18n-skip>${hero.name}</strong><small>${hero.season ? `S${hero.season}` : "Base"} · ${hero.rarity}</small></button>`).join("");
   }
 
   function gearOptions(max, selected, suffix = "") {
@@ -255,7 +257,7 @@
     writeActiveRecord({ gear });
     renderLoadout();
     renderPower();
-    window.fl2Toast(`All four equipment levels set to ${level}`);
+    window.fl2Toast(t(`All four equipment levels set to ${level}`));
   });
 
   byId("openMerit").addEventListener("click", () => {
@@ -282,7 +284,7 @@
     heroState = Planner.normalizeHeroState(null, null);
     loadActiveHero();
     store?.removeFeatureState("heroes");
-    window.fl2Toast("Hero roster cleared for this profile");
+    window.fl2Toast(t("Hero roster cleared for this profile"));
   });
 
   window.addEventListener("fl2:profilechange", restore);

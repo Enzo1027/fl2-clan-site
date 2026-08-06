@@ -1,9 +1,9 @@
-const CACHE_NAME = "fl2-command-center-v11";
+const CACHE_NAME = "fl2-command-center-v17";
 const CORE = [
   "/tools.html", "/hq.html", "/heroes.html", "/daily.html", "/shops.html",
   "/calculator.html", "/research.html", "/tank.html", "/index.html", "/mass-communications.html",
   "/app.webmanifest", "/styles.css", "/tools.css", "/tool-common.css", "/command-center.css", "/calculator.css",
-  "/app.js", "/profile-store.js", "/tool-common.js", "/tools.js", "/mass-communications.js", "/mass-communications.css",
+  "/app.js", "/profile-store.js", "/tool-translations.js", "/tool-i18n.js", "/tool-common.js", "/tools.js", "/mass-communications.js", "/mass-communications.css",
   "/calculator-engine.js", "/calculator.js", "/progress-backup.js",
   "/research-engine.js", "/research.js", "/tank-engine.js", "/tank.js",
   "/hq-engine.js", "/hq.js", "/hero-engine.js", "/heroes.js",
@@ -36,6 +36,10 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
   if (url.pathname === "/api/event" && request.method === "POST") {
     event.respondWith(fetch(request).catch(() => new Response(null, { status: 202 })));
+    return;
+  }
+  if (url.pathname === "/api/visit" && request.method === "POST") {
+    event.respondWith(fetch(request).catch(() => new Response(null, { status: 503 })));
     return;
   }
   if (request.method !== "GET" || url.pathname.startsWith("/api/")) return;

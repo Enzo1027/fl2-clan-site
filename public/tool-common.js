@@ -1,6 +1,9 @@
 (function initializeToolCommon() {
   "use strict";
 
+  const i18n = window.fl2I18n;
+  const t = (value) => i18n?.t(value) || value;
+  const tf = (value, ...tokens) => i18n?.format(value, ...tokens) || tokens.reduce((output, token, index) => output.replaceAll(`{${index}}`, token), value);
   const NAV = [
     ["tools.html", "Command Center"], ["calculator.html", "Merit"], ["research.html", "Research"],
     ["tank.html", "Tank"], ["hq.html", "HQ"], ["heroes.html", "Heroes"],
@@ -9,7 +12,8 @@
   const currentFile = location.pathname.split("/").pop() || "index.html";
 
   document.querySelectorAll(".tool-nav").forEach((nav) => {
-    nav.innerHTML = NAV.map(([href, label]) => `<a href="${href}"${href === currentFile ? ' aria-current="page"' : ""}>${label}</a>`).join("");
+    nav.innerHTML = NAV.map(([href, label]) => `<a href="${i18n?.localizedUrl(href) || href}"${href === currentFile ? ' aria-current="page"' : ""}>${t(label)}</a>`).join("");
+    nav.setAttribute("aria-label", t("FL2 tools"));
   });
 
   const Profiles = window.FL2ProfileStore;
@@ -24,8 +28,8 @@
     const profileLabel = store ? `${store.getProfile().name} ` : "";
     document.querySelectorAll("#localSaveStatus").forEach((status) => {
       status.textContent = automaticCacheState.offlineReady
-        ? `${profileLabel}auto-saved · offline ready`
-        : `${profileLabel}auto-saved on this device`;
+        ? `${profileLabel}${t("auto-saved · offline ready")}`
+        : `${profileLabel}${t("auto-saved on this device")}`;
     });
     window.dispatchEvent(new CustomEvent("fl2:cachestatus", { detail: { ...automaticCacheState } }));
   }
@@ -99,46 +103,46 @@
       if (!topbar) return;
       wrap = document.createElement("div");
       wrap.className = "profile-switcher";
-      wrap.setAttribute("aria-label", "Local player profile");
+      wrap.setAttribute("aria-label", t("Local player profile"));
       topbar.append(wrap);
     }
     const profiles = store.listProfiles();
     wrap.innerHTML = `
-      <label><span>Player profile</span><select aria-label="Active local player profile">${profiles.map((profile) => `<option value="${profile.id}"${profile.isActive ? " selected" : ""}>${profile.name}</option>`).join("")}</select></label>
-      <button type="button" data-profile-action="add" aria-label="Add profile" title="Add profile">+</button>
-      <button type="button" data-profile-action="rename" aria-label="Rename profile" title="Rename profile">✎</button>
-      <button type="button" data-profile-action="delete" aria-label="Delete profile" title="Delete profile">×</button>`;
+      <label><span>${t("Player profile")}</span><select data-i18n-skip aria-label="${t("Active local player profile")}">${profiles.map((profile) => `<option value="${profile.id}"${profile.isActive ? " selected" : ""}>${profile.name}</option>`).join("")}</select></label>
+      <button type="button" data-profile-action="add" aria-label="${t("Add profile")}" title="${t("Add profile")}">+</button>
+      <button type="button" data-profile-action="rename" aria-label="${t("Rename profile")}" title="${t("Rename profile")}">✎</button>
+      <button type="button" data-profile-action="delete" aria-label="${t("Delete profile")}" title="${t("Delete profile")}">×</button>`;
     wrap.querySelector("select").addEventListener("change", (event) => {
       store.setActiveProfile(event.target.value);
-      toast(`Switched to ${store.getProfile().name}`);
+      toast(tf("Switched to {0}", store.getProfile().name));
       announceProfileChange();
       renderProfileSwitcher();
     });
     wrap.querySelector('[data-profile-action="add"]').addEventListener("click", () => {
-      const name = prompt("Name this local player profile:", "New profile");
+      const name = prompt(t("Name this local player profile:"), t("New profile"));
       if (!name) return;
       const profile = store.createProfile(name);
-      toast(`${profile.name} created on this device`);
+      toast(tf("{0} created on this device", profile.name));
       announceProfileChange();
       renderProfileSwitcher();
     });
     wrap.querySelector('[data-profile-action="rename"]').addEventListener("click", () => {
       const profile = store.getProfile();
-      const name = prompt("Rename this local profile:", profile.name);
+      const name = prompt(t("Rename this local profile:"), profile.name);
       if (!name) return;
       const renamed = store.renameProfile(profile.id, name);
-      toast(`Profile renamed to ${renamed.name}`);
+      toast(tf("Profile renamed to {0}", renamed.name));
       renderProfileSwitcher();
     });
     wrap.querySelector('[data-profile-action="delete"]').addEventListener("click", () => {
       const profile = store.getProfile();
-      if (!confirm(`Delete ${profile.name} and its saved progress from this device?`)) return;
+      if (!confirm(tf("Delete {0} and its saved progress from this device?", profile.name))) return;
       try {
         store.deleteProfile(profile.id);
-        toast(`${profile.name} deleted`);
+        toast(tf("{0} deleted", profile.name));
         announceProfileChange();
         renderProfileSwitcher();
-      } catch (error) { toast(error.message); }
+      } catch (error) { toast(t(error.message)); }
     });
   }
 

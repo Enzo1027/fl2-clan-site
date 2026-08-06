@@ -9,7 +9,9 @@
   const answerPanel = document.getElementById("answerPanel");
   const storageKey = "fl2-merit-calculator-level-aware-v3";
   const profileStore = window.fl2Profiles;
-  const formatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
+  const i18n = window.fl2I18n;
+  const t = (value) => i18n?.t(value) || value;
+  const formatter = new Intl.NumberFormat(i18n?.locale || "en-US", { maximumFractionDigits: 1 });
   const byId = (id) => document.getElementById(id);
   const format = (value) => formatter.format(Number.isFinite(value) ? value : 0);
   let heroState = null;
@@ -87,7 +89,7 @@
 
   function initializeHeroSync(restoredValues) {
     if (!Planner) return;
-    byId("hero").innerHTML = `${Planner.HEROES.map((hero) => `<option>${hero.name}</option>`).join("")}<option>Other hero</option>`;
+    byId("hero").innerHTML = `${Planner.HEROES.map((hero) => `<option>${hero.name}</option>`).join("")}<option>${t("Other hero")}</option>`;
     const saved = profileStore?.getFeatureState("heroes");
     heroState = Planner.normalizeHeroState(saved, restoredValues || {});
     const restoredHeroId = Planner.heroIdFromName(restoredValues?.hero);
@@ -136,7 +138,8 @@
   function renderNextSteps(result) {
     const levelHeadline = result.level.promotionUnlocked
       ? `Lv.${format(result.level.level)}`
-      : `${format(result.level.levelsToPromotion)} level${result.level.levelsToPromotion === 1 ? "" : "s"} short`;
+      : i18n?.format(result.level.levelsToPromotion === 1 ? "{0} level short" : "{0} levels short", format(result.level.levelsToPromotion))
+        || `${format(result.level.levelsToPromotion)} level${result.level.levelsToPromotion === 1 ? "" : "s"} short`;
     const levelDetail = result.level.promotionUnlocked
       ? `Normal orange cap at this star: Lv.${result.level.normalCap}`
       : "Reach Lv.20 with Enhancement Alloy first";

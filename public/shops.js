@@ -1,6 +1,7 @@
 (function initializeShopPage() {
   "use strict";
   const store = window.fl2Profiles;
+  const t = (value) => window.fl2I18n?.t(value) || value;
   const form = document.getElementById("shopForm");
   const verdictLabels = { buy: "Buy", "buy-if": "Situational", hold: "Hold", skip: "Skip", last: "Buy last", locked: "Locked" };
   function values() {
@@ -23,6 +24,6 @@
     render(Boolean(saved));
   }
   form.addEventListener("input", () => render(true)); form.addEventListener("change", () => render(true)); form.addEventListener("submit", (event) => { event.preventDefault(); render(true); document.getElementById("shopGrid").scrollIntoView({ behavior: "smooth", block: "start" }); });
-  document.getElementById("clearShops").addEventListener("click", () => { store?.removeFeatureState("shops"); restore(); window.fl2Toast("Shop context cleared for this profile"); });
+  document.getElementById("clearShops").addEventListener("click", () => { store?.removeFeatureState("shops"); restore(); window.fl2Toast(t("Shop context cleared for this profile")); });
   window.addEventListener("fl2:profilechange", restore); restore();
 })();

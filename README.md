@@ -15,6 +15,8 @@ Mobile-first Last Z planning tools and FL2's eight-language Season 2 guide libra
 
 All user progress is stored in `localStorage` under separate Main, Farm, Alt, or custom profiles. No login or per-user server database is required. The command center exports and restores one small versioned JSON backup containing every local profile; the Research and Tank pages retain compatible focused backup controls. A service worker keeps the core planners usable after they have been installed/visited.
 
+Every tool supports English, Spanish, French, German, Arabic, Turkish, Dutch, and Indonesian through `?lang=<code>`. Tool navigation preserves the selected language, Arabic uses right-to-left layout, and the main library passes its active language into every tool link. The generated `public/tool-translations.js` bundle is cached with the planners, so translation never depends on a live service at runtime. To rebuild the bundle after changing visible tool text, run `python3 scripts/build_tool_translations.py --update`, review the generated copy, and rerun the local browser checks before publishing.
+
 The only server-side analytics added for the command center are aggregate page-event counts at `/api/event`; the endpoint receives no player profile, form values, device identifier, or IP-derived key. Existing visit-counter behavior remains separate at `/api/visit`.
 
 The checked-in requirement snapshots live in `public/data/research-trees.json` and `public/data/tank-modifications.json`. Their versioned browser requests are cached for repeat visits, while HTML stays uncached so deployments appear immediately. Refresh and normalize those public community datasets with:

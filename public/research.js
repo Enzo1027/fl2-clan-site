@@ -5,7 +5,9 @@
   const MODEL_VERSION = 2;
   const engine = window.FL2Research;
   const profileStore = window.fl2Profiles;
-  const number = new Intl.NumberFormat();
+  const i18n = window.fl2I18n;
+  const t = (value) => i18n?.t(value) || value;
+  const number = new Intl.NumberFormat(i18n?.locale);
   let bundle = null;
   let openNodeId = null;
 
@@ -250,8 +252,8 @@
   }
 
   function filteredNodes(tree) {
-    const query = state.search.trim().toLowerCase();
-    return query ? tree.nodes.filter((node) => node.name.toLowerCase().includes(query)) : tree.nodes;
+    const query = state.search.trim().toLocaleLowerCase(i18n?.locale);
+    return query ? tree.nodes.filter((node) => `${node.name} ${t(node.name)}`.toLocaleLowerCase(i18n?.locale).includes(query)) : tree.nodes;
   }
 
   function nodeCard(tree, node) {
@@ -396,7 +398,7 @@
   elements.tableViewButton.addEventListener("click", () => { state.view = "table"; saveState(); render(); });
   elements.clearTreeButton.addEventListener("click", () => {
     const tree = activeTree();
-    if (!window.confirm(`Clear all saved progress and goals for ${tree.name}?`)) return;
+    if (!window.confirm(i18n?.format("Clear all saved progress and goals for {0}?", t(tree.name)) || `Clear all saved progress and goals for ${tree.name}?`)) return;
     delete state.progress[tree.id];
     delete state.goals[tree.id];
     saveState();
@@ -435,7 +437,8 @@
     })
     .then((data) => {
       bundle = data;
-      elements.researchFreshness.textContent = `Requirements snapshot checked ${new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(new Date(bundle.capturedAt))}.`;
+      const checkedDate = new Intl.DateTimeFormat(i18n?.locale, { dateStyle: "medium" }).format(new Date(bundle.capturedAt));
+      elements.researchFreshness.textContent = i18n?.format("Requirements snapshot checked {0}.", checkedDate) || `Requirements snapshot checked ${checkedDate}.`;
       render();
     })
     .catch((error) => {

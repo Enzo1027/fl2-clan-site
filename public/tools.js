@@ -1,8 +1,10 @@
 (function initializeCommandCenter() {
   "use strict";
   const store = window.fl2Profiles;
+  const i18n = window.fl2I18n;
+  const t = (value) => i18n?.t(value) || value;
   const byId = (id) => document.getElementById(id);
-  const format = (value) => new Intl.NumberFormat().format(Math.round(value || 0));
+  const format = (value) => new Intl.NumberFormat(i18n?.locale).format(Math.round(value || 0));
   let researchData;
   let tankData;
 
@@ -33,6 +35,7 @@
     const normalizedHeroes = hero && window.HeroPlanner?.normalizeHeroState(hero, merit);
     const activeHeroRecord = normalizedHeroes && window.HeroPlanner.getHeroRecord(normalizedHeroes, normalizedHeroes.activeHeroId);
     const selectedHero = window.HeroPlanner?.HEROES?.find((item) => item.id === normalizedHeroes?.activeHeroId);
+    byId("summaryHero").toggleAttribute("data-i18n-skip", Boolean(selectedHero));
     byId("summaryHero").textContent = selectedHero?.name || "Not set";
     byId("summaryHeroMeta").textContent = activeHeroRecord?.level ? `Level ${activeHeroRecord.level} → ${activeHeroRecord.targetLevel || activeHeroRecord.level}` : "Plan XP and fragments";
     byId("cardHeroes").textContent = selectedHero ? `${selectedHero.name} saved →` : "Set up →";
@@ -73,19 +76,19 @@
     const blob = new Blob([store.stringifySnapshot()], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a"); link.href = url; link.download = `fl2-all-profiles-${new Date().toISOString().slice(0, 10)}.json`; link.click();
-    URL.revokeObjectURL(url); window.fl2Toast("All local profiles backed up");
+    URL.revokeObjectURL(url); window.fl2Toast(t("All local profiles backed up"));
   });
   byId("importAll").addEventListener("change", async (event) => {
     const [file] = event.target.files || [];
     if (!file) return;
-    try { store.importSnapshot(await file.text()); window.fl2Toast("Backup restored"); render(); }
-    catch { window.fl2Toast("That is not a valid FL2 backup"); }
+    try { store.importSnapshot(await file.text()); window.fl2Toast(t("Backup restored")); render(); }
+    catch { window.fl2Toast(t("That is not a valid FL2 backup")); }
     event.target.value = "";
   });
   byId("reportIssue").addEventListener("click", async () => {
     const report = `FL2 data correction\nPage: ${location.href}\nProfile: ${store?.getProfile()?.name || "local"}\nNumber shown:\nNumber seen in game:\nScreenshot/source:\nDate seen: ${new Date().toISOString().slice(0, 10)}`;
-    try { await navigator.clipboard.writeText(report); window.fl2Toast("Correction report copied"); }
-    catch { window.fl2Toast("Could not access the clipboard"); }
+    try { await navigator.clipboard.writeText(report); window.fl2Toast(t("Correction report copied")); }
+    catch { window.fl2Toast(t("Could not access the clipboard")); }
   });
   window.addEventListener("fl2:profilechange", render);
   loadData().then(render).catch(render);
