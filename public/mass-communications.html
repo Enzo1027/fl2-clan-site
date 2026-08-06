@@ -6,12 +6,12 @@
     <meta name="theme-color" content="#071015" />
     <meta name="description" content="Protected FrostBorn Lions mass communications archive." />
     <meta name="robots" content="noindex, nofollow, noarchive" />
-    <meta name="fl2-build" content="20260728-mass-comms-v2" />
+    <meta name="fl2-build" content="20260806-svs-strategy-v4" />
     <title>Mass Communications | FrostBorn Lions [FL2]</title>
     <link rel="icon" href="assets/brand/fl2-mark.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="styles.css?v=20260728-mass-comms-v2" />
-    <link rel="stylesheet" href="mass-communications.css?v=20260728-mass-comms-v2" />
-    <script src="mass-communications.js?v=20260728-mass-comms-v2" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260806-svs-strategy-v4" />
+    <link rel="stylesheet" href="mass-communications.css?v=20260806-svs-strategy-v4" />
+    <script src="mass-communications.js?v=20260806-svs-strategy-v4" defer></script>
   </head>
   <body>
     <div class="site-shell mass-shell">
@@ -28,7 +28,15 @@
             <span aria-hidden="true">←</span>
             <span id="libraryLinkLabel">Field Library</span>
           </a>
-          <nav class="language-tabs" id="massLanguageTabs" aria-label="Choose language"></nav>
+          <div class="language-switcher" aria-label="Language navigation">
+            <button class="language-scroll-button" id="previousLanguages" type="button" aria-label="Previous languages">
+              <span aria-hidden="true">‹</span>
+            </button>
+            <nav class="language-tabs" id="massLanguageTabs" aria-label="Choose language"></nav>
+            <button class="language-scroll-button" id="nextLanguages" type="button" aria-label="Next languages">
+              <span aria-hidden="true">›</span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -77,11 +85,33 @@
               <p class="season-label" id="catalogLabel">Conversation catalog</p>
               <h2 id="archiveTitle">Mass Communications</h2>
             </div>
-            <button class="quiet-button" id="logoutButton" type="button">
-              <span aria-hidden="true">↪</span>
-              <span id="logoutLabel">Log out</span>
-            </button>
+            <div class="archive-access-actions">
+              <button class="quiet-button" id="unlockAnotherButton" type="button">
+                <span aria-hidden="true">＋</span>
+                <span id="unlockAnotherLabel">Unlock another archive</span>
+              </button>
+              <button class="quiet-button" id="logoutButton" type="button">
+                <span aria-hidden="true">↪</span>
+                <span id="logoutLabel">Log out</span>
+              </button>
+            </div>
           </div>
+
+          <form class="additional-password-form" id="additionalPasswordForm" hidden>
+            <label for="additionalArchivePassword" id="additionalPasswordLabel">Additional archive password</label>
+            <div class="password-row">
+              <input
+                id="additionalArchivePassword"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                required
+                spellcheck="false"
+              />
+              <button type="submit" id="additionalUnlockButton">Unlock</button>
+            </div>
+            <p class="form-status" id="additionalLoginStatus" role="status" aria-live="polite"></p>
+          </form>
 
           <div class="catalog-grid" id="conversationCatalog" aria-live="polite"></div>
 
@@ -104,6 +134,7 @@
             </div>
             <header class="conversation-heading">
               <p class="season-label" id="conversationKicker">Alliance group chat</p>
+              <p class="conversation-collection" id="conversationCollection" hidden></p>
               <h2 id="conversationTitle"></h2>
               <p id="conversationDescription"></p>
               <div class="conversation-meta" id="conversationMeta"></div>

@@ -3,8 +3,10 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const {
+  SVS_STRATEGY_SESSION_COOKIE,
   clearSessionCookie,
   createAuthStore,
+  findConversation,
   getClientIp,
   listConversations,
   loadCatalog,
@@ -23,6 +25,24 @@ const analyticsFile = path.join(dataDir, "analytics.json");
 const massCommunicationsDir = path.join(root, "content", "mass-communications");
 const port = Number(process.env.PORT || 4173);
 const massCommunicationsAuth = createAuthStore();
+const svsStrategyAuth = createAuthStore({
+  cookieName: SVS_STRATEGY_SESSION_COOKIE,
+  sessionNamespace: "svs-strategy",
+});
+const massCommunicationsArchives = [
+  {
+    id: "alliance-archive",
+    auth: massCommunicationsAuth,
+    passwordEnvironment: "MASS_COMMS_PASSWORD",
+    contentKeyEnvironment: "MASS_COMMS_CONTENT_KEY",
+  },
+  {
+    id: "svs-strategy",
+    auth: svsStrategyAuth,
+    passwordEnvironment: "SVS_STRATEGY_PASSWORD",
+    contentKeyEnvironment: "SVS_STRATEGY_CONTENT_KEY",
+  },
+];
 
 const mimeTypes = {
   ".css": "text/css; charset=utf-8",
@@ -173,8 +193,12 @@ function massCommunicationsLanguage(requestUrl) {
   return normalizeLanguage(new URL(requestUrl, "http://localhost").searchParams.get("lang"), supportedLanguages);
 }
 
-function requireMassCommunicationsAuth(req, res) {
-  if (massCommunicationsAuth.isAuthenticated(req)) return true;
+function authenticatedMassCommunicationsArchives(req) {
+  return massCommunicationsArchives.filter((archive) => archive.auth.isAuthenticated(req));
+}
+
+function requireMassCommunicationsAuth(req, res, archive) {
+  if (archive ? archive.auth.isAuthenticated(req) : authenticatedMassCommunicationsArchives(req).length) return true;
   sendJson(res, 401, { error: "Authentication required" });
   return false;
 }
@@ -188,18 +212,26 @@ async function handleMassCommunications(req, res) {
       sendJson(res, 405, { error: "Method not allowed" });
       return;
     }
-    const authenticated = massCommunicationsAuth.isAuthenticated(req);
-    const headers = {};
-    if (authenticated) {
+    const authenticatedArchives = authenticatedMassCommunicationsArchives(req);
+    const cookies = [];
+    for (const archive of authenticatedArchives) {
       try {
-        const session = massCommunicationsAuth.createSession();
-        headers["Set-Cookie"] = sessionCookie(session.token, session.maxAgeSeconds, secure);
+        const session = archive.auth.createSession();
+        cookies.push(sessionCookie(session.token, session.maxAgeSeconds, secure, archive.auth.cookieName));
       } catch {
         sendJson(res, 503, { authenticated: false, error: "Secure archive is not configured" });
         return;
       }
     }
-    sendJson(res, 200, { authenticated }, headers);
+    sendJson(
+      res,
+      200,
+      {
+        authenticated: authenticatedArchives.length > 0,
+        accessGroups: authenticatedArchives.map((archive) => archive.id),
+      },
+      cookies.length ? { "Set-Cookie": cookies } : {},
+    );
     return;
   }
 
@@ -208,8 +240,10 @@ async function handleMassCommunications(req, res) {
       sendJson(res, 405, { error: "Method not allowed" });
       return;
     }
-    const configuredPassword = process.env.MASS_COMMS_PASSWORD;
-    if (!configuredPassword || !process.env.MASS_COMMS_SESSION_SECRET) {
+    const configuredArchives = massCommunicationsArchives.filter(
+      (archive) => process.env[archive.passwordEnvironment],
+    );
+    if (!configuredArchives.length || !process.env.MASS_COMMS_SESSION_SECRET) {
       sendJson(res, 503, { error: "Secure archive is not configured" });
       return;
     }
@@ -232,7 +266,10 @@ async function handleMassCommunications(req, res) {
     } catch {
       password = "";
     }
-    if (!safeEqual(password, configuredPassword)) {
+    const matchingArchive = configuredArchives.find(
+      (archive) => safeEqual(password, process.env[archive.passwordEnvironment]),
+    );
+    if (!matchingArchive) {
       sendJson(res, 401, { error: "Incorrect password" });
       return;
     }
@@ -240,7 +277,7 @@ async function handleMassCommunications(req, res) {
     massCommunicationsAuth.clearLoginAttempts(ip);
     let session;
     try {
-      session = massCommunicationsAuth.createSession();
+      session = matchingArchive.auth.createSession();
     } catch {
       sendJson(res, 503, { error: "Secure archive is not configured" });
       return;
@@ -248,8 +285,15 @@ async function handleMassCommunications(req, res) {
     sendJson(
       res,
       200,
-      { authenticated: true },
-      { "Set-Cookie": sessionCookie(session.token, session.maxAgeSeconds, secure) },
+      { authenticated: true, unlocked: matchingArchive.id },
+      {
+        "Set-Cookie": sessionCookie(
+          session.token,
+          session.maxAgeSeconds,
+          secure,
+          matchingArchive.auth.cookieName,
+        ),
+      },
     );
     return;
   }
@@ -259,8 +303,17 @@ async function handleMassCommunications(req, res) {
       sendJson(res, 405, { error: "Method not allowed" });
       return;
     }
-    massCommunicationsAuth.destroySession(req);
-    sendJson(res, 200, { authenticated: false }, { "Set-Cookie": clearSessionCookie(secure) });
+    for (const archive of massCommunicationsArchives) archive.auth.destroySession(req);
+    sendJson(
+      res,
+      200,
+      { authenticated: false },
+      {
+        "Set-Cookie": massCommunicationsArchives.map(
+          (archive) => clearSessionCookie(secure, archive.auth.cookieName),
+        ),
+      },
+    );
     return;
   }
 
@@ -280,7 +333,8 @@ async function handleMassCommunications(req, res) {
 
   if (pathname === "/api/mass-communications/catalog") {
     try {
-      sendJson(res, 200, listConversations(massCommunicationsDir, language));
+      const accessGroups = authenticatedMassCommunicationsArchives(req).map((archive) => archive.id);
+      sendJson(res, 200, listConversations(massCommunicationsDir, language, { accessGroups }));
     } catch {
       sendJson(res, 500, { error: "Unable to load archive catalog" });
     }
@@ -289,9 +343,20 @@ async function handleMassCommunications(req, res) {
 
   const conversationMatch = pathname.match(/^\/api\/mass-communications\/conversations\/([^/]+)$/);
   if (conversationMatch) {
+    const conversationMetadata = findConversation(massCommunicationsDir, conversationMatch[1]);
+    if (!conversationMetadata) {
+      sendJson(res, 404, { error: "Conversation not found" });
+      return;
+    }
+    const accessGroup = conversationMetadata.accessGroup || "alliance-archive";
+    const archive = massCommunicationsArchives.find((item) => item.id === accessGroup);
+    if (!archive || !requireMassCommunicationsAuth(req, res, archive)) return;
+
     let conversation;
     try {
-      conversation = loadConversation(massCommunicationsDir, conversationMatch[1], language);
+      conversation = loadConversation(massCommunicationsDir, conversationMatch[1], language, {
+        contentKey: process.env[archive.contentKeyEnvironment],
+      });
     } catch (error) {
       const unavailable = /content key is not configured/i.test(error.message);
       sendJson(res, unavailable ? 503 : 500, {

@@ -1,4 +1,4 @@
-const CACHE_NAME = "fl2-command-center-v10";
+const CACHE_NAME = "fl2-command-center-v11";
 const CORE = [
   "/tools.html", "/hq.html", "/heroes.html", "/daily.html", "/shops.html",
   "/calculator.html", "/research.html", "/tank.html", "/index.html", "/mass-communications.html",

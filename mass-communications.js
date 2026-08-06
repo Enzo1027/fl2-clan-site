@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 
 const SESSION_COOKIE = "fl2_mass_comms";
+const SVS_STRATEGY_SESSION_COOKIE = "fl2_svs_strategy";
 const SESSION_TTL_MS = 400 * 24 * 60 * 60 * 1000;
 const LOGIN_WINDOW_MS = 15 * 60 * 1000;
 const LOGIN_ATTEMPT_LIMIT = 5;
@@ -36,6 +37,8 @@ function createAuthStore(options = {}) {
   const sessionTtlMs = options.sessionTtlMs || SESSION_TTL_MS;
   const loginWindowMs = options.loginWindowMs || LOGIN_WINDOW_MS;
   const loginAttemptLimit = options.loginAttemptLimit || LOGIN_ATTEMPT_LIMIT;
+  const cookieName = options.cookieName || SESSION_COOKIE;
+  const sessionNamespace = String(options.sessionNamespace || "");
   const loginAttempts = new Map();
 
   function prune(now = Date.now()) {
@@ -50,12 +53,13 @@ function createAuthStore(options = {}) {
   }
 
   function signSession(payload) {
-    return crypto.createHmac("sha256", sessionSecret()).update(payload).digest("base64url");
+    const scopedPayload = sessionNamespace ? `${sessionNamespace}:${payload}` : payload;
+    return crypto.createHmac("sha256", sessionSecret()).update(scopedPayload).digest("base64url");
   }
 
   function isAuthenticated(req, now = Date.now()) {
     prune(now);
-    const token = parseCookies(req.headers.cookie)[SESSION_COOKIE];
+    const token = parseCookies(req.headers.cookie)[cookieName];
     if (!token || !sessionSecret()) return false;
     const parts = token.split(".");
     if (parts.length !== 3) return false;
@@ -97,6 +101,7 @@ function createAuthStore(options = {}) {
 
   return {
     clearLoginAttempts,
+    cookieName,
     consumeLoginAttempt,
     createSession,
     destroySession,
@@ -104,9 +109,9 @@ function createAuthStore(options = {}) {
   };
 }
 
-function sessionCookie(token, maxAgeSeconds, secure) {
+function sessionCookie(token, maxAgeSeconds, secure, cookieName = SESSION_COOKIE) {
   const parts = [
-    `${SESSION_COOKIE}=${encodeURIComponent(token)}`,
+    `${cookieName}=${encodeURIComponent(token)}`,
     "HttpOnly",
     "SameSite=Strict",
     "Path=/",
@@ -116,8 +121,8 @@ function sessionCookie(token, maxAgeSeconds, secure) {
   return parts.join("; ");
 }
 
-function clearSessionCookie(secure) {
-  return sessionCookie("", 0, secure);
+function clearSessionCookie(secure, cookieName = SESSION_COOKIE) {
+  return sessionCookie("", 0, secure, cookieName);
 }
 
 function requestIsSecure(req) {
@@ -148,7 +153,7 @@ function parseTranscript(raw, language) {
       continue;
     }
 
-    const allianceMatch = line.match(/^\[([A-Z0-9]+)\]\s*([^:]+?)\s*:\s*(.*)$/u);
+    const allianceMatch = line.match(/^\[([A-Za-z0-9]+)\]\s*([^:]+?)\s*:\s*(.*)$/u);
     if (allianceMatch) {
       const namePart = allianceMatch[2].trim();
       const replyMatch = namePart.match(/^(.*?)\s*\[([^\]]+)\]$/u);
@@ -192,15 +197,15 @@ function parseTranscript(raw, language) {
   };
 }
 
-function contentKeyFromEnvironment() {
-  const encoded = String(process.env.MASS_COMMS_CONTENT_KEY || "").trim();
+function contentKeyFromValue(value = process.env.MASS_COMMS_CONTENT_KEY) {
+  const encoded = String(value || "").trim();
   if (!encoded) throw new Error("Mass communications content key is not configured");
   const key = Buffer.from(encoded, "base64");
   if (key.length !== 32) throw new Error("Mass communications content key must be 32 bytes");
   return key;
 }
 
-function decryptTranscript(raw) {
+function decryptTranscript(raw, contentKey) {
   const envelope = JSON.parse(raw);
   if (
     envelope.version !== 1
@@ -212,7 +217,7 @@ function decryptTranscript(raw) {
   }
   const decipher = crypto.createDecipheriv(
     "aes-256-gcm",
-    contentKeyFromEnvironment(),
+    contentKeyFromValue(contentKey),
     Buffer.from(envelope.iv, "base64"),
   );
   decipher.setAuthTag(Buffer.from(envelope.tag, "base64"));
@@ -229,41 +234,85 @@ function loadCatalog(contentDir) {
   return parsed;
 }
 
-function listConversations(contentDir, language) {
-  const catalog = loadCatalog(contentDir);
+function localizedValue(value, language) {
+  if (typeof value === "string") return value;
+  return value?.[language] || value?.en || "";
+}
+
+function parseDocument(raw, language) {
+  const normalized = String(raw).replace(/\r\n/g, "\n").trim();
+  const blocks = normalized.split(/\n\s*\n/u).map((block) => block.trim()).filter(Boolean);
+  const sourceTitle = blocks.shift() || "";
+
   return {
-    conversations: catalog.conversations.map((conversation) => {
+    sourceTitle,
+    language,
+    direction: language === "ar" ? "rtl" : "ltr",
+    blocks: blocks.map((block) => {
+      const numbered = block.match(/^(\d+)\.\s+([\s\S]*)$/u);
+      if (numbered) {
+        return { type: "numbered", number: Number(numbered[1]), text: numbered[2].replace(/\n+/g, " ") };
+      }
+      const compact = block.replace(/\n+/g, " ");
+      const letters = compact.replace(/[^\p{L}]/gu, "");
+      const isHeading = letters.length >= 3 && letters === letters.toLocaleUpperCase(language);
+      return { type: isHeading ? "heading" : "paragraph", text: compact };
+    }),
+  };
+}
+
+function conversationAccessGroup(conversation) {
+  return conversation.accessGroup || "alliance-archive";
+}
+
+function findConversation(contentDir, slug) {
+  if (!SLUG_PATTERN.test(slug)) return null;
+  return loadCatalog(contentDir).conversations.find((item) => item.slug === slug) || null;
+}
+
+function listConversations(contentDir, language, options = {}) {
+  const catalog = loadCatalog(contentDir);
+  const accessGroups = options.accessGroups ? new Set(options.accessGroups) : null;
+  return {
+    conversations: catalog.conversations
+      .filter((conversation) => !accessGroups || accessGroups.has(conversationAccessGroup(conversation)))
+      .map((conversation) => {
       const selectedLanguage = conversation.languages[language] ? language : conversation.fallbackLanguage;
       return {
         slug: conversation.slug,
-        title: conversation.title,
-        description: conversation.description?.[language] || conversation.description?.en || "",
+        title: localizedValue(conversation.title, language),
+        description: localizedValue(conversation.description, language),
+        collection: localizedValue(conversation.collection, language),
+        contentType: conversation.contentType || "transcript",
         selectedLanguage,
         requestedLanguage: language,
         isFallback: selectedLanguage !== language,
         availableLanguages: Object.keys(conversation.languages),
       };
-    }),
+      }),
   };
 }
 
-function loadConversation(contentDir, slug, language) {
-  if (!SLUG_PATTERN.test(slug)) return null;
-  const catalog = loadCatalog(contentDir);
-  const conversation = catalog.conversations.find((item) => item.slug === slug);
+function loadConversation(contentDir, slug, language, options = {}) {
+  const conversation = findConversation(contentDir, slug);
   if (!conversation) return null;
 
   const selectedLanguage = conversation.languages[language] ? language : conversation.fallbackLanguage;
   const filename = conversation.languages[selectedLanguage];
   if (!filename || path.basename(filename) !== filename) return null;
   const transcriptPath = path.join(contentDir, conversation.slug, filename);
-  const decrypted = decryptTranscript(fs.readFileSync(transcriptPath, "utf8"));
-  const parsed = parseTranscript(decrypted, selectedLanguage);
+  const decrypted = decryptTranscript(fs.readFileSync(transcriptPath, "utf8"), options.contentKey);
+  const contentType = conversation.contentType || "transcript";
+  const parsed = contentType === "document"
+    ? parseDocument(decrypted, selectedLanguage)
+    : parseTranscript(decrypted, selectedLanguage);
 
   return {
     slug: conversation.slug,
-    title: conversation.title,
-    description: conversation.description?.[language] || conversation.description?.en || "",
+    title: localizedValue(conversation.title, language),
+    description: localizedValue(conversation.description, language),
+    collection: localizedValue(conversation.collection, language),
+    contentType,
     requestedLanguage: language,
     selectedLanguage,
     isFallback: selectedLanguage !== language,
@@ -278,14 +327,17 @@ function normalizeLanguage(value, supportedLanguages) {
 
 module.exports = {
   SESSION_COOKIE,
+  SVS_STRATEGY_SESSION_COOKIE,
   clearSessionCookie,
   decryptTranscript,
   createAuthStore,
   getClientIp,
+  findConversation,
   listConversations,
   loadCatalog,
   loadConversation,
   normalizeLanguage,
+  parseDocument,
   parseTranscript,
   requestIsSecure,
   safeEqual,

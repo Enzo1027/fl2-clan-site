@@ -3,6 +3,7 @@
   "conversations": [
     {
       "slug": "irny-and-fl2-group-chat",
+      "accessGroup": "alliance-archive",
       "title": "IRNY and FL2 Group Chat",
       "fallbackLanguage": "en",
       "description": {
@@ -24,6 +25,106 @@
         "tr": "tr.enc.json",
         "nl": "nl.enc.json",
         "id": "id.enc.json"
+      }
+    },
+    {
+      "slug": "svs-strategy-transcript",
+      "accessGroup": "svs-strategy",
+      "contentType": "transcript",
+      "collection": {
+        "en": "State 630 SvS Strategy",
+        "es": "Estrategia SvS del Estado 630",
+        "fr": "Stratégie SvS de l’État 630",
+        "de": "SvS-Strategie von Staat 630",
+        "ar": "استراتيجية SvS للولاية 630",
+        "tr": "630 Eyaleti SvS Stratejisi",
+        "nl": "SvS-strategie van Staat 630",
+        "id": "Strategi SvS Negara Bagian 630"
+      },
+      "title": {
+        "en": "Complete Conversation",
+        "es": "Conversación completa",
+        "fr": "Conversation complète",
+        "de": "Vollständiges Gespräch",
+        "ar": "المحادثة الكاملة",
+        "tr": "Tam Görüşme",
+        "nl": "Volledig gesprek",
+        "id": "Percakapan Lengkap"
+      },
+      "fallbackLanguage": "en",
+      "description": {
+        "en": "Full English translation with timestamps, names, alliance tags, replies, and system notices preserved.",
+        "es": "Traducción completa con horas, nombres, etiquetas de alianza, respuestas y avisos del sistema.",
+        "fr": "Traduction complète avec heures, noms, étiquettes d’alliance, réponses et avis système.",
+        "de": "Vollständige Übersetzung mit Zeitstempeln, Namen, Allianz-Tags, Antworten und Systemmeldungen.",
+        "ar": "ترجمة كاملة مع الحفاظ على التوقيت والأسماء وعلامات التحالف والردود وإشعارات النظام.",
+        "tr": "Zaman damgaları, adlar, ittifak etiketleri, yanıtlar ve sistem bildirimleri korunmuş tam çeviri.",
+        "nl": "Volledige vertaling met behoud van tijden, namen, alliantie-tags, antwoorden en systeemmeldingen.",
+        "id": "Terjemahan lengkap dengan waktu, nama, tag aliansi, balasan, dan pemberitahuan sistem dipertahankan."
+      },
+      "languages": {
+        "en": "en.enc.json", "es": "es.enc.json", "fr": "fr.enc.json", "de": "de.enc.json",
+        "ar": "ar.enc.json", "tr": "tr.enc.json", "nl": "nl.enc.json", "id": "id.enc.json"
+      }
+    },
+    {
+      "slug": "svs-strategy-summary",
+      "accessGroup": "svs-strategy",
+      "contentType": "document",
+      "collection": {
+        "en": "State 630 SvS Strategy", "es": "Estrategia SvS del Estado 630", "fr": "Stratégie SvS de l’État 630",
+        "de": "SvS-Strategie von Staat 630", "ar": "استراتيجية SvS للولاية 630", "tr": "630 Eyaleti SvS Stratejisi",
+        "nl": "SvS-strategie van Staat 630", "id": "Strategi SvS Negara Bagian 630"
+      },
+      "title": {
+        "en": "Catch-Up Summary", "es": "Resumen para ponerse al día", "fr": "Résumé de rattrapage",
+        "de": "Zusammenfassung zum Einstieg", "ar": "ملخص للحاق بالنقاش", "tr": "Güncel Durum Özeti",
+        "nl": "Inhaalsamenvatting", "id": "Ringkasan untuk Mengejar Ketertinggalan"
+      },
+      "fallbackLanguage": "en",
+      "description": {
+        "en": "A concise briefing on decisions, refinements, risks, and the group’s current position.",
+        "es": "Informe conciso sobre decisiones, ajustes, riesgos y la situación actual del grupo.",
+        "fr": "Point concis sur les décisions, ajustements, risques et la position actuelle du groupe.",
+        "de": "Kompakter Überblick über Entscheidungen, Anpassungen, Risiken und den aktuellen Stand.",
+        "ar": "إحاطة موجزة بالقرارات والتنقيحات والمخاطر والوضع الحالي للمجموعة.",
+        "tr": "Kararlar, iyileştirmeler, riskler ve grubun mevcut durumu hakkında kısa bilgilendirme.",
+        "nl": "Beknopte briefing over besluiten, verfijningen, risico’s en de huidige stand.",
+        "id": "Pengarahan ringkas tentang keputusan, penyempurnaan, risiko, dan posisi kelompok saat ini."
+      },
+      "languages": {
+        "en": "en.enc.json", "es": "es.enc.json", "fr": "fr.enc.json", "de": "de.enc.json",
+        "ar": "ar.enc.json", "tr": "tr.enc.json", "nl": "nl.enc.json", "id": "id.enc.json"
+      }
+    },
+    {
+      "slug": "svs-strategy-open-items",
+      "accessGroup": "svs-strategy",
+      "contentType": "document",
+      "collection": {
+        "en": "State 630 SvS Strategy", "es": "Estrategia SvS del Estado 630", "fr": "Stratégie SvS de l’État 630",
+        "de": "SvS-Strategie von Staat 630", "ar": "استراتيجية SvS للولاية 630", "tr": "630 Eyaleti SvS Stratejisi",
+        "nl": "SvS-strategie van Staat 630", "id": "Strategi SvS Negara Bagian 630"
+      },
+      "title": {
+        "en": "Open Decisions & Action Items", "es": "Decisiones y acciones pendientes", "fr": "Décisions et actions en suspens",
+        "de": "Offene Entscheidungen und Aufgaben", "ar": "القرارات والإجراءات المعلقة", "tr": "Açık Kararlar ve Eylem Maddeleri",
+        "nl": "Openstaande besluiten en acties", "id": "Keputusan Terbuka & Tindak Lanjut"
+      },
+      "fallbackLanguage": "en",
+      "description": {
+        "en": "The unresolved questions, assignments, confirmations, and safeguards still requiring agreement.",
+        "es": "Preguntas, asignaciones, confirmaciones y medidas de seguridad que aún requieren acuerdo.",
+        "fr": "Questions, affectations, confirmations et mesures de sécurité restant à convenir.",
+        "de": "Offene Fragen, Zuweisungen, Bestätigungen und Schutzmaßnahmen, die noch abgestimmt werden müssen.",
+        "ar": "الأسئلة والتكليفات والتأكيدات وضوابط السلامة التي لا تزال بحاجة إلى اتفاق.",
+        "tr": "Hâlâ uzlaşılması gereken sorular, görevler, onaylar ve güvenlik önlemleri.",
+        "nl": "Open vragen, toewijzingen, bevestigingen en veiligheidsmaatregelen waarover nog overeenstemming nodig is.",
+        "id": "Pertanyaan, penugasan, konfirmasi, dan pengamanan yang masih memerlukan kesepakatan."
+      },
+      "languages": {
+        "en": "en.enc.json", "es": "es.enc.json", "fr": "fr.enc.json", "de": "de.enc.json",
+        "ar": "ar.enc.json", "tr": "tr.enc.json", "nl": "nl.enc.json", "id": "id.enc.json"
       }
     }
   ]

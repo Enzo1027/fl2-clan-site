@@ -6,14 +6,17 @@ const os = require("node:os");
 const path = require("node:path");
 
 const {
+  SVS_STRATEGY_SESSION_COOKIE,
   createAuthStore,
+  listConversations,
   loadConversation,
+  parseDocument,
   parseTranscript,
   sessionCookie,
 } = require("../mass-communications");
 
-function requestWithToken(token) {
-  return { headers: { cookie: `fl2_mass_comms=${encodeURIComponent(token)}` } };
+function requestWithToken(token, cookieName = "fl2_mass_comms") {
+  return { headers: { cookie: `${cookieName}=${encodeURIComponent(token)}` } };
 }
 
 test("persistent signed session survives a new auth store", () => {
@@ -36,6 +39,29 @@ test("session cookie is persistent, HttpOnly, strict, and secure when requested"
   assert.match(cookie, /Secure/);
 });
 
+test("independent archive sessions cannot be replayed across cookie scopes", () => {
+  const sessionSecret = "s".repeat(48);
+  const now = 1_800_000_000_000;
+  const legacyStore = createAuthStore({ sessionSecret });
+  const strategyStore = createAuthStore({
+    sessionSecret,
+    cookieName: SVS_STRATEGY_SESSION_COOKIE,
+    sessionNamespace: "svs-strategy",
+  });
+  const legacySession = legacyStore.createSession(now);
+  const strategySession = strategyStore.createSession(now);
+
+  assert.equal(legacyStore.isAuthenticated(requestWithToken(legacySession.token), now), true);
+  assert.equal(
+    strategyStore.isAuthenticated(requestWithToken(strategySession.token, SVS_STRATEGY_SESSION_COOKIE), now),
+    true,
+  );
+  assert.equal(
+    strategyStore.isAuthenticated(requestWithToken(legacySession.token, SVS_STRATEGY_SESSION_COOKIE), now),
+    false,
+  );
+});
+
 test("login limiter blocks after the configured attempt count", () => {
   const store = createAuthStore({
     sessionSecret: "s".repeat(48),
@@ -56,7 +82,7 @@ test("transcript parser preserves timestamps, speakers, replies, and paragraphs"
       "[No timestamp visible]",
       "System: A joined.",
       "[11:02]",
-      "[FL2]-Zion- [replying to King Konq]: First paragraph.",
+      "[TigZ]-Zion- [replying to King Konq]: First paragraph.",
       "",
       "Second paragraph.",
       "[IRNY]King Konq: Agreed.",
@@ -70,7 +96,57 @@ test("transcript parser preserves timestamps, speakers, replies, and paragraphs"
   assert.equal(parsed.entries[1].speaker, "-Zion-");
   assert.equal(parsed.entries[1].replyTo, "King Konq");
   assert.equal(parsed.entries[1].message, "First paragraph.\n\nSecond paragraph.");
+  assert.equal(parsed.entries[1].alliance, "TigZ");
   assert.equal(parsed.entries[2].alliance, "IRNY");
+});
+
+test("document parser preserves headings, paragraphs, and numbered action items", () => {
+  const parsed = parseDocument([
+    "Strategy summary",
+    "",
+    "COMMAND AND COORDINATION",
+    "",
+    "The group agreed on one commander.",
+    "",
+    "1. Confirm the commander before publishing.",
+  ].join("\n"), "en");
+
+  assert.equal(parsed.sourceTitle, "Strategy summary");
+  assert.deepEqual(parsed.blocks, [
+    { type: "heading", text: "COMMAND AND COORDINATION" },
+    { type: "paragraph", text: "The group agreed on one commander." },
+    { type: "numbered", number: 1, text: "Confirm the commander before publishing." },
+  ]);
+});
+
+test("catalog filters conversations by independently unlocked access groups", () => {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "fl2-mass-catalog-"));
+  fs.writeFileSync(path.join(tempDir, "catalog.json"), JSON.stringify({
+    languages: ["en", "es"],
+    conversations: [
+      { slug: "legacy", title: "Legacy", fallbackLanguage: "en", languages: { en: "en.enc.json" } },
+      {
+        slug: "strategy",
+        accessGroup: "svs-strategy",
+        contentType: "document",
+        title: { en: "Summary", es: "Resumen" },
+        collection: { en: "SvS Strategy", es: "Estrategia SvS" },
+        fallbackLanguage: "en",
+        languages: { en: "en.enc.json", es: "es.enc.json" },
+      },
+    ],
+  }));
+
+  try {
+    const legacy = listConversations(tempDir, "en", { accessGroups: ["alliance-archive"] });
+    const strategy = listConversations(tempDir, "es", { accessGroups: ["svs-strategy"] });
+    assert.deepEqual(legacy.conversations.map((item) => item.slug), ["legacy"]);
+    assert.deepEqual(strategy.conversations.map((item) => item.slug), ["strategy"]);
+    assert.equal(strategy.conversations[0].title, "Resumen");
+    assert.equal(strategy.conversations[0].contentType, "document");
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
 });
 
 test("encrypted conversation content loads only with the content key", () => {
