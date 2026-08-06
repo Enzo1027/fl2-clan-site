@@ -31,7 +31,8 @@
     5: ["Vehicle", "Shelter", "Army", "Science", "Hero", "Army"], 6: ["Science", "Vehicle", "Hero", "Shelter", "Science", "Army"],
     7: ["Vehicle", "Shelter", "Army", "Science", "Hero", "Army"],
   };
-  const formatTime = (date) => new Intl.DateTimeFormat([], { hour: "numeric", minute: "2-digit" }).format(date);
+  const locale = window.fl2I18n?.locale;
+  const formatTime = (date) => new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit" }).format(date);
   const atNow = (now = new Date()) => FL2Daily.apocalypseNow(now);
   const atDateKey = (now = new Date()) => FL2Daily.apocalypseDateKey(now);
   const autoDay = (now = new Date()) => FL2Daily.duelDay(now);
@@ -53,7 +54,7 @@
   function render() {
     const day = chosenDay(), data = DAY_DATA[day], now = new Date();
     document.getElementById("duelDay").value = state.duelDayOverride;
-    document.getElementById("atDate").textContent = atNow(now).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
+    document.getElementById("atDate").textContent = atNow(now).toLocaleDateString(locale, { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
     document.getElementById("duelKicker").textContent = data.kicker;
     document.getElementById("todayTheme").textContent = data.name;
     document.getElementById("todayAction").textContent = data.action;

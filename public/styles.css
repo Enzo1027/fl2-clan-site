@@ -115,6 +115,7 @@ button {
 
 .language-tabs {
   display: flex;
+  flex: 1 1 420px;
   justify-content: flex-end;
   min-width: 0;
   overflow-x: auto;
@@ -123,7 +124,41 @@ button {
   border-radius: var(--radius);
   background: rgba(8, 18, 24, 0.82);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+  scroll-behavior: smooth;
+  scroll-padding-inline: 48px;
+  scroll-snap-type: x proximity;
+  overscroll-behavior-inline: contain;
+  touch-action: pan-x;
+  -webkit-overflow-scrolling: touch;
+  direction: ltr;
 }
+
+.library-language-switcher {
+  display: flex;
+  flex: 1 1 420px;
+  min-width: 0;
+  direction: ltr;
+}
+
+.library-language-switcher .language-tabs { flex: 1 1 auto; }
+
+.language-scroll-button {
+  display: none;
+  flex: 0 0 40px;
+  width: 40px;
+  min-height: 48px;
+  place-items: center;
+  border: 1px solid rgba(79, 195, 238, 0.3);
+  color: var(--soft);
+  background: rgba(8, 18, 24, 0.96);
+  font-size: 1.65rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.language-scroll-button:first-child { border-radius: 8px 0 0 8px; }
+.language-scroll-button:last-child { border-radius: 0 8px 8px 0; }
+.language-scroll-button:disabled { opacity: 0.32; cursor: default; }
 
 .topbar-actions {
   display: flex;
@@ -233,6 +268,8 @@ button {
   background: transparent;
   color: var(--muted);
   cursor: pointer;
+  flex: 0 0 auto;
+  scroll-snap-align: center;
 }
 
 .language-tab:last-child {
@@ -1186,6 +1223,11 @@ button.upload-item {
   .brand strong {
     font-size: 1.22rem;
   }
+
+  .topbar-actions { flex-wrap: wrap; }
+  .library-language-switcher { flex-basis: 100%; width: 100%; }
+  .library-language-switcher .language-tabs { justify-content: flex-start; border-right: 0; border-left: 0; border-radius: 0; }
+  .library-language-switcher .language-scroll-button { display: grid; }
 
   .language-tab {
     min-width: 94px;

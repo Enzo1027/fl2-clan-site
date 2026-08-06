@@ -1,4 +1,4 @@
-const APP_VERSION = "20260806-svs-strategy-v4";
+const APP_VERSION = "20260806-tools-i18n-v1";
 window.FL2_BUILD = APP_VERSION;
 
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
@@ -23,6 +23,8 @@ const state = {
 
 const els = {
   languageTabs: document.querySelector("#languageTabs"),
+  libraryPreviousLanguages: document.querySelector("#libraryPreviousLanguages"),
+  libraryNextLanguages: document.querySelector("#libraryNextLanguages"),
   dayTabs: document.querySelector("#dayTabs"),
   guideMeta: document.querySelector("#guideMeta"),
   guideTitle: document.querySelector("#guideTitle"),
@@ -688,6 +690,10 @@ function t(key) {
   return I18N[state.language]?.[key] ?? I18N.en[key] ?? key;
 }
 
+function toolText(source) {
+  return window.FL2_TOOL_TRANSLATIONS?.[state.language]?.[source] ?? source;
+}
+
 function dayTitle(day) {
   return `S2 ${t("day")} ${day.number}`;
 }
@@ -727,9 +733,24 @@ function renderChromeLabels() {
   brand?.setAttribute("href", `#lang=${state.language}&day=day-1&view=poster`);
   const massCommunicationsLink = document.querySelector("#massCommunicationsLink");
   massCommunicationsLink?.setAttribute("href", `mass-communications.html?lang=${state.language}`);
-  document.querySelector('.tools-menu a[href^="mass-communications.html"]')
-    ?.setAttribute("href", `mass-communications.html?lang=${state.language}`);
+  document.querySelectorAll(".tools-menu a[href]").forEach((link) => {
+    const url = new URL(link.getAttribute("href"), window.location.href);
+    if (url.origin !== window.location.origin || !url.pathname.endsWith(".html")) return;
+    url.searchParams.set("lang", state.language);
+    link.setAttribute("href", `${url.pathname.split("/").pop()}${url.search}${url.hash}`);
+  });
+  const toolsMenu = document.querySelector(".tools-menu");
+  toolsMenu?.querySelector("nav")?.setAttribute("aria-label", toolText("FL2 tools"));
+  toolsMenu?.querySelectorAll("strong, nav span").forEach((element) => {
+    const source = element.dataset.toolSource || element.textContent.trim();
+    element.dataset.toolSource = source;
+    element.textContent = toolText(source);
+  });
+  const toolsMenuLabel = document.querySelector("#toolsMenuLabel");
+  if (toolsMenuLabel) toolsMenuLabel.textContent = `FL2 ${toolText("Tools")}`;
   els.languageTabs.setAttribute("aria-label", t("chooseLanguage"));
+  els.libraryPreviousLanguages.setAttribute("aria-label", toolText("Previous languages"));
+  els.libraryNextLanguages.setAttribute("aria-label", toolText("Next languages"));
   els.dayTabs.setAttribute("aria-label", t("chooseDay"));
   document.querySelector(".signal")?.setAttribute("aria-label", t("libraryStatus"));
   document.querySelector(".intel-panel")?.setAttribute("aria-label", t("guideDetails"));
@@ -784,12 +805,29 @@ function renderLanguageTabs() {
     els.languageTabs.append(button);
   }
 
-  requestAnimationFrame(() => {
-    els.languageTabs.querySelector(".is-active")?.scrollIntoView({
-      block: "nearest",
-      inline: "center",
-    });
-  });
+  requestAnimationFrame(() => centerActiveLibraryLanguage("auto"));
+}
+
+function updateLibraryLanguageControls() {
+  const maximum = Math.max(0, els.languageTabs.scrollWidth - els.languageTabs.clientWidth);
+  els.libraryPreviousLanguages.disabled = els.languageTabs.scrollLeft <= 2;
+  els.libraryNextLanguages.disabled = els.languageTabs.scrollLeft >= maximum - 2;
+}
+
+function centerActiveLibraryLanguage(behavior = "smooth") {
+  const active = els.languageTabs.querySelector(".is-active");
+  if (!active) return;
+  const tabsRect = els.languageTabs.getBoundingClientRect();
+  const activeRect = active.getBoundingClientRect();
+  const target = els.languageTabs.scrollLeft + activeRect.left - tabsRect.left - (els.languageTabs.clientWidth - active.offsetWidth) / 2;
+  els.languageTabs.scrollTo({ left: Math.max(0, target), behavior });
+  window.setTimeout(updateLibraryLanguageControls, behavior === "smooth" ? 260 : 0);
+}
+
+function scrollLibraryLanguages(direction) {
+  const distance = Math.max(160, Math.round(els.languageTabs.clientWidth * 0.72));
+  els.languageTabs.scrollBy({ left: direction * distance, behavior: "smooth" });
+  window.setTimeout(updateLibraryLanguageControls, 260);
 }
 
 function renderDayTabs() {
@@ -1149,6 +1187,24 @@ function applyZoom() {
 }
 
 function wireEvents() {
+  els.libraryPreviousLanguages.addEventListener("click", () => scrollLibraryLanguages(-1));
+  els.libraryNextLanguages.addEventListener("click", () => scrollLibraryLanguages(1));
+  els.languageTabs.addEventListener("scroll", updateLibraryLanguageControls, { passive: true });
+  window.addEventListener("resize", () => centerActiveLibraryLanguage("auto"), { passive: true });
+  els.languageTabs.addEventListener("wheel", (event) => {
+    if (els.languageTabs.scrollWidth <= els.languageTabs.clientWidth || Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+    event.preventDefault();
+    els.languageTabs.scrollLeft += event.deltaY;
+  }, { passive: false });
+  els.languageTabs.addEventListener("keydown", (event) => {
+    if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+    const buttons = [...els.languageTabs.querySelectorAll("button")];
+    const current = buttons.indexOf(document.activeElement);
+    if (current < 0) return;
+    event.preventDefault();
+    const direction = event.key === "ArrowLeft" ? -1 : 1;
+    buttons[(current + direction + buttons.length) % buttons.length].focus();
+  });
   for (const button of els.modeButtons) {
     button.addEventListener("click", () => setHash({ view: button.dataset.view }));
   }

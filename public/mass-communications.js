@@ -243,7 +243,9 @@ function centerActiveLanguage(behavior = "smooth") {
   const tabs = elements.languageTabs;
   const active = tabs.querySelector(".is-active");
   if (!active) return;
-  const target = active.offsetLeft - (tabs.clientWidth - active.offsetWidth) / 2;
+  const tabsRect = tabs.getBoundingClientRect();
+  const activeRect = active.getBoundingClientRect();
+  const target = tabs.scrollLeft + activeRect.left - tabsRect.left - (tabs.clientWidth - active.offsetWidth) / 2;
   tabs.scrollTo({ left: Math.max(0, target), behavior });
   window.setTimeout(updateLanguageScrollControls, behavior === "smooth" ? 260 : 0);
 }

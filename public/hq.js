@@ -6,7 +6,9 @@
   const target = document.getElementById("targetHq");
   const resources = ["wood", "food", "zent", "steel"];
   const labels = { wood: "Wood", food: "Food", zent: "Zent", steel: "Steel" };
-  const format = (value) => new Intl.NumberFormat().format(Math.round(value || 0));
+  const i18n = window.fl2I18n;
+  const t = (value) => i18n?.t(value) || value;
+  const format = (value) => new Intl.NumberFormat(i18n?.locale).format(Math.round(value || 0));
   const short = (value) => {
     if (!value) return "0";
     if (value >= 1e9) return `${(value / 1e9).toFixed(value % 1e9 ? 2 : 0).replace(/\.00$/, "")}G`;
@@ -50,7 +52,7 @@
   }
   form.addEventListener("input", render); form.addEventListener("change", render);
   form.addEventListener("submit", (event) => { event.preventDefault(); render(); document.querySelector(".result-panel").scrollIntoView({ behavior: "smooth", block: "start" }); });
-  document.getElementById("clearHq").addEventListener("click", () => { store?.removeFeatureState("hq"); form.reset(); current.value = "29"; target.value = "30"; render(false); window.fl2Toast("HQ plan cleared for this profile"); });
+  document.getElementById("clearHq").addEventListener("click", () => { store?.removeFeatureState("hq"); form.reset(); current.value = "29"; target.value = "30"; render(false); window.fl2Toast(t("HQ plan cleared for this profile")); });
   window.addEventListener("fl2:profilechange", restore);
   populateLevels(); restore();
 })();

@@ -4,7 +4,9 @@
   const STORAGE_KEY = "fl2-tank-planner-v1";
   const engine = window.FL2Tank;
   const profileStore = window.fl2Profiles;
-  const number = new Intl.NumberFormat();
+  const i18n = window.fl2I18n;
+  const t = (value) => i18n?.t(value) || value;
+  const number = new Intl.NumberFormat(i18n?.locale);
   let data = null;
   let openStageId = null;
   let state = loadState();
@@ -73,7 +75,7 @@
   }
 
   function dateLabel(date) {
-    return new Intl.DateTimeFormat(undefined, { year: "numeric", month: "short", day: "numeric" }).format(date);
+    return new Intl.DateTimeFormat(i18n?.locale, { year: "numeric", month: "short", day: "numeric" }).format(date);
   }
 
   function localDateValue(date = new Date()) {
@@ -319,7 +321,7 @@
     renderPace(engine.getTankSummary(data, state.completions));
   });
   elements.clearTankButton.addEventListener("click", () => {
-    if (!window.confirm("Clear all saved tank progress?")) return;
+    if (!window.confirm(t("Clear all saved tank progress?"))) return;
     state.completions = {};
     state.selectedStageId = data.modifications[0].id;
     saveState();
@@ -351,10 +353,12 @@
     })
     .then((payload) => {
       data = payload;
-      elements.tankFreshness.textContent = `Requirements snapshot checked ${new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(new Date(data.capturedAt))}.`;
+      const checkedDate = new Intl.DateTimeFormat(i18n?.locale, { dateStyle: "medium" }).format(new Date(data.capturedAt));
+      elements.tankFreshness.textContent = i18n?.format("Requirements snapshot checked {0}.", checkedDate) || `Requirements snapshot checked ${checkedDate}.`;
       render();
     })
     .catch((error) => {
-      elements.tankWorkspace.innerHTML = `<p class="unknown-note">Tank data could not load: ${error.message}. Reload to try again.</p>`;
+      const message = i18n?.format("Tank data could not load: {0}. Reload to try again.", error.message) || `Tank data could not load: ${error.message}. Reload to try again.`;
+      elements.tankWorkspace.innerHTML = `<p class="unknown-note">${message}</p>`;
     });
 })();
