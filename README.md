@@ -63,3 +63,13 @@ npm run import:s2
 This repo includes `render.yaml` for a Render Node web service. The server serves `./public` and powers the bottom visit counter.
 
 The Render config uses the `starter` instance type, sets `DATA_DIR=/var/data`, and attaches a 1 GB persistent disk at `/var/data`. This keeps the service from sleeping and preserves the visit counter across deploys and normal restarts. Render can still briefly restart services during deploys or platform maintenance.
+
+## Protected Mass Communications
+
+The Mass Communications reader supports independently protected archives with long-lived, HttpOnly device cookies. The original alliance archive uses `MASS_COMMS_PASSWORD` and `MASS_COMMS_CONTENT_KEY`; the State 630 SvS Strategy sections use `SVS_STRATEGY_PASSWORD` and `SVS_STRATEGY_CONTENT_KEY`. Both access scopes use `MASS_COMMS_SESSION_SECRET` for signed sessions, but their cookies and signatures are isolated.
+
+Plaintext translations are never committed. To encrypt the three SvS Strategy sections from a local translation directory:
+
+```bash
+node scripts/encrypt_svs_strategy.js /path/to/svs-strategy-translations /path/to/private-content-key
+```

@@ -23,7 +23,9 @@ const COPY = {
     groupChat: "Alliance group chat", messages: "messages", timeSections: "time sections", language: "Language",
     fallback: "English fallback", noTime: "No timestamp visible", replying: "replying to",
     noMatches: "No messages match your search.", loadError: "Unable to load the conversation.",
-    chooseLanguage: "Choose language",
+    chooseLanguage: "Choose language", unlockAnother: "Unlock another archive", additionalPassword: "Additional archive password",
+    unlockShort: "Unlock", accessAdded: "Archive unlocked.", sections: "sections", strategyDocument: "Strategy document",
+    noContentMatches: "No content matches your search.", previousLanguages: "Previous languages", nextLanguages: "Next languages",
   },
   es: {
     library: "Biblioteca de campo", secure: "Archivo FL2 protegido", title: "Comunicaciones masivas",
@@ -36,7 +38,9 @@ const COPY = {
     groupChat: "Chat grupal de la alianza", messages: "mensajes", timeSections: "secciones horarias", language: "Idioma",
     fallback: "Versión inglesa", noTime: "Sin hora visible", replying: "en respuesta a",
     noMatches: "Ningún mensaje coincide con tu búsqueda.", loadError: "No se pudo cargar la conversación.",
-    chooseLanguage: "Elegir idioma",
+    chooseLanguage: "Elegir idioma", unlockAnother: "Desbloquear otro archivo", additionalPassword: "Contraseña del archivo adicional",
+    unlockShort: "Desbloquear", accessAdded: "Archivo desbloqueado.", sections: "secciones", strategyDocument: "Documento estratégico",
+    noContentMatches: "Ningún contenido coincide con tu búsqueda.", previousLanguages: "Idiomas anteriores", nextLanguages: "Idiomas siguientes",
   },
   fr: {
     library: "Bibliothèque de terrain", secure: "Archive FL2 protégée", title: "Communications de masse",
@@ -49,7 +53,9 @@ const COPY = {
     groupChat: "Discussion de groupe de l’alliance", messages: "messages", timeSections: "plages horaires", language: "Langue",
     fallback: "Version anglaise", noTime: "Aucune heure visible", replying: "en réponse à",
     noMatches: "Aucun message ne correspond à votre recherche.", loadError: "Impossible de charger la conversation.",
-    chooseLanguage: "Choisir la langue",
+    chooseLanguage: "Choisir la langue", unlockAnother: "Déverrouiller une autre archive", additionalPassword: "Mot de passe de l’archive supplémentaire",
+    unlockShort: "Déverrouiller", accessAdded: "Archive déverrouillée.", sections: "sections", strategyDocument: "Document stratégique",
+    noContentMatches: "Aucun contenu ne correspond à votre recherche.", previousLanguages: "Langues précédentes", nextLanguages: "Langues suivantes",
   },
   de: {
     library: "Feldbibliothek", secure: "Geschütztes FL2-Archiv", title: "Massenkommunikation",
@@ -62,7 +68,9 @@ const COPY = {
     groupChat: "Allianz-Gruppenchat", messages: "Nachrichten", timeSections: "Zeitabschnitte", language: "Sprache",
     fallback: "Englische Ersatzversion", noTime: "Keine sichtbare Uhrzeit", replying: "Antwort an",
     noMatches: "Keine Nachrichten entsprechen deiner Suche.", loadError: "Das Gespräch konnte nicht geladen werden.",
-    chooseLanguage: "Sprache auswählen",
+    chooseLanguage: "Sprache auswählen", unlockAnother: "Weiteres Archiv entsperren", additionalPassword: "Passwort des weiteren Archivs",
+    unlockShort: "Entsperren", accessAdded: "Archiv entsperrt.", sections: "Abschnitte", strategyDocument: "Strategiedokument",
+    noContentMatches: "Keine Inhalte entsprechen deiner Suche.", previousLanguages: "Vorherige Sprachen", nextLanguages: "Nächste Sprachen",
   },
   ar: {
     library: "المكتبة الميدانية", secure: "أرشيف FL2 المحمي", title: "الاتصالات الجماعية",
@@ -75,7 +83,9 @@ const COPY = {
     groupChat: "دردشة مجموعة التحالف", messages: "رسالة", timeSections: "أقسام زمنية", language: "اللغة",
     fallback: "النسخة الإنجليزية البديلة", noTime: "لا يوجد توقيت ظاهر", replying: "ردًا على",
     noMatches: "لا توجد رسائل مطابقة لبحثك.", loadError: "تعذر تحميل المحادثة.",
-    chooseLanguage: "اختر اللغة",
+    chooseLanguage: "اختر اللغة", unlockAnother: "فتح أرشيف آخر", additionalPassword: "كلمة مرور الأرشيف الإضافي",
+    unlockShort: "فتح", accessAdded: "تم فتح الأرشيف.", sections: "أقسام", strategyDocument: "وثيقة استراتيجية",
+    noContentMatches: "لا يوجد محتوى يطابق بحثك.", previousLanguages: "اللغات السابقة", nextLanguages: "اللغات التالية",
   },
   tr: {
     library: "Saha Kütüphanesi", secure: "Korumalı FL2 Arşivi", title: "Toplu İletişimler",
@@ -88,7 +98,9 @@ const COPY = {
     groupChat: "İttifak grup sohbeti", messages: "mesaj", timeSections: "zaman bölümü", language: "Dil",
     fallback: "İngilizce yedek sürüm", noTime: "Görünür zaman damgası yok", replying: "yanıtlıyor",
     noMatches: "Aramanızla eşleşen mesaj yok.", loadError: "Görüşme yüklenemedi.",
-    chooseLanguage: "Dil seçin",
+    chooseLanguage: "Dil seçin", unlockAnother: "Başka bir arşivin kilidini aç", additionalPassword: "Ek arşiv parolası",
+    unlockShort: "Kilidi aç", accessAdded: "Arşivin kilidi açıldı.", sections: "bölüm", strategyDocument: "Strateji belgesi",
+    noContentMatches: "Aramanızla eşleşen içerik yok.", previousLanguages: "Önceki diller", nextLanguages: "Sonraki diller",
   },
   nl: {
     library: "Veldbibliotheek", secure: "Beveiligd FL2-archief", title: "Massacommunicatie",
@@ -101,7 +113,9 @@ const COPY = {
     groupChat: "Alliantie-groepschat", messages: "berichten", timeSections: "tijdvakken", language: "Taal",
     fallback: "Engelse reserveversie", noTime: "Geen zichtbare tijd", replying: "antwoord aan",
     noMatches: "Geen berichten komen overeen met je zoekopdracht.", loadError: "Het gesprek kon niet worden geladen.",
-    chooseLanguage: "Taal kiezen",
+    chooseLanguage: "Taal kiezen", unlockAnother: "Nog een archief ontgrendelen", additionalPassword: "Wachtwoord van extra archief",
+    unlockShort: "Ontgrendelen", accessAdded: "Archief ontgrendeld.", sections: "secties", strategyDocument: "Strategiedocument",
+    noContentMatches: "Geen inhoud komt overeen met je zoekopdracht.", previousLanguages: "Vorige talen", nextLanguages: "Volgende talen",
   },
   id: {
     library: "Pustaka Lapangan", secure: "Arsip FL2 Terlindungi", title: "Komunikasi Massal",
@@ -114,7 +128,9 @@ const COPY = {
     groupChat: "Obrolan grup aliansi", messages: "pesan", timeSections: "bagian waktu", language: "Bahasa",
     fallback: "Versi Inggris cadangan", noTime: "Tidak ada waktu yang terlihat", replying: "membalas",
     noMatches: "Tidak ada pesan yang cocok dengan pencarian.", loadError: "Percakapan tidak dapat dimuat.",
-    chooseLanguage: "Pilih bahasa",
+    chooseLanguage: "Pilih bahasa", unlockAnother: "Buka arsip lain", additionalPassword: "Kata sandi arsip tambahan",
+    unlockShort: "Buka", accessAdded: "Arsip dibuka.", sections: "bagian", strategyDocument: "Dokumen strategi",
+    noContentMatches: "Tidak ada konten yang cocok dengan pencarian Anda.", previousLanguages: "Bahasa sebelumnya", nextLanguages: "Bahasa berikutnya",
   },
 };
 
@@ -123,6 +139,8 @@ const elements = {
   libraryLink: document.querySelector("#libraryLink"),
   libraryLinkLabel: document.querySelector("#libraryLinkLabel"),
   languageTabs: document.querySelector("#massLanguageTabs"),
+  previousLanguages: document.querySelector("#previousLanguages"),
+  nextLanguages: document.querySelector("#nextLanguages"),
   secureArchiveLabel: document.querySelector("#secureArchiveLabel"),
   massTitle: document.querySelector("#massTitle"),
   massIntro: document.querySelector("#massIntro"),
@@ -139,6 +157,13 @@ const elements = {
   archive: document.querySelector("#archivePanel"),
   catalogLabel: document.querySelector("#catalogLabel"),
   archiveTitle: document.querySelector("#archiveTitle"),
+  unlockAnother: document.querySelector("#unlockAnotherButton"),
+  unlockAnotherLabel: document.querySelector("#unlockAnotherLabel"),
+  additionalForm: document.querySelector("#additionalPasswordForm"),
+  additionalPassword: document.querySelector("#additionalArchivePassword"),
+  additionalPasswordLabel: document.querySelector("#additionalPasswordLabel"),
+  additionalUnlock: document.querySelector("#additionalUnlockButton"),
+  additionalLoginStatus: document.querySelector("#additionalLoginStatus"),
   logout: document.querySelector("#logoutButton"),
   logoutLabel: document.querySelector("#logoutLabel"),
   catalog: document.querySelector("#conversationCatalog"),
@@ -150,6 +175,7 @@ const elements = {
   print: document.querySelector("#printConversation"),
   printLabel: document.querySelector("#printLabel"),
   conversationKicker: document.querySelector("#conversationKicker"),
+  conversationCollection: document.querySelector("#conversationCollection"),
   conversationTitle: document.querySelector("#conversationTitle"),
   conversationDescription: document.querySelector("#conversationDescription"),
   conversationMeta: document.querySelector("#conversationMeta"),
@@ -203,12 +229,29 @@ function renderLanguageTabs() {
     });
     elements.languageTabs.append(button);
   }
-  requestAnimationFrame(() => {
-    elements.languageTabs.querySelector(".is-active")?.scrollIntoView({
-      block: "nearest",
-      inline: "center",
-    });
-  });
+  requestAnimationFrame(() => centerActiveLanguage("auto"));
+}
+
+function updateLanguageScrollControls() {
+  const tabs = elements.languageTabs;
+  const maxScroll = Math.max(0, tabs.scrollWidth - tabs.clientWidth);
+  elements.previousLanguages.disabled = tabs.scrollLeft <= 2;
+  elements.nextLanguages.disabled = tabs.scrollLeft >= maxScroll - 2;
+}
+
+function centerActiveLanguage(behavior = "smooth") {
+  const tabs = elements.languageTabs;
+  const active = tabs.querySelector(".is-active");
+  if (!active) return;
+  const target = active.offsetLeft - (tabs.clientWidth - active.offsetWidth) / 2;
+  tabs.scrollTo({ left: Math.max(0, target), behavior });
+  window.setTimeout(updateLanguageScrollControls, behavior === "smooth" ? 260 : 0);
+}
+
+function scrollLanguages(direction) {
+  const distance = Math.max(160, Math.round(elements.languageTabs.clientWidth * 0.72));
+  elements.languageTabs.scrollBy({ left: direction * distance, behavior: "smooth" });
+  window.setTimeout(updateLanguageScrollControls, 260);
 }
 
 function renderChrome() {
@@ -220,6 +263,8 @@ function renderChrome() {
   elements.homeLink.href = homeHref;
   elements.libraryLink.href = homeHref;
   elements.languageTabs.setAttribute("aria-label", t("chooseLanguage"));
+  elements.previousLanguages.setAttribute("aria-label", t("previousLanguages"));
+  elements.nextLanguages.setAttribute("aria-label", t("nextLanguages"));
   elements.libraryLinkLabel.textContent = t("library");
   elements.secureArchiveLabel.textContent = t("secure");
   elements.massTitle.textContent = t("title");
@@ -232,6 +277,9 @@ function renderChrome() {
   elements.unlock.textContent = t("unlock");
   elements.catalogLabel.textContent = t("catalog");
   elements.archiveTitle.textContent = t("title");
+  elements.unlockAnotherLabel.textContent = t("unlockAnother");
+  elements.additionalPasswordLabel.textContent = t("additionalPassword");
+  elements.additionalUnlock.textContent = t("unlockShort");
   elements.logoutLabel.textContent = t("logout");
   elements.backLabel.textContent = t("all");
   elements.searchLabel.textContent = t("search");
@@ -248,6 +296,7 @@ function showGate(message = "") {
   state.conversation = null;
   elements.gate.hidden = false;
   elements.archive.hidden = true;
+  elements.additionalForm.hidden = true;
   elements.loginStatus.textContent = message;
 }
 
@@ -257,6 +306,7 @@ function showArchive() {
   elements.archive.hidden = false;
   elements.catalog.hidden = false;
   elements.reader.hidden = true;
+  elements.additionalForm.hidden = true;
 }
 
 async function api(path, options = {}) {
@@ -297,6 +347,12 @@ function renderCatalog() {
     top.append(icon, language);
 
     const copy = document.createElement("div");
+    if (conversation.collection) {
+      const collection = document.createElement("p");
+      collection.className = "conversation-card-collection";
+      collection.textContent = conversation.collection;
+      copy.append(collection);
+    }
     const title = document.createElement("h3");
     title.textContent = conversation.title;
     const description = document.createElement("p");
@@ -386,6 +442,47 @@ function renderConversationEntries() {
   elements.emptySearch.hidden = entries.length > 0;
 }
 
+function renderDocumentBlocks() {
+  const conversation = state.conversation;
+  const query = elements.search.value.trim().toLocaleLowerCase(state.language);
+  const blocks = conversation.blocks.filter((block) => (
+    !query || block.text.toLocaleLowerCase(state.language).includes(query)
+  ));
+  elements.timeline.replaceChildren();
+  elements.timeline.classList.add("document-content");
+
+  let numberedList = null;
+  for (const block of blocks) {
+    if (block.type === "numbered") {
+      if (!numberedList) {
+        numberedList = document.createElement("ol");
+        numberedList.className = "strategy-items";
+        elements.timeline.append(numberedList);
+      }
+      const item = document.createElement("li");
+      item.value = block.number;
+      item.textContent = block.text;
+      numberedList.append(item);
+      continue;
+    }
+
+    numberedList = null;
+    const element = document.createElement(block.type === "heading" ? "h3" : "p");
+    element.className = block.type === "heading" ? "document-heading" : "document-paragraph";
+    element.textContent = block.text;
+    elements.timeline.append(element);
+  }
+  elements.emptySearch.textContent = t("noContentMatches");
+  elements.emptySearch.hidden = blocks.length > 0;
+}
+
+function renderConversationContent() {
+  elements.timeline.classList.toggle("document-content", state.conversation?.contentType === "document");
+  elements.emptySearch.textContent = state.conversation?.contentType === "document" ? t("noContentMatches") : t("noMatches");
+  if (state.conversation?.contentType === "document") renderDocumentBlocks();
+  else renderConversationEntries();
+}
+
 async function loadConversation(slug) {
   try {
     const conversation = await api(
@@ -396,23 +493,33 @@ async function loadConversation(slug) {
     elements.catalog.hidden = true;
     elements.reader.hidden = false;
     elements.search.value = "";
+    elements.conversationKicker.textContent = conversation.contentType === "document" ? t("strategyDocument") : t("groupChat");
+    elements.conversationCollection.textContent = conversation.collection || "";
+    elements.conversationCollection.hidden = !conversation.collection;
     elements.conversationTitle.textContent = conversation.title;
     elements.conversationDescription.textContent = conversation.description;
     elements.conversationMeta.replaceChildren();
     const language = document.createElement("span");
     language.textContent = `${t("language")}: ${languageInfo(conversation.selectedLanguage).native}`;
-    const messages = document.createElement("span");
-    messages.textContent = `${conversation.entries.length} ${t("messages")}`;
-    const timeSections = document.createElement("span");
-    timeSections.textContent = `${conversation.timestampCount} ${t("timeSections")}`;
-    elements.conversationMeta.append(language, messages, timeSections);
+    elements.conversationMeta.append(language);
+    if (conversation.contentType === "document") {
+      const sections = document.createElement("span");
+      sections.textContent = `${conversation.blocks.length} ${t("sections")}`;
+      elements.conversationMeta.append(sections);
+    } else {
+      const messages = document.createElement("span");
+      messages.textContent = `${conversation.entries.length} ${t("messages")}`;
+      const timeSections = document.createElement("span");
+      timeSections.textContent = `${conversation.timestampCount} ${t("timeSections")}`;
+      elements.conversationMeta.append(messages, timeSections);
+    }
     if (conversation.isFallback) {
       const fallback = document.createElement("span");
       fallback.className = "fallback-chip";
       fallback.textContent = t("fallback");
       elements.conversationMeta.append(fallback);
     }
-    renderConversationEntries();
+    renderConversationContent();
     elements.reader.scrollIntoView({ block: "start" });
   } catch (error) {
     if (error.status === 401) {
@@ -478,7 +585,42 @@ elements.back.addEventListener("click", () => {
   window.scrollTo({ top: elements.archive.offsetTop - 80, behavior: "smooth" });
 });
 
-elements.search.addEventListener("input", renderConversationEntries);
+elements.unlockAnother.addEventListener("click", () => {
+  elements.additionalForm.hidden = !elements.additionalForm.hidden;
+  elements.additionalLoginStatus.textContent = "";
+  if (!elements.additionalForm.hidden) elements.additionalPassword.focus();
+});
+
+elements.previousLanguages.addEventListener("click", () => scrollLanguages(-1));
+elements.nextLanguages.addEventListener("click", () => scrollLanguages(1));
+elements.languageTabs.addEventListener("scroll", updateLanguageScrollControls, { passive: true });
+window.addEventListener("resize", () => centerActiveLanguage("auto"));
+
+elements.additionalForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  elements.additionalUnlock.disabled = true;
+  elements.additionalLoginStatus.textContent = "";
+  try {
+    await api("/api/mass-communications/login", {
+      method: "POST",
+      body: JSON.stringify({ password: elements.additionalPassword.value }),
+    });
+    elements.additionalPassword.value = "";
+    elements.additionalLoginStatus.textContent = t("accessAdded");
+    await loadCatalog();
+    window.setTimeout(() => {
+      elements.additionalForm.hidden = true;
+      elements.additionalLoginStatus.textContent = "";
+    }, 1200);
+  } catch (error) {
+    elements.additionalLoginStatus.textContent = error.status === 401 ? t("incorrect") : (error.message || t("unavailable"));
+    elements.additionalPassword.select();
+  } finally {
+    elements.additionalUnlock.disabled = false;
+  }
+});
+
+elements.search.addEventListener("input", renderConversationContent);
 elements.print.addEventListener("click", () => window.print());
 
 state.language = selectedLanguageFromUrl();

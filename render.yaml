@@ -16,6 +16,10 @@ services:
         sync: false
       - key: MASS_COMMS_SESSION_SECRET
         sync: false
+      - key: SVS_STRATEGY_PASSWORD
+        sync: false
+      - key: SVS_STRATEGY_CONTENT_KEY
+        sync: false
     disk:
       name: fl2-counter-data
       mountPath: /var/data

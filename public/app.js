@@ -1,4 +1,4 @@
-const APP_VERSION = "20260728-mass-comms-v1";
+const APP_VERSION = "20260806-svs-strategy-v4";
 window.FL2_BUILD = APP_VERSION;
 
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
