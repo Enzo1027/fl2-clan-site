@@ -46,5 +46,5 @@ test("offline cache includes the complete tool localization runtime", () => {
   const serviceWorker = fs.readFileSync(path.join(root, "public/sw.js"), "utf8");
   assert.match(serviceWorker, /\/tool-translations\.js/);
   assert.match(serviceWorker, /\/tool-i18n\.js/);
-  assert.match(serviceWorker, /fl2-command-center-v17/);
+  assert.match(serviceWorker, /fl2-command-center-v19/);
 });

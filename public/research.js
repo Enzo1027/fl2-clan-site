@@ -10,6 +10,8 @@
   const number = new Intl.NumberFormat(i18n?.locale);
   let bundle = null;
   let openNodeId = null;
+  let avaCalculatorTreeId = null;
+  let avaCalculatorNodeId = null;
 
   let state = loadState();
   const elements = {
@@ -50,6 +52,17 @@
     nodeLevelList: document.querySelector("#nodeLevelList"),
     clearNodeButton: document.querySelector("#clearNodeButton"),
     closeNodeDialog: document.querySelector("#closeNodeDialog"),
+    avaTreeSelect: document.querySelector("#avaTreeSelect"),
+    avaNodeSelect: document.querySelector("#avaNodeSelect"),
+    avaLevelSelect: document.querySelector("#avaLevelSelect"),
+    avaSelectionHint: document.querySelector("#avaSelectionHint"),
+    addAvaSelection: document.querySelector("#addAvaSelection"),
+    avaPlanList: document.querySelector("#avaPlanList"),
+    avaPlanEmpty: document.querySelector("#avaPlanEmpty"),
+    avaPlanBadgeTotal: document.querySelector("#avaPlanBadgeTotal"),
+    avaPlanPointTotal: document.querySelector("#avaPlanPointTotal"),
+    avaPlanUnknown: document.querySelector("#avaPlanUnknown"),
+    clearAvaPlan: document.querySelector("#clearAvaPlan"),
   };
 
   function loadState() {
@@ -62,6 +75,7 @@
           autoComplete: saved.modelVersion === MODEL_VERSION ? Boolean(saved.autoComplete) : false,
           progress: saved.progress || {},
           goals: saved.goals || {},
+          avaPlan: saved.avaPlan && typeof saved.avaPlan === "object" && !Array.isArray(saved.avaPlan) ? saved.avaPlan : {},
           search: "",
         };
       }
@@ -72,6 +86,7 @@
       autoComplete: false,
       progress: {},
       goals: {},
+      avaPlan: {},
       search: "",
     };
   }
@@ -85,6 +100,7 @@
         autoComplete: state.autoComplete,
         progress: state.progress,
         goals: state.goals,
+        avaPlan: state.avaPlan,
       };
       if (profileStore) profileStore.setFeatureState("research", snapshot);
       else localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
@@ -137,6 +153,8 @@
     let remaining = 0;
     let spentUnknown = 0;
     let remainingUnknown = 0;
+    let avaPointsEarned = 0;
+    let avaPointsRemaining = 0;
     let levels = 0;
     let totalLevels = 0;
     let goalKnown = 0;
@@ -149,6 +167,8 @@
       remaining += summary.remainingKnown;
       spentUnknown += summary.completedUnknown;
       remainingUnknown += summary.remainingUnknown;
+      avaPointsEarned += summary.avaPointsEarned;
+      avaPointsRemaining += summary.avaPointsRemaining;
       levels += summary.completedLevels;
       totalLevels += summary.totalLevels;
       const goals = treeGoals(tree);
@@ -159,17 +179,121 @@
     });
 
     elements.allSpent.textContent = format(spent);
-    elements.allSpentMeta.textContent = spentUnknown ? `Plus ${spentUnknown} completed cost${spentUnknown === 1 ? "" : "s"} not published` : "All completed costs published";
+    elements.allSpentMeta.textContent = `${format(avaPointsEarned)} Ava points earned${spentUnknown ? ` · Plus ${spentUnknown} completed cost${spentUnknown === 1 ? "" : "s"} not published` : " · 165 per badge"}`;
     elements.allRemaining.textContent = format(remaining);
-    elements.allRemainingMeta.textContent = remainingUnknown
-      ? `Plus ${remainingUnknown} level cost${remainingUnknown === 1 ? "" : "s"} not published yet`
-      : "All remaining costs published";
+    elements.allRemainingMeta.textContent = `${format(avaPointsRemaining)} known Ava points available${remainingUnknown ? ` · Plus ${remainingUnknown} level cost${remainingUnknown === 1 ? "" : "s"} not published yet` : " · 165 per badge"}`;
     elements.allLevels.textContent = `${format(levels)} / ${format(totalLevels)}`;
     elements.allPercent.textContent = `${totalLevels ? Math.floor((levels / totalLevels) * 100) : 0}% complete`;
     elements.allGoal.textContent = goalCount ? (goalKnown || goalUnknown ? formatCost(goalKnown, goalUnknown) : "Achieved") : "None";
     elements.allGoalMeta.textContent = goalCount
       ? `${goalCount} node goal${goalCount === 1 ? "" : "s"} across all trees`
       : "Choose a node goal below";
+  }
+
+  function replaceOptions(select, entries, selectedValue) {
+    select.replaceChildren(...entries.map(({ value, label }) => {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = label;
+      return option;
+    }));
+    select.value = selectedValue;
+  }
+
+  function avaPlanEntries() {
+    return Object.entries(state.avaPlan || {}).flatMap(([treeId, nodePlans]) => {
+      const tree = bundle.trees.find((item) => item.id === treeId);
+      if (!tree || !nodePlans || typeof nodePlans !== "object") return [];
+      return Object.entries(nodePlans).flatMap(([nodeId, savedPlan]) => {
+        const node = tree.nodes.find((item) => item.id === nodeId);
+        if (!node || !savedPlan || typeof savedPlan !== "object") return [];
+        const requirement = engine.getLevelRangeRequirement(node, savedPlan.startLevel, savedPlan.targetLevel);
+        return requirement.levels ? [{ tree, node, requirement }] : [];
+      });
+    });
+  }
+
+  function renderAvaCalculatorControls() {
+    const selectedTree = bundle.trees.find((tree) => tree.id === avaCalculatorTreeId)
+      || activeTree();
+    avaCalculatorTreeId = selectedTree.id;
+    replaceOptions(
+      elements.avaTreeSelect,
+      bundle.trees.map((tree) => ({ value: tree.id, label: tree.name })),
+      avaCalculatorTreeId,
+    );
+
+    const selectedNode = selectedTree.nodes.find((node) => node.id === avaCalculatorNodeId)
+      || selectedTree.nodes[0];
+    avaCalculatorNodeId = selectedNode?.id || null;
+    replaceOptions(
+      elements.avaNodeSelect,
+      selectedTree.nodes.map((node) => ({ value: node.id, label: node.name })),
+      avaCalculatorNodeId || "",
+    );
+
+    if (!selectedNode) {
+      replaceOptions(elements.avaLevelSelect, [{ value: "", label: "No research levels available" }], "");
+      elements.avaLevelSelect.disabled = true;
+      elements.addAvaSelection.disabled = true;
+      elements.avaSelectionHint.textContent = "No research levels available";
+      return;
+    }
+
+    const currentLevel = engine.clampLevel(treeProgress(selectedTree)[selectedNode.id], selectedNode.maxLevel);
+    const levels = Array.from({ length: Math.max(0, selectedNode.maxLevel - currentLevel) }, (_, index) => currentLevel + index + 1);
+    replaceOptions(
+      elements.avaLevelSelect,
+      levels.length
+        ? [{ value: "", label: "Choose target level" }, ...levels.map((level) => ({ value: String(level), label: `Level ${level}` }))]
+        : [{ value: "", label: "All levels already complete" }],
+      "",
+    );
+    elements.avaLevelSelect.disabled = levels.length === 0;
+    elements.addAvaSelection.disabled = true;
+    elements.avaSelectionHint.textContent = levels.length
+      ? `Current saved level: ${currentLevel}. The calculator will include levels ${currentLevel + 1} through your target.`
+      : `Level ${currentLevel} is already complete.`;
+  }
+
+  function renderAvaPlan() {
+    const entries = avaPlanEntries();
+    let knownBadges = 0;
+    let unknownCosts = 0;
+    elements.avaPlanList.replaceChildren(...entries.map(({ tree, node, requirement }) => {
+      knownBadges += requirement.badges.known;
+      unknownCosts += requirement.badges.unknown;
+      const item = document.createElement("article");
+      item.className = "ava-plan-item";
+      const firstLevel = requirement.startLevel + 1;
+      const range = firstLevel === requirement.targetLevel
+        ? `Level ${requirement.targetLevel}`
+        : `Levels ${firstLevel}–${requirement.targetLevel}`;
+      item.innerHTML = `
+        <div><small>${tree.name}</small><strong>${node.name}</strong><span>${range}</span></div>
+        <div class="ava-plan-item-totals"><strong>${formatCost(requirement.badges.known, requirement.badges.unknown)} badges</strong><span>${format(requirement.avaPoints)} known Ava points</span></div>
+        <button type="button" aria-label="Remove ${node.name} from today's Ava plan">×</button>`;
+      item.querySelector("button").addEventListener("click", () => {
+        delete state.avaPlan[tree.id][node.id];
+        if (!Object.keys(state.avaPlan[tree.id]).length) delete state.avaPlan[tree.id];
+        saveState();
+        renderAvaPlan();
+      });
+      return item;
+    }));
+    elements.avaPlanEmpty.hidden = entries.length > 0;
+    elements.avaPlanBadgeTotal.textContent = formatCost(knownBadges, unknownCosts);
+    elements.avaPlanPointTotal.textContent = format(engine.getAvaPoints(knownBadges));
+    elements.avaPlanUnknown.hidden = unknownCosts === 0;
+    elements.avaPlanUnknown.textContent = unknownCosts
+      ? `Ava points for ${unknownCosts} unpublished badge cost${unknownCosts === 1 ? "" : "s"} are not included.`
+      : "";
+    elements.clearAvaPlan.disabled = entries.length === 0;
+  }
+
+  function renderAvaCalculator() {
+    renderAvaCalculatorControls();
+    renderAvaPlan();
   }
 
   function renderTreeList() {
@@ -202,7 +326,7 @@
       ? `Unlocks with ${tree.unlockRequirements.join(" · ")}`
       : "No recorded unlock requirement";
     elements.treeProgressLabel.textContent = `${summary.completedLevels} / ${tree.totalLevels} levels`;
-    elements.treeBadgeLabel.textContent = `${format(summary.spentKnown)} known spent · ${format(summary.remainingKnown)} known left${summary.remainingUnknown ? ` · ${summary.remainingUnknown} costs unpublished` : ""}`;
+    elements.treeBadgeLabel.textContent = `${format(summary.spentKnown)} known spent · ${format(summary.remainingKnown)} known left · ${format(summary.avaPointsEarned)} Ava points earned${summary.remainingUnknown ? ` · ${summary.remainingUnknown} costs unpublished` : ""}`;
     elements.treeProgressBar.style.width = `${Math.min(100, summary.levelPercent)}%`;
     elements.treeProgressTrack.setAttribute("aria-valuemax", String(tree.totalLevels));
     elements.treeProgressTrack.setAttribute("aria-valuenow", String(summary.completedLevels));
@@ -226,7 +350,9 @@
     elements.goalDescription.textContent = achieved
       ? "Goal achieved — choose another target whenever you are ready"
       : `${requirement.levels} selected level${requirement.levels === 1 ? "" : "s"} remaining — previous nodes stay exactly as entered`;
-    elements.goalCost.textContent = achieved ? "✓ Achieved" : `${formatCost(requirement.known, requirement.unknown)} badges`;
+    elements.goalCost.textContent = achieved
+      ? "✓ Achieved"
+      : `${formatCost(requirement.known, requirement.unknown)} badges · ${format(requirement.avaPoints)} known Ava points`;
   }
 
   function renderStats(tree) {
@@ -273,6 +399,7 @@
       <h3>${node.name}</h3>
       <span>
         <span class="node-cost"><span>${progress.complete ? "Complete" : "Known remaining"}</span><strong>${progress.complete ? "✓" : format(progress.remaining.known)}</strong></span>
+        <span class="node-ava">${format(progress.avaPoints.remaining)} known Ava points remaining</span>
         ${progress.remaining.unknown ? `<span class="node-unknown">Plus ${progress.remaining.unknown} unpublished cost${progress.remaining.unknown === 1 ? "" : "s"}</span>` : ""}
         <span class="node-meter"><span style="width:${node.maxLevel ? (progress.level / node.maxLevel) * 100 : 0}%"></span></span>
       </span>`;
@@ -307,11 +434,11 @@
     wrap.className = "data-table-wrap";
     wrap.innerHTML = `
       <table class="data-table">
-        <thead><tr><th>Research</th><th>Previous map path</th><th class="right">Level</th><th class="right">Remaining</th></tr></thead>
+        <thead><tr><th>Research</th><th>Previous map path</th><th class="right">Level</th><th class="right">Badges remaining</th><th class="right">Ava points remaining</th></tr></thead>
         <tbody>${nodes.map((node) => {
           const progress = engine.getNodeProgress(node, treeProgress(tree)[node.id]);
           const parentNames = node.parents.map((id) => tree.nodes.find((item) => item.id === id)?.name || id).join(", ") || "None";
-          return `<tr data-node-id="${node.id}" role="button" tabindex="0" aria-haspopup="dialog" aria-label="Open ${node.name}, level ${progress.level} of ${node.maxLevel}"><td><strong>${node.name}</strong></td><td>${parentNames}</td><td class="right ${progress.complete ? "green" : ""}">${progress.level}/${node.maxLevel}</td><td class="right gold">${formatCost(progress.remaining.known, progress.remaining.unknown)}</td></tr>`;
+          return `<tr data-node-id="${node.id}" role="button" tabindex="0" aria-haspopup="dialog" aria-label="Open ${node.name}, level ${progress.level} of ${node.maxLevel}"><td><strong>${node.name}</strong></td><td>${parentNames}</td><td class="right ${progress.complete ? "green" : ""}">${progress.level}/${node.maxLevel}</td><td class="right gold">${formatCost(progress.remaining.known, progress.remaining.unknown)}</td><td class="right cyan">${format(progress.avaPoints.remaining)}</td></tr>`;
         }).join("")}</tbody>
       </table>`;
     wrap.querySelectorAll("tbody tr").forEach((row) => {
@@ -334,6 +461,7 @@
     state.activeTreeId = tree.id;
     const summary = engine.getTreeSummary(tree, treeProgress(tree));
     renderOverall();
+    renderAvaCalculator();
     renderTreeList();
     renderActiveHeader(tree, summary);
     renderGoal(tree);
@@ -353,8 +481,10 @@
     elements.dialogNodeParents.textContent = parents.length ? `Previous map path: ${parents.join(" · ")}` : "Starting node — no previous path";
     elements.nodeSummary.innerHTML = `
       <div><span>Current level</span><strong>${progress.level} / ${node.maxLevel}</strong></div>
-      <div><span>Spent</span><strong>${formatCost(progress.spent.known, progress.spent.unknown)}</strong></div>
-      <div><span>Remaining</span><strong>${formatCost(progress.remaining.known, progress.remaining.unknown)}</strong></div>`;
+      <div><span>Badges spent</span><strong>${formatCost(progress.spent.known, progress.spent.unknown)}</strong></div>
+      <div><span>Badges remaining</span><strong>${formatCost(progress.remaining.known, progress.remaining.unknown)}</strong></div>
+      <div><span>Ava points earned</span><strong>${format(progress.avaPoints.earned)}</strong></div>
+      <div><span>Known Ava points remaining</span><strong>${format(progress.avaPoints.remaining)}</strong></div>`;
     elements.nodeGoalSelect.innerHTML = `<option value="">No goal</option>${Array.from({ length: node.maxLevel }, (_, index) => `<option value="${index + 1}">Level ${index + 1}</option>`).join("")}`;
     elements.nodeGoalSelect.value = String(treeGoals(tree)[node.id] || "");
     elements.nodeLevelList.replaceChildren(...Array.from({ length: node.maxLevel }, (_, index) => {
@@ -369,7 +499,8 @@
         return `${stat.label} ${stat.format === "percent" ? `${value}%` : stat.format === "number" ? `+${format(value)}` : value}`;
       }).filter(Boolean).join(" · ") || "No published stat detail";
       const cost = node.badgeCost[index];
-      row.innerHTML = `<span class="level-check">${level <= progress.level ? "✓" : ""}</span><span class="level-number">Lv ${level}</span><span class="level-cost">${cost === null || cost === undefined ? "? badges" : `${format(cost)} badges`}</span><span class="level-stats">${statText}</span>`;
+      const avaPoints = cost === null || cost === undefined ? null : engine.getAvaPoints(cost);
+      row.innerHTML = `<span class="level-check">${level <= progress.level ? "✓" : ""}</span><span class="level-number">Lv ${level}</span><span class="level-reward"><span>${cost === null || cost === undefined ? "? badges" : `${format(cost)} badges`}</span><strong>${avaPoints === null ? "? Ava points" : `${format(avaPoints)} Ava points`}</strong></span><span class="level-stats">${statText}</span>`;
       row.addEventListener("click", () => {
         const current = treeProgress(tree);
         state.progress[tree.id] = engine.applyNodeLevel(tree, current, node.id, level, state.autoComplete);
@@ -393,6 +524,42 @@
   elements.nodeSearch.addEventListener("input", () => {
     state.search = elements.nodeSearch.value;
     renderWorkspace(activeTree());
+  });
+  elements.avaTreeSelect.addEventListener("change", () => {
+    avaCalculatorTreeId = elements.avaTreeSelect.value;
+    avaCalculatorNodeId = null;
+    renderAvaCalculatorControls();
+  });
+  elements.avaNodeSelect.addEventListener("change", () => {
+    avaCalculatorNodeId = elements.avaNodeSelect.value;
+    renderAvaCalculatorControls();
+  });
+  elements.avaLevelSelect.addEventListener("change", () => {
+    elements.addAvaSelection.disabled = !elements.avaLevelSelect.value;
+  });
+  elements.addAvaSelection.addEventListener("click", () => {
+    const tree = bundle.trees.find((item) => item.id === avaCalculatorTreeId);
+    const node = tree?.nodes.find((item) => item.id === avaCalculatorNodeId);
+    const targetLevel = Number(elements.avaLevelSelect.value);
+    if (!tree || !node || !targetLevel) return;
+    const currentLevel = engine.clampLevel(treeProgress(tree)[node.id], node.maxLevel);
+    if (!state.avaPlan[tree.id]) state.avaPlan[tree.id] = {};
+    const existing = state.avaPlan[tree.id][node.id];
+    const hasExisting = existing && typeof existing === "object"
+      && Number.isFinite(Number(existing.startLevel)) && Number.isFinite(Number(existing.targetLevel));
+    const existingStart = engine.clampLevel(existing?.startLevel, node.maxLevel);
+    const existingTarget = engine.clampLevel(existing?.targetLevel, node.maxLevel);
+    state.avaPlan[tree.id][node.id] = {
+      startLevel: hasExisting ? Math.min(existingStart, currentLevel) : currentLevel,
+      targetLevel: hasExisting ? Math.max(existingTarget, targetLevel) : targetLevel,
+    };
+    saveState();
+    renderAvaCalculator();
+  });
+  elements.clearAvaPlan.addEventListener("click", () => {
+    state.avaPlan = {};
+    saveState();
+    renderAvaPlan();
   });
   elements.mapViewButton.addEventListener("click", () => { state.view = "map"; saveState(); render(); });
   elements.tableViewButton.addEventListener("click", () => { state.view = "table"; saveState(); render(); });
@@ -426,6 +593,8 @@
   window.addEventListener("fl2:profilechange", () => {
     state = loadState();
     openNodeId = null;
+    avaCalculatorTreeId = null;
+    avaCalculatorNodeId = null;
     if (elements.nodeDialog.open) elements.nodeDialog.close();
     if (bundle) render();
   });

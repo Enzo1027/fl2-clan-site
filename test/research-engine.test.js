@@ -17,6 +17,31 @@ test("calculates known and unknown research costs honestly", () => {
   const result = research.getNodeProgress(fireUp, fireUp.maxLevel);
   assert.equal(result.spent.known, 70_430);
   assert.equal(result.spent.unknown, 3);
+  assert.equal(result.avaPoints.earned, 70_430 * 165);
+});
+
+test("converts each consumed badge into 165 Ava points", () => {
+  assert.equal(research.AVA_POINTS_PER_BADGE, 165);
+  assert.equal(research.getAvaPoints(1), 165);
+  assert.equal(research.getAvaPoints(700), 115_500);
+  assert.equal(research.getAvaPoints(null), 0);
+});
+
+test("daily Ava plans total a selected range of research levels", () => {
+  const fireUp = unitTree.nodes.find((node) => node.id === "fire-up");
+  const plan = research.getLevelRangeRequirement(fireUp, 2, 5);
+  assert.equal(plan.levels, 3);
+  assert.equal(plan.badges.known, 1_100 + 1_300 + 1_500);
+  assert.equal(plan.badges.unknown, 0);
+  assert.equal(plan.avaPoints, (1_100 + 1_300 + 1_500) * 165);
+});
+
+test("daily Ava plans preserve unknown level costs without inventing points", () => {
+  const fireUp = armyTree.nodes.find((node) => node.id === "fire-up");
+  const plan = research.getLevelRangeRequirement(fireUp, 0, fireUp.maxLevel);
+  assert.equal(plan.badges.known, 70_430);
+  assert.equal(plan.badges.unknown, 3);
+  assert.equal(plan.avaPoints, 70_430 * 165);
 });
 
 test("auto-complete fills every transitive prerequisite", () => {
@@ -61,12 +86,15 @@ test("tree summary tracks levels, badges, and unknowns", () => {
   const summary = research.getTreeSummary(unitTree, progress);
   assert.equal(summary.completedLevels, 15);
   assert.equal(summary.spentKnown, 5_550 + 21_350);
+  assert.equal(summary.avaPointsEarned, (5_550 + 21_350) * 165);
+  assert.equal(summary.avaPointsRemaining, summary.remainingKnown * 165);
   assert.equal(summary.completedUnknown, 0);
 });
 
 test("a goal counts only the node levels the user selected", () => {
   const goal = research.getGoalRequirement(unitTree, {}, { "unit-special-training": 1 });
   assert.equal(goal.known, 54_900);
+  assert.equal(goal.avaPoints, 54_900 * 165);
   assert.equal(goal.levels, 1);
 });
 
