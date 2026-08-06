@@ -5,6 +5,8 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function createResearchEngine() {
   "use strict";
 
+  const AVA_POINTS_PER_BADGE = 165;
+
   function clampLevel(value, maximum) {
     const number = Number(value);
     if (!Number.isFinite(number)) return 0;
@@ -22,11 +24,38 @@
     );
   }
 
+  function getAvaPoints(badges) {
+    const value = Number(badges);
+    return Number.isFinite(value) && value > 0 ? value * AVA_POINTS_PER_BADGE : 0;
+  }
+
   function getNodeProgress(node, levelValue) {
     const level = clampLevel(levelValue, node.maxLevel);
     const spent = sumCostRange(node.badgeCost, 0, level);
     const remaining = sumCostRange(node.badgeCost, level, node.maxLevel);
-    return { level, spent, remaining, complete: level === node.maxLevel };
+    return {
+      level,
+      spent,
+      remaining,
+      avaPoints: {
+        earned: getAvaPoints(spent.known),
+        remaining: getAvaPoints(remaining.known),
+      },
+      complete: level === node.maxLevel,
+    };
+  }
+
+  function getLevelRangeRequirement(node, startLevelValue, targetLevelValue) {
+    const startLevel = clampLevel(startLevelValue, node.maxLevel);
+    const targetLevel = Math.max(startLevel, clampLevel(targetLevelValue, node.maxLevel));
+    const badges = sumCostRange(node.badgeCost, startLevel, targetLevel);
+    return {
+      startLevel,
+      targetLevel,
+      levels: targetLevel - startLevel,
+      badges,
+      avaPoints: getAvaPoints(badges.known),
+    };
   }
 
   function getPrerequisiteIds(tree, nodeId) {
@@ -108,6 +137,8 @@
     return {
       spentKnown,
       remainingKnown,
+      avaPointsEarned: getAvaPoints(spentKnown),
+      avaPointsRemaining: getAvaPoints(remainingKnown),
       completedUnknown,
       remainingUnknown,
       completedLevels,
@@ -137,9 +168,10 @@
         total.known += gap.known;
         total.unknown += gap.unknown;
         total.levels += target - current;
+        total.avaPoints = getAvaPoints(total.known);
         return total;
       },
-      { known: 0, unknown: 0, levels: 0, targetProgress },
+      { known: 0, unknown: 0, levels: 0, avaPoints: 0, targetProgress },
     );
   }
 
@@ -167,9 +199,12 @@
   }
 
   return {
+    AVA_POINTS_PER_BADGE,
     clampLevel,
     sumCostRange,
+    getAvaPoints,
     getNodeProgress,
+    getLevelRangeRequirement,
     getPrerequisiteIds,
     getDependentIds,
     applyNodeLevel,

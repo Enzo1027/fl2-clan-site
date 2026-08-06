@@ -27,7 +27,7 @@ LANGUAGES = {"es": "Spanish", "fr": "French", "de": "German", "ar": "Arabic", "t
 VISIBLE_ATTRIBUTES = {"aria-label", "title", "placeholder", "alt", "content"}
 SKIP_JSON_KEYS = {"id", "slug", "sourceUrl", "capturedAt", "image", "href", "url"}
 PROTECTED_TERMS = (
-    "FrostBorn Lions", "Last Z", "FL2", "SvS", "HQ", "R&D", "VIP", "UTC", "JSON",
+    "FrostBorn Lions", "Last Z", "FL2", "SvS", "HQ", "R&D", "VIP", "UTC", "JSON", "Ava",
     "Apocalypse Time", "Everfrost", "Discord", "Reddit",
 )
 FRAGMENTS = (
@@ -36,11 +36,12 @@ FRAGMENTS = (
     "auto-saved", "offline ready", "on this device", "privately", "Not set", "Not entered", "Not needed", "Not safe yet",
     "Level", "levels", "level", "Stage", "stages", "stars", "star", "skills", "skill", "days", "weeks", "hours",
     "complete", "completed", "finished", "started", "saved", "spent", "remaining", "remain", "needed", "owned", "total",
-    "published", "unpublished", "known", "unknown", "wrenches", "badges", "medals", "fragments", "books", "resources",
-    "Starting path", "All published stages finished", "No goal", "Achieved", "Data status", "Ready", "Apply", "Clear all",
+    "published", "unpublished", "known", "unknown", "wrenches", "badges", "medals", "fragments", "books", "resources", "Ava points",
+    "Starting path", "All published stages finished", "No goal", "Achieved", "Data status", "Ready", "Apply", "Clear all", "Daily planning",
     "Previous", "Next", "Current", "Target", "Cost", "Progress", "Summary", "Results", "Source", "Sources", "Evidence",
-    "Buy", "Hold", "Skip", "Save", "Open", "Download", "Restore", "Copy", "Search", "Close", "Cancel", "Delete",
-    "not published yet", "not published", "known remaining", "known badges", "known spent", "known left",
+    "Buy", "Hold", "Skip", "Save", "Open", "Download", "Restore", "Copy", "Search", "Close", "Cancel", "Delete", "Add selection",
+    "not published yet", "not published", "known remaining", "known badges", "known spent", "known left", "per badge",
+    "Ava points earned", "Ava points remaining", "known Ava points", "known Ava points available", "known Ava points remaining",
     "selected levels remaining", "selected level remaining", "across all trees", "Unlocks with", "Requires",
     "completed costs", "completed cost", "level costs", "level cost", "node goals", "node goal",
     "Plus", "costs", "cost", "goals", "goal", "nodes", "node", "trees", "tree", "future", "previous",
@@ -53,7 +54,12 @@ TEMPLATES = (
     "{0} level short", "{0} levels short", "{0} Cores",
     "{0} medals saved →", "{0}% complete", "{0}% finished", "{0} of {1} stages started", "{0} wrenches away",
     "At Lv {0} · {1}", "{0} cumulative after this step", "{0} costs unpublished", "{0} known spent · {1} known left",
-    "{0} of {1} levels finished.", "{0} / {1} levels", "{0} badges", "{0} / {1} wrenches",
+    "{0} of {1} levels finished.", "{0} / {1} levels", "{0} badges", "{0} Ava points", "{0} known Ava points", "{0} / {1} wrenches",
+    "{0} Ava points earned", "{0} Ava points remaining", "{0} known Ava points available", "{0} known Ava points remaining",
+    "{0} Ava points earned · {1} per badge", "{0} badges · {1} known Ava points",
+    "Current saved level: {0}. The calculator will include levels {1} through your target.", "Level {0} is already complete.",
+    "Levels {0}–{1}", "Remove {0} from today's Ava plan", "Ava points for {0} unpublished badge cost are not included.",
+    "Ava points for {0} unpublished badge costs are not included.",
     "Switched to {0}", "{0} created on this device", "Profile renamed to {0}", "{0} deleted",
     "Delete {0} and its saved progress from this device?", "Clear all saved progress and goals for {0}?",
     "Jump to {0}, level {1}", "Open level {0} {1}, {2} of {3} complete", "Open {0}, level {1} of {2}",

@@ -31,7 +31,7 @@
           <div class="tool-hero-copy">
             <p class="eyebrow">Your badge roadmap</p>
             <h1 id="pageTitle">Research planner</h1>
-            <p>Tap exactly what you have finished. Every node stays independent, FL2 remembers it on this device, and optional previous-node autofill is there only when you want it.</p>
+            <p>Tap exactly what you have finished. Every node stays independent, FL2 remembers it on this device, and each badge consumed earns 165 Ava points.</p>
           </div>
           <div class="hero-art" aria-hidden="true">
             <div class="research-orbit">
@@ -43,10 +43,32 @@
         </section>
 
         <section class="summary-strip" aria-label="Overall research progress">
-          <article class="summary-card accent"><span>Known badges spent</span><strong id="allSpent">0</strong><small id="allSpentMeta">All completed costs published</small></article>
-          <article class="summary-card gold"><span>Known badges remaining</span><strong id="allRemaining">5,595,164</strong><small id="allRemainingMeta">Plus 27 level costs not published yet</small></article>
+          <article class="summary-card accent"><span>Known badges spent</span><strong id="allSpent">0</strong><small id="allSpentMeta">0 Ava points earned · 165 per badge</small></article>
+          <article class="summary-card gold"><span>Known badges remaining</span><strong id="allRemaining">5,595,164</strong><small id="allRemainingMeta">923,202,060 known Ava points available · Plus 27 level costs not published yet</small></article>
           <article class="summary-card green"><span>Levels finished</span><strong id="allLevels">0 / 1,745</strong><small id="allPercent">0% complete</small></article>
           <article class="summary-card"><span>Active goal</span><strong id="allGoal">None</strong><small id="allGoalMeta">Choose a node goal below</small></article>
+        </section>
+
+        <section class="ava-calculator" aria-labelledby="avaCalculatorTitle">
+          <header class="ava-calculator-head">
+            <div><p class="eyebrow">Daily planning</p><h2 id="avaCalculatorTitle">Today’s Ava calculator</h2><p>Add multiple research targets to see the badges they consume and the Ava points they can earn today.</p></div>
+            <div class="ava-formula"><strong>165</strong><span>Ava points per badge</span></div>
+          </header>
+          <div class="ava-calculator-controls">
+            <label><span>Research tree</span><select class="select-input" id="avaTreeSelect"></select></label>
+            <label><span>Research item</span><select class="select-input" id="avaNodeSelect"></select></label>
+            <label><span>Complete through</span><select class="select-input" id="avaLevelSelect"></select></label>
+            <button class="button" id="addAvaSelection" type="button" disabled>Add selection</button>
+          </div>
+          <p class="ava-selection-hint" id="avaSelectionHint"></p>
+          <div class="ava-plan-list" id="avaPlanList"></div>
+          <p class="ava-plan-empty" id="avaPlanEmpty">No research selected yet. Add as many targets as you want.</p>
+          <div class="ava-plan-total">
+            <div><span>Selected badges</span><strong id="avaPlanBadgeTotal">0</strong></div>
+            <div><span>Potential Ava points</span><strong id="avaPlanPointTotal">0</strong></div>
+            <button class="danger-button" id="clearAvaPlan" type="button" disabled>Clear daily plan</button>
+          </div>
+          <p class="ava-plan-unknown" id="avaPlanUnknown" hidden></p>
         </section>
 
         <section class="local-save-bar" aria-label="Progress storage and backup">
@@ -121,7 +143,7 @@
     <dialog id="nodeDialog" aria-labelledby="dialogNodeTitle">
       <div class="dialog-shell">
         <header class="dialog-head">
-          <div><p class="eyebrow">Research node</p><h2 id="dialogNodeTitle"></h2><p id="dialogNodeParents"></p><p class="dialog-hint">Tap your highest completed level.</p></div>
+          <div><p class="eyebrow">Research node</p><h2 id="dialogNodeTitle"></h2><p id="dialogNodeParents"></p><p class="dialog-hint">Tap your highest completed level. Each row shows badges consumed and Ava points earned.</p></div>
           <button class="dialog-close" id="closeNodeDialog" type="button" aria-label="Close">×</button>
         </header>
         <div class="dialog-body">
